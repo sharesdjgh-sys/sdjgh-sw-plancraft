@@ -1,5 +1,5 @@
 {
-  "name": "ideaspark",
+  "name": "plancraft",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -24,7 +24,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.45.2",
-    "lucide-react": "^1.7.0",
+    "lucide-react": "^0.488.0",
     "next": "16.2.3",
     "next-auth": "^5.0.0-beta.30",
     "react": "19.2.4",

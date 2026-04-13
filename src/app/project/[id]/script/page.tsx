@@ -2,12 +2,41 @@
 
 import { useState, useEffect, use } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Textarea } from "@/components/ui/textarea";
 import AiChat from "@/components/ai-assistant/AiChat";
 import StepIndicator from "@/components/progress-tracker/StepIndicator";
-import { Save, ArrowRight, ArrowLeft, CheckCircle, Sparkles, Check, Download, FileText, Plus, ChevronDown, ChevronUp, Users } from "lucide-react";
-import { getProject, updateProject, type Episode, type Cut, type Project, type Character } from "@/lib/storage";
-import { downloadEpisode, downloadAllEpisodes } from "@/lib/download";
+import { Save, ArrowRight, ArrowLeft, Sparkles, Check, Download, FileText, CheckCircle, Wand2 } from "lucide-react";
+import { getProject, updateProject, type Episode, type Project, type Character } from "@/lib/storage";
+import { downloadProposalScript } from "@/lib/download";
+
+function FeatureListPanel({ episodes }: { episodes: Episode[] }) {
+  if (episodes.length === 0) return null;
+  return (
+    <div className="bg-white rounded-2xl border border-[#EBE7E0] p-4 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-xs font-bold text-[#1A1A1A]">기능 목록</span>
+        <span className="text-[10px] text-[#ADA8A0]">{episodes.length}개</span>
+      </div>
+      <div className="space-y-1">
+        {episodes.map((ep, i) => (
+          <div
+            key={i}
+            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#FBF9F6] border border-[#EBE7E0]"
+          >
+            <div className="w-4 h-4 rounded-full bg-[#C06070]/10 flex items-center justify-center flex-shrink-0">
+              <span className="text-[8px] font-bold text-[#C06070]">{ep.episodeNumber}</span>
+            </div>
+            <span className="text-xs text-[#1A1A1A] truncate flex-1">
+              {ep.title || `기능 ${ep.episodeNumber}`}
+            </span>
+            {ep.isCompleted && <CheckCircle className="w-3 h-3 text-green-500 flex-shrink-0" />}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function CharacterPanel({ characters }: { characters: Character[] }) {
   const [open, setOpen] = useState(true);
@@ -18,12 +47,8 @@ function CharacterPanel({ characters }: { characters: Character[] }) {
         onClick={() => setOpen((o) => !o)}
         className="w-full flex items-center justify-between px-4 py-3 hover:bg-[#F4F1EC] transition-colors"
       >
-        <div className="flex items-center gap-2">
-          <Users className="w-3.5 h-3.5 text-[#C06070]" />
-          <span className="text-xs font-bold text-[#1A1A1A]">이해관계자</span>
-          <span className="text-[10px] text-[#ADA8A0]">{characters.length}명</span>
-        </div>
-        {open ? <ChevronUp className="w-3.5 h-3.5 text-[#ADA8A0]" /> : <ChevronDown className="w-3.5 h-3.5 text-[#ADA8A0]" />}
+        <span className="text-xs font-bold text-[#1A1A1A]">이해관계자</span>
+        <span className="text-[10px] text-[#ADA8A0]">{characters.length}명</span>
       </button>
       {open && (
         <div className="px-4 pb-3 space-y-2">
@@ -46,45 +71,26 @@ function CharacterPanel({ characters }: { characters: Character[] }) {
 
 export default function ScriptPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
+  const router = useRouter();
   const [project, setProject] = useState<Project | null>(null);
-  const [episodes, setEpisodes] = useState<Episode[]>([
-    { episodeNumber: 1, title: "", synopsis: "", cuts: [], script: "", isCompleted: false },
-  ]);
-  const [activeEp, setActiveEp] = useState(0);
+  const [proposalScript, setProposalScript] = useState("");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [autofilling, setAutofilling] = useState(false);
 
   useEffect(() => {
     const p = getProject(id);
     if (p) {
       setProject(p);
-      if (p.episodes.length > 0) {
-        setEpisodes(p.episodes.map((ep) => ({ ...ep, cuts: ep.cuts ?? [] })));
-      }
+      updateProject(id, { currentStep: Math.max(5, p.currentStep) });
+      setProposalScript(p.proposalScript ?? "");
     }
   }, [id]);
-
-  const updateEp = (field: keyof Episode, value: string | boolean | Cut[]) => {
-    setEpisodes((eps) => eps.map((ep, i) => (i === activeEp ? { ...ep, [field]: value } : ep)));
-  };
-
-  const addEpisode = () => {
-    const newEp: Episode = {
-      episodeNumber: episodes.length + 1,
-      title: "",
-      synopsis: "",
-      cuts: [],
-      script: "",
-      isCompleted: false,
-    };
-    setEpisodes((e) => [...e, newEp]);
-    setActiveEp(episodes.length);
-  };
 
   const save = () => {
     setSaving(true);
     updateProject(id, {
-      episodes,
+      proposalScript,
       currentStep: Math.max(5, project?.currentStep ?? 1),
     });
     setSaving(false);
@@ -92,10 +98,40 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
     setTimeout(() => setSaved(false), 2000);
   };
 
-  const ep = episodes[activeEp];
-  const scriptText = ep?.script ?? "";
-  const charCount = scriptText.length;
-  const lineCount = scriptText ? scriptText.split("\n").length : 0;
+  const goNext = () => {
+    updateProject(id, {
+      proposalScript,
+      currentStep: Math.max(5, project?.currentStep ?? 1),
+    });
+    router.push(`/project/${id}/submit`);
+  };
+
+  const autofill = async () => {
+    if (!project?.ideaChat || project.ideaChat.length === 0) {
+      alert("먼저 아이디어 발굴 단계에서 AI와 대화해주세요!");
+      return;
+    }
+    setAutofilling(true);
+    try {
+      const res = await fetch("/api/ai/autofill", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ideaChat: project.ideaChat, step: "script" }),
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      if (data.script) {
+        setProposalScript(data.script);
+      }
+    } catch {
+      alert("자동채우기에 실패했어요. 다시 시도해주세요.");
+    } finally {
+      setAutofilling(false);
+    }
+  };
+
+  const charCount = proposalScript.length;
+  const lineCount = proposalScript ? proposalScript.split("\n").length : 0;
 
   return (
     <div className="min-h-screen bg-[#FBF9F6]">
@@ -112,21 +148,20 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
             <span className="text-xs font-semibold text-[#1A1A1A] truncate">{project?.title ?? "..."}</span>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
+            <button
+              onClick={autofill}
+              disabled={autofilling}
+              className="flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-full border border-[#C06070]/30 text-[#C06070] hover:bg-[#C06070]/5 transition-all duration-200 disabled:opacity-50"
+            >
+              <Wand2 className="w-3.5 h-3.5" /> {autofilling ? "채우는 중..." : "AI 자동채우기"}
+            </button>
             {project && (
-              <>
-                <button
-                  onClick={() => downloadEpisode({ ...project, episodes }, activeEp)}
-                  className="flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] transition-all duration-200"
-                >
-                  <Download className="w-3.5 h-3.5" /> 이 섹션
-                </button>
-                <button
-                  onClick={() => downloadAllEpisodes({ ...project, episodes })}
-                  className="flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] transition-all duration-200"
-                >
-                  <Download className="w-3.5 h-3.5" /> 전체
-                </button>
-              </>
+              <button
+                onClick={() => downloadProposalScript({ ...project, proposalScript })}
+                className="flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] transition-all duration-200"
+              >
+                <Download className="w-3.5 h-3.5" /> 기획서 다운로드
+              </button>
             )}
             <button
               onClick={save}
@@ -143,68 +178,17 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
         {/* Left sidebar */}
         <aside className="w-52 flex-shrink-0 space-y-3 sticky top-20 self-start">
           <div className="bg-white rounded-2xl border border-[#EBE7E0] p-4 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
-            <StepIndicator currentStep={project?.currentStep ?? 1} projectId={id} />
+            <StepIndicator currentStep={project?.currentStep ?? 1} projectId={id} isCompleted={project?.isCompleted} />
           </div>
 
-          <div className="bg-white rounded-2xl border border-[#EBE7E0] p-4 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold text-[#1A1A1A]">섹션 목록</span>
-              <button onClick={addEpisode} className="text-[#C06070] hover:text-[#A8505F] transition-colors">
-                <Plus className="w-4 h-4" />
-              </button>
-            </div>
-            <div className="space-y-1">
-              {episodes.map((ep, i) => (
-                <button
-                  key={i}
-                  onClick={() => setActiveEp(i)}
-                  className={`w-full text-left px-3 py-2 rounded-xl text-xs flex items-center justify-between transition-all duration-200 ${
-                    activeEp === i
-                      ? "bg-[#C06070]/8 text-[#C06070] font-semibold border border-[#C06070]/20"
-                      : "text-[#7A7067] hover:bg-[#F4F1EC]"
-                  }`}
-                >
-                  <span>섹션 {ep.episodeNumber} {ep.title && `· ${ep.title.slice(0, 6)}`}</span>
-                  {ep.isCompleted && <CheckCircle className="w-3.5 h-3.5 text-green-500 flex-shrink-0" />}
-                </button>
-              ))}
-            </div>
-          </div>
+          <FeatureListPanel episodes={project?.episodes ?? []} />
         </aside>
 
         <main className="flex-1 min-w-0 space-y-4">
-          <div className="flex items-center justify-between mb-2">
-            <div>
-              <p className="text-[10px] font-medium text-[#C06070] uppercase tracking-widest mb-1">Step 05</p>
-              <h1 className="text-xl font-bold text-[#1A1A1A] tracking-tight">기획서 내용 작성</h1>
-            </div>
-            <label className="flex items-center gap-2 text-xs text-[#7A7067] cursor-pointer">
-              <input
-                type="checkbox"
-                checked={ep?.isCompleted ?? false}
-                onChange={(e) => updateEp("isCompleted", e.target.checked)}
-                className="rounded accent-[#C06070]"
-              />
-              이 섹션 완료됨
-            </label>
+          <div>
+            <p className="text-[10px] font-medium text-[#C06070] uppercase tracking-widest mb-1">Step 05</p>
+            <h1 className="text-xl font-bold text-[#1A1A1A] tracking-tight">기획서 내용 작성</h1>
           </div>
-
-          {/* 섹션 정보 */}
-          {ep?.title && (
-            <div className="bg-[#F4F1EC] rounded-2xl border border-[#EBE7E0] px-5 py-3 flex items-center gap-3">
-              <FileText className="w-4 h-4 text-[#C06070] flex-shrink-0" />
-              <div>
-                <p className="text-xs font-bold text-[#1A1A1A]">섹션 {ep.episodeNumber}: {ep.title}</p>
-                {ep.synopsis && <p className="text-[10px] text-[#7A7067] mt-0.5 line-clamp-1">{ep.synopsis}</p>}
-              </div>
-              <Link
-                href={`/project/${id}/episodes`}
-                className="ml-auto text-[10px] text-[#ADA8A0] hover:text-[#C06070] transition-colors whitespace-nowrap"
-              >
-                기능 설계 보기 →
-              </Link>
-            </div>
-          )}
 
           {/* 기획서 내용 */}
           <div className="bg-white rounded-2xl border border-[#EBE7E0] shadow-[0_2px_12px_rgba(0,0,0,0.04)] overflow-hidden">
@@ -213,11 +197,13 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
               <span className="text-sm font-bold text-[#1A1A1A]">기획서 내용</span>
             </div>
             <div className="p-5">
-              <p className="text-[10px] text-[#ADA8A0] mb-3">각 섹션의 내용을 자유롭게 작성해봐요</p>
+              <p className="text-[10px] text-[#ADA8A0] mb-3">
+                지금까지 정리한 내용을 바탕으로 완성된 기획서를 작성해봐요. 왼쪽 기능 목록을 참고하세요.
+              </p>
               <Textarea
-                placeholder={`기획서를 작성해주세요.\n\n예시:\n[배경 및 필요성]\n매년 학교 급식에서 발생하는 잔반량은 전국적으로 ...\n\n[해결 방안]\n본 SW는 학생 식단 선호 데이터를 수집하여 ...\n\n[기대 효과]\n잔반량 30% 감소, 급식 만족도 향상 ...`}
-                value={scriptText}
-                onChange={(e) => updateEp("script", e.target.value)}
+                placeholder={`기획서를 작성해주세요.\n\n예시:\n[배경 및 필요성]\n매년 학교 급식에서 발생하는 잔반량은 전국적으로 ...\n\n[해결 방안]\n본 SW는 학생 식단 선호 데이터를 수집하여 ...\n\n[핵심 기능]\n1. 식단 추천 — 학생 선호도 기반 개인화 추천\n2. 잔반 분석 — 섭취량 추적 및 통계 제공\n\n[기대 효과]\n잔반량 30% 감소, 급식 만족도 향상 ...`}
+                value={proposalScript}
+                onChange={(e) => setProposalScript(e.target.value)}
                 rows={26}
                 className="font-mono text-xs"
               />
@@ -242,11 +228,9 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
               >
                 저장
               </button>
-              <Link href={`/project/${id}/submit`}>
-                <button className="flex items-center gap-2 text-xs font-semibold px-5 py-2.5 rounded-full bg-[#C06070] text-white hover:bg-[#A8505F] transition-all duration-300">
-                  다음: 제출 준비 <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </Link>
+              <button onClick={goNext} className="flex items-center gap-2 text-xs font-semibold px-5 py-2.5 rounded-full bg-[#C06070] text-white hover:bg-[#A8505F] transition-all duration-300">
+                다음: 제출 준비 <ArrowRight className="w-3.5 h-3.5" />
+              </button>
             </div>
           </div>
         </main>
@@ -256,7 +240,7 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
           <div className="flex-1 min-h-0">
             <AiChat
               step="script"
-              initialMessage="기획서 작성을 도와드릴게요! 어떤 섹션부터 작성하실 건가요? 배경, 목적, 기능, 기대효과 순서로 작성하면 논리적인 기획서가 완성돼요."
+              initialMessage="기획서 작성을 도와드릴게요! 배경 및 필요성, 해결 방안, 핵심 기능, 기대 효과 순서로 작성하면 논리적인 기획서가 완성돼요."
               placeholder="기획서 작성에 대해 질문하세요..."
             />
           </div>

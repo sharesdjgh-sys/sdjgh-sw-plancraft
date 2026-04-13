@@ -72,6 +72,20 @@ body {
 .hero-enter-2 { animation: float-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.12s both; }
 .hero-enter-3 { animation: float-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.24s both; }
 
+/* Reduced-motion fallback */
+@media (prefers-reduced-motion: reduce) {
+  .hero-enter, .hero-enter-2, .hero-enter-3 {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar        { width: 4px; }
 ::-webkit-scrollbar-track  { background: transparent; }

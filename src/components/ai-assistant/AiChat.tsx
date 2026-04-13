@@ -26,12 +26,16 @@ interface AiChatProps {
   step: string;
   placeholder?: string;
   initialMessage?: string;
+  initialMessages?: Message[];
+  onMessagesChange?: (messages: Message[]) => void;
 }
 
-export default function AiChat({ step, placeholder, initialMessage }: AiChatProps) {
-  const [messages, setMessages] = useState<Message[]>(
-    initialMessage ? [{ role: "assistant", content: initialMessage }] : []
-  );
+export default function AiChat({ step, placeholder, initialMessage, initialMessages, onMessagesChange }: AiChatProps) {
+  const [messages, setMessages] = useState<Message[]>(() => {
+    if (initialMessages && initialMessages.length > 0) return initialMessages;
+    if (initialMessage) return [{ role: "assistant", content: initialMessage }];
+    return [];
+  });
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -45,6 +49,7 @@ export default function AiChat({ step, placeholder, initialMessage }: AiChatProp
     const userMsg: Message = { role: "user", content: input.trim() };
     const next = [...messages, userMsg];
     setMessages(next);
+    onMessagesChange?.(next);
     setInput("");
     setLoading(true);
 
@@ -55,9 +60,13 @@ export default function AiChat({ step, placeholder, initialMessage }: AiChatProp
         body: JSON.stringify({ messages: next, step }),
       });
       const data = await res.json();
-      setMessages([...next, { role: "assistant", content: stripMarkdown(data.reply) }]);
+      const newMessages = [...next, { role: "assistant" as const, content: stripMarkdown(data.reply) }];
+      setMessages(newMessages);
+      onMessagesChange?.(newMessages);
     } catch {
-      setMessages([...next, { role: "assistant", content: "오류가 발생했어요. 다시 시도해주세요." }]);
+      const errMessages = [...next, { role: "assistant" as const, content: "오류가 발생했어요. 다시 시도해주세요." }];
+      setMessages(errMessages);
+      onMessagesChange?.(errMessages);
     } finally {
       setLoading(false);
     }
@@ -96,7 +105,7 @@ export default function AiChat({ step, placeholder, initialMessage }: AiChatProp
         {messages.map((msg, i) => (
           <div key={i} className={`flex gap-2.5 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
             <div className={`w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 ${
-              msg.role === "user" ? "bg-[#1A1A1A]" : "bg-[#C06070]"
+              msg.role === "user" ? "bg-[#A8505F]" : "bg-[#C06070]"
             }`}>
               {msg.role === "user"
                 ? <User className="w-3 h-3 text-white" />
@@ -105,7 +114,7 @@ export default function AiChat({ step, placeholder, initialMessage }: AiChatProp
             </div>
             <div className={`max-w-[82%] rounded-2xl px-3.5 py-2.5 text-xs leading-relaxed ${
               msg.role === "user"
-                ? "bg-[#1A1A1A] text-white rounded-tr-sm"
+                ? "bg-[#C06070] text-white rounded-tr-sm"
                 : "bg-white text-[#1A1A1A] rounded-tl-sm border border-[#EBE7E0] shadow-[0_1px_4px_rgba(0,0,0,0.04)]"
             }`}>
               {msg.content}

@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import AiChat from "@/components/ai-assistant/AiChat";
 import StepIndicator from "@/components/progress-tracker/StepIndicator";
 import { ArrowRight, Sparkles } from "lucide-react";
-import { getProject, updateProject, type Project } from "@/lib/storage";
+import { getProject, updateProject, type Project, type ChatMessage } from "@/lib/storage";
 
 export default function IdeaPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -51,7 +51,7 @@ export default function IdeaPage({ params }: { params: Promise<{ id: string }> }
       <div className="max-w-7xl mx-auto px-4 py-6 flex gap-5">
         <aside className="w-52 flex-shrink-0">
           <div className="bg-white rounded-2xl border border-[#EBE7E0] p-4 sticky top-20 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
-            <StepIndicator currentStep={project?.currentStep ?? 1} projectId={id} />
+            <StepIndicator currentStep={project?.currentStep ?? 1} projectId={id} isCompleted={project?.isCompleted} />
           </div>
         </aside>
 
@@ -66,8 +66,11 @@ export default function IdeaPage({ params }: { params: Promise<{ id: string }> }
 
           <div className="h-[calc(100vh-15rem)]">
             <AiChat
+              key={project?.id ?? "loading"}
               step="idea"
               initialMessage="안녕하세요! SW 아이디어 멘토 아이디어봇이에요 😊 어떤 문제를 SW로 해결하고 싶으신가요? 막막해도 괜찮아요. 학교나 일상에서 불편하거나 개선하고 싶은 점이 있으면 편하게 말해봐요!"
+              initialMessages={project?.ideaChat}
+              onMessagesChange={(msgs) => updateProject(id, { ideaChat: msgs as ChatMessage[] })}
               placeholder="아이디어에 대해 자유롭게 이야기해봐요..."
             />
           </div>

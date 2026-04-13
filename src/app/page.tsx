@@ -24,7 +24,7 @@ export default function HomePage() {
           <div className="w-7 h-7 rounded-lg bg-[#C06070] flex items-center justify-center">
             <Sparkles className="w-3.5 h-3.5 text-white" />
           </div>
-          <span className="text-sm font-semibold tracking-tight text-[#1A1A1A]">IdeaSpark</span>
+          <span className="text-sm font-semibold tracking-tight text-[#1A1A1A]">PlanCraft</span>
         </div>
         <div className="flex items-center gap-5">
           <Link href="/guide" className="text-sm text-[#7A7067] hover:text-[#1A1A1A] transition-colors duration-200">
@@ -300,9 +300,9 @@ export default function HomePage() {
             <div className="w-5 h-5 rounded bg-[#C06070] flex items-center justify-center">
               <Sparkles className="w-2.5 h-2.5 text-white" />
             </div>
-            <span className="text-xs text-[#ADA8A0] font-medium">IdeaSpark</span>
+            <span className="text-xs text-[#ADA8A0] font-medium">PlanCraft</span>
           </div>
-          <p className="text-xs text-[#ADA8A0]">© 2025 IdeaSpark</p>
+          <p className="text-xs text-[#ADA8A0]">© 2025 PlanCraft</p>
         </div>
       </footer>
     </div>

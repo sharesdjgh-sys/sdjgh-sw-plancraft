@@ -127,7 +127,7 @@ export default function DashboardPage() {
             <div className="w-6 h-6 rounded-lg bg-[#C06070] flex items-center justify-center">
               <Sparkles className="w-3 h-3 text-white" />
             </div>
-            <span className="text-sm font-semibold text-[#1A1A1A] tracking-tight">IdeaSpark</span>
+            <span className="text-sm font-semibold text-[#1A1A1A] tracking-tight">PlanCraft</span>
           </Link>
           <div className="flex items-center gap-2">
             <input ref={importRef} type="file" accept=".json" className="hidden" onChange={handleImport} />
@@ -253,7 +253,7 @@ export default function DashboardPage() {
                 <div>
                   <label className="block text-xs font-semibold text-[#1A1A1A] mb-1.5">참가 공모전명</label>
                   <Input
-                    placeholder="예: 창의적 코딩 활동을 통한 SW교육 저변 확대"
+                    placeholder="예: SW 아이디어 공모전"
                     value={form.targetCompetition}
                     onChange={(e) => setForm((f) => ({ ...f, targetCompetition: e.target.value }))}
                   />
@@ -302,7 +302,7 @@ export default function DashboardPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {filtered.map((p) => {
-              const progress = Math.round(((p.currentStep - 1) / 5) * 100);
+              const progress = p.isCompleted ? 100 : Math.round(((p.currentStep - 1) / STEPS.length) * 100);
               const dday = getDday(p.deadline);
               return (
                 <div key={p.id} className="relative group">

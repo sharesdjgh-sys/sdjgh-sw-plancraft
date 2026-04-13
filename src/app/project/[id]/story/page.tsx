@@ -6,16 +6,19 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import AiChat from "@/components/ai-assistant/AiChat";
 import StepIndicator from "@/components/progress-tracker/StepIndicator";
-import { Save, ArrowRight, Sparkles, Check, Download } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Save, ArrowRight, Sparkles, Check, Download, Wand2 } from "lucide-react";
 import { getProject, updateProject, type Project } from "@/lib/storage";
 import { downloadStory } from "@/lib/download";
 
 export default function StoryPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
+  const router = useRouter();
   const [project, setProject] = useState<Project | null>(null);
   const [story, setStory] = useState({ logline: "", theme: "", setting: "", plotOutline: "", totalEpisodes: "1" });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [autofilling, setAutofilling] = useState(false);
 
   useEffect(() => {
     const p = getProject(id);
@@ -32,6 +35,42 @@ export default function StoryPage({ params }: { params: Promise<{ id: string }> 
     setTimeout(() => setSaved(false), 2000);
   };
 
+  const goNext = () => {
+    updateProject(id, {
+      story: { ...story },
+      currentStep: Math.max(2, project?.currentStep ?? 1),
+    });
+    router.push(`/project/${id}/characters`);
+  };
+
+  const autofill = async () => {
+    if (!project?.ideaChat || project.ideaChat.length === 0) {
+      alert("먼저 아이디어 발굴 단계에서 AI와 대화해주세요!");
+      return;
+    }
+    setAutofilling(true);
+    try {
+      const res = await fetch("/api/ai/autofill", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ideaChat: project.ideaChat, step: "story" }),
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      setStory((s) => ({
+        logline: data.logline ?? s.logline,
+        theme: data.theme ?? s.theme,
+        setting: data.setting ?? s.setting,
+        plotOutline: data.plotOutline ?? s.plotOutline,
+        totalEpisodes: data.totalEpisodes ?? s.totalEpisodes,
+      }));
+    } catch (e) {
+      alert("자동채우기에 실패했어요. 다시 시도해주세요.");
+    } finally {
+      setAutofilling(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#FBF9F6]">
       <header className="bg-white border-b border-[#EBE7E0] px-6 py-3.5 sticky top-0 z-40">
@@ -45,12 +84,21 @@ export default function StoryPage({ params }: { params: Promise<{ id: string }> 
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
             {project && (
-              <button
-                onClick={() => downloadStory({ ...project, story })}
-                className="flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] transition-all duration-200"
-              >
-                <Download className="w-3.5 h-3.5" /> 다운로드
-              </button>
+              <>
+                <button
+                  onClick={autofill}
+                  disabled={autofilling}
+                  className="flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-full border border-[#C06070]/30 text-[#C06070] hover:bg-[#C06070]/5 transition-all duration-200 disabled:opacity-50"
+                >
+                  <Wand2 className="w-3.5 h-3.5" /> {autofilling ? "채우는 중..." : "AI 자동채우기"}
+                </button>
+                <button
+                  onClick={() => downloadStory({ ...project, story })}
+                  className="flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] transition-all duration-200"
+                >
+                  <Download className="w-3.5 h-3.5" /> 다운로드
+                </button>
+              </>
             )}
             <button
               onClick={save}
@@ -66,7 +114,7 @@ export default function StoryPage({ params }: { params: Promise<{ id: string }> 
       <div className="max-w-7xl mx-auto px-4 py-6 flex gap-5">
         <aside className="w-52 flex-shrink-0">
           <div className="bg-white rounded-2xl border border-[#EBE7E0] p-4 sticky top-20 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
-            <StepIndicator currentStep={project?.currentStep ?? 1} projectId={id} />
+            <StepIndicator currentStep={project?.currentStep ?? 1} projectId={id} isCompleted={project?.isCompleted} />
           </div>
         </aside>
 
@@ -115,11 +163,9 @@ export default function StoryPage({ params }: { params: Promise<{ id: string }> 
             <button onClick={save} disabled={saving} className="text-xs font-medium px-4 py-2.5 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] transition-all duration-200 disabled:opacity-50">
               저장
             </button>
-            <Link href={`/project/${id}/characters`}>
-              <button className="flex items-center gap-2 text-xs font-semibold px-5 py-2.5 rounded-full bg-[#C06070] text-white hover:bg-[#A8505F] transition-all duration-300">
-                다음: 이해관계자 분석 <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            </Link>
+            <button onClick={goNext} className="flex items-center gap-2 text-xs font-semibold px-5 py-2.5 rounded-full bg-[#C06070] text-white hover:bg-[#A8505F] transition-all duration-300">
+              다음: 이해관계자 분석 <ArrowRight className="w-3.5 h-3.5" />
+            </button>
           </div>
         </main>
 

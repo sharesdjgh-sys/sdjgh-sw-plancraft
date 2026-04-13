@@ -23,6 +23,8 @@ export type Episode = {
   isCompleted: boolean;
 };
 
+export type ChatMessage = { role: "user" | "assistant"; content: string };
+
 export type Project = {
   id: string;
   title: string;
@@ -33,7 +35,9 @@ export type Project = {
   currentStep: number;
   isCompleted: boolean;
   authorNote: string;
+  proposalScript: string;
   createdAt: string;
+  ideaChat?: ChatMessage[];
   story: {
     logline: string;
     theme: string;
@@ -45,7 +49,7 @@ export type Project = {
   episodes: Episode[];
 };
 
-const KEY = "ideaspark_projects";
+const KEY = "plancraft_projects";
 
 export function getProjects(): Project[] {
   if (typeof window === "undefined") return [];
@@ -87,6 +91,7 @@ export function createProject(data: {
     currentStep: 1,
     isCompleted: false,
     authorNote: "",
+    proposalScript: "",
     story: { logline: "", theme: "", setting: "", plotOutline: "", totalEpisodes: "1" },
     characters: [],
     episodes: [{ episodeNumber: 1, title: "", synopsis: "", cuts: [], script: "", isCompleted: false }],

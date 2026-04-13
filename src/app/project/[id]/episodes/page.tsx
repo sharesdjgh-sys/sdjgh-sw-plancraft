@@ -2,11 +2,12 @@
 
 import { useState, useEffect, use } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import AiChat from "@/components/ai-assistant/AiChat";
 import StepIndicator from "@/components/progress-tracker/StepIndicator";
-import { Plus, Trash2, Save, ArrowRight, CheckCircle, Sparkles, Check, Download, Cpu } from "lucide-react";
+import { Plus, Trash2, Save, ArrowRight, CheckCircle, Sparkles, Check, Download, Cpu, Wand2 } from "lucide-react";
 import { getProject, updateProject, type Episode, type Cut, type Project } from "@/lib/storage";
 import { downloadEpisode, downloadAllEpisodes } from "@/lib/download";
 
@@ -14,6 +15,7 @@ const ANGLES = ["사용자 입력", "시스템 처리", "데이터 조회", "결
 
 export default function EpisodesPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
+  const router = useRouter();
   const [project, setProject] = useState<Project | null>(null);
   const [episodes, setEpisodes] = useState<Episode[]>([
     { episodeNumber: 1, title: "", synopsis: "", cuts: [], script: "", isCompleted: false },
@@ -21,11 +23,13 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
   const [activeEp, setActiveEp] = useState(0);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [autofilling, setAutofilling] = useState(false);
 
   useEffect(() => {
     const p = getProject(id);
     if (p) {
       setProject(p);
+      updateProject(id, { currentStep: Math.max(4, p.currentStep) });
       const totalEp = Math.max(1, parseInt(p.story.totalEpisodes) || 1);
       const existing = p.episodes.length > 0
         ? p.episodes.map((ep) => ({ ...ep, cuts: ep.cuts ?? [] }))
@@ -95,6 +99,48 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
     setTimeout(() => setSaved(false), 2000);
   };
 
+  const goNext = () => {
+    updateProject(id, {
+      episodes,
+      currentStep: Math.max(4, project?.currentStep ?? 1),
+    });
+    router.push(`/project/${id}/script`);
+  };
+
+  const autofill = async () => {
+    if (!project?.ideaChat || project.ideaChat.length === 0) {
+      alert("먼저 아이디어 발굴 단계에서 AI와 대화해주세요!");
+      return;
+    }
+    setAutofilling(true);
+    try {
+      const res = await fetch("/api/ai/autofill", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ideaChat: project.ideaChat, step: "episodes" }),
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      if (Array.isArray(data.episodes)) {
+        setEpisodes((prev) =>
+          data.episodes.map((ep: { title: string; synopsis: string }, i: number) => ({
+            episodeNumber: i + 1,
+            title: ep.title ?? "",
+            synopsis: ep.synopsis ?? "",
+            cuts: prev[i]?.cuts ?? [],
+            script: prev[i]?.script ?? "",
+            isCompleted: prev[i]?.isCompleted ?? false,
+          }))
+        );
+        setActiveEp(0);
+      }
+    } catch {
+      alert("자동채우기에 실패했어요. 다시 시도해주세요.");
+    } finally {
+      setAutofilling(false);
+    }
+  };
+
   const ep = episodes[activeEp];
 
   const selectClass =
@@ -117,6 +163,13 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
           <div className="flex items-center gap-2 flex-shrink-0">
             {project && (
               <>
+                <button
+                  onClick={autofill}
+                  disabled={autofilling}
+                  className="flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-full border border-[#C06070]/30 text-[#C06070] hover:bg-[#C06070]/5 transition-all duration-200 disabled:opacity-50"
+                >
+                  <Wand2 className="w-3.5 h-3.5" /> {autofilling ? "채우는 중..." : "AI 자동채우기"}
+                </button>
                 <button
                   onClick={() => downloadEpisode({ ...project, episodes }, activeEp)}
                   className="flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] transition-all duration-200"
@@ -146,7 +199,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
         {/* Left sidebar */}
         <aside className="w-52 flex-shrink-0 space-y-3 sticky top-20 self-start">
           <div className="bg-white rounded-2xl border border-[#EBE7E0] p-4 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
-            <StepIndicator currentStep={project?.currentStep ?? 1} projectId={id} />
+            <StepIndicator currentStep={project?.currentStep ?? 1} projectId={id} isCompleted={project?.isCompleted} />
           </div>
 
           <div className="bg-white rounded-2xl border border-[#EBE7E0] p-4 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
@@ -315,11 +368,9 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
             >
               저장
             </button>
-            <Link href={`/project/${id}/script`}>
-              <button className="flex items-center gap-2 text-xs font-semibold px-5 py-2.5 rounded-full bg-[#C06070] text-white hover:bg-[#A8505F] transition-all duration-300">
-                다음: 기획서 작성 <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            </Link>
+            <button onClick={goNext} className="flex items-center gap-2 text-xs font-semibold px-5 py-2.5 rounded-full bg-[#C06070] text-white hover:bg-[#A8505F] transition-all duration-300">
+              다음: 기획서 작성 <ArrowRight className="w-3.5 h-3.5" />
+            </button>
           </div>
         </main>
 

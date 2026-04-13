@@ -2,11 +2,12 @@
 
 import { useState, useEffect, use } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import AiChat from "@/components/ai-assistant/AiChat";
 import StepIndicator from "@/components/progress-tracker/StepIndicator";
-import { Plus, Trash2, ArrowRight, Check, Save, Sparkles, User, Download } from "lucide-react";
+import { Plus, Trash2, ArrowRight, Check, Save, Sparkles, User, Download, Wand2 } from "lucide-react";
 import { getProject, updateProject, type Character, type Project } from "@/lib/storage";
 import { downloadCharacters } from "@/lib/download";
 
@@ -14,16 +15,19 @@ const ROLES = ["주요 사용자", "보조 사용자", "운영자", "이해관�
 
 export default function CharactersPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
+  const router = useRouter();
   const [project, setProject] = useState<Project | null>(null);
   const [characters, setCharacters] = useState<Character[]>([]);
   const [editIdx, setEditIdx] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [autofilling, setAutofilling] = useState(false);
 
   useEffect(() => {
     const p = getProject(id);
     if (p) {
       setProject(p);
+      updateProject(id, { currentStep: Math.max(3, p.currentStep) });
       if (p.characters.length > 0) setCharacters(p.characters);
     }
   }, [id]);
@@ -54,6 +58,39 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
     setTimeout(() => setSaved(false), 2000);
   };
 
+  const goNext = () => {
+    updateProject(id, {
+      characters,
+      currentStep: Math.max(3, project?.currentStep ?? 1),
+    });
+    router.push(`/project/${id}/episodes`);
+  };
+
+  const autofill = async () => {
+    if (!project?.ideaChat || project.ideaChat.length === 0) {
+      alert("먼저 아이디어 발굴 단계에서 AI와 대화해주세요!");
+      return;
+    }
+    setAutofilling(true);
+    try {
+      const res = await fetch("/api/ai/autofill", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ideaChat: project.ideaChat, step: "character" }),
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      if (Array.isArray(data.characters)) {
+        setCharacters(data.characters);
+        setEditIdx(null);
+      }
+    } catch {
+      alert("자동채우기에 실패했어요. 다시 시도해주세요.");
+    } finally {
+      setAutofilling(false);
+    }
+  };
+
   const selectClass =
     "flex h-10 w-full rounded-xl border border-[#EBE7E0] bg-white px-3 py-2 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#C06070]/20 focus:border-[#C06070]/40 transition-all duration-200";
 
@@ -73,12 +110,21 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
             {project && (
-              <button
-                onClick={() => downloadCharacters({ ...project, characters })}
-                className="flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] transition-all duration-200"
-              >
-                <Download className="w-3.5 h-3.5" /> 다운로드
-              </button>
+              <>
+                <button
+                  onClick={autofill}
+                  disabled={autofilling}
+                  className="flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-full border border-[#C06070]/30 text-[#C06070] hover:bg-[#C06070]/5 transition-all duration-200 disabled:opacity-50"
+                >
+                  <Wand2 className="w-3.5 h-3.5" /> {autofilling ? "채우는 중..." : "AI 자동채우기"}
+                </button>
+                <button
+                  onClick={() => downloadCharacters({ ...project, characters })}
+                  className="flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] transition-all duration-200"
+                >
+                  <Download className="w-3.5 h-3.5" /> 다운로드
+                </button>
+              </>
             )}
             <button
               onClick={save}
@@ -94,7 +140,7 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
       <div className="max-w-7xl mx-auto px-4 py-6 flex gap-5">
         <aside className="w-52 flex-shrink-0">
           <div className="bg-white rounded-2xl border border-[#EBE7E0] p-4 sticky top-20 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
-            <StepIndicator currentStep={project?.currentStep ?? 1} projectId={id} />
+            <StepIndicator currentStep={project?.currentStep ?? 1} projectId={id} isCompleted={project?.isCompleted} />
           </div>
         </aside>
 
@@ -233,11 +279,9 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
             >
               저장
             </button>
-            <Link href={`/project/${id}/episodes`}>
-              <button className="flex items-center gap-2 text-xs font-semibold px-5 py-2.5 rounded-full bg-[#C06070] text-white hover:bg-[#A8505F] transition-all duration-300">
-                다음: 기능 설계 <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            </Link>
+            <button onClick={goNext} className="flex items-center gap-2 text-xs font-semibold px-5 py-2.5 rounded-full bg-[#C06070] text-white hover:bg-[#A8505F] transition-all duration-300">
+              다음: 기능 설계 <ArrowRight className="w-3.5 h-3.5" />
+            </button>
           </div>
         </main>
 

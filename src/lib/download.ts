@@ -15,7 +15,7 @@ function triggerDownload(filename: string, content: string, mimeType: string) {
 export function exportAllProjects() {
   const data = JSON.stringify(getProjects(), null, 2);
   const date = new Date().toISOString().slice(0, 10);
-  triggerDownload(`ideaspark_backup_${date}.json`, data, "application/json");
+  triggerDownload(`plancraft_backup_${date}.json`, data, "application/json");
 }
 
 export function importProjects(file: File): Promise<void> {
@@ -146,6 +146,17 @@ export function downloadAllEpisodes(project: Project) {
   triggerDownload(`${project.title}_전체기능.txt`, lines.join("\n"), "text/plain;charset=utf-8");
 }
 
+export function downloadProposalScript(project: Project) {
+  const lines = [
+    `[ ${project.title} — 기획서 ]`,
+    project.author ? `작성자: ${project.author}` : "",
+    `작성일: ${new Date().toLocaleDateString("ko-KR")}`,
+    "",
+    project.proposalScript || "(미작성)",
+  ].filter(Boolean);
+  triggerDownload(`${project.title}_기획서.txt`, lines.join("\n"), "text/plain;charset=utf-8");
+}
+
 export function downloadFullSummary(project: Project) {
   const s = project.story;
   const lines = [
@@ -170,7 +181,7 @@ export function downloadFullSummary(project: Project) {
       ch.backstory ? `  SW와의 관계: ${ch.backstory}` : "",
       "",
     ]),
-    "═══ 기능 설계 & 기획서 ═══",
+    "═══ 기능 설계 ═══",
     ...project.episodes.flatMap((ep) => {
       const cutLines: string[] = [];
       const cuts = ep.cuts ?? [];
@@ -188,11 +199,11 @@ export function downloadFullSummary(project: Project) {
         ep.synopsis ? `기능 설명: ${ep.synopsis}` : "",
         "",
         ...cutLines,
-        "  [ 기획서 내용 ]",
-        ep.script || "(미작성)",
-        "",
       ];
     }),
+    "═══ 기획서 ═══",
+    project.proposalScript || "(미작성)",
+    "",
   ].filter((l) => l !== undefined);
   triggerDownload(`${project.title}_최종요약.txt`, lines.join("\n"), "text/plain;charset=utf-8");
 }

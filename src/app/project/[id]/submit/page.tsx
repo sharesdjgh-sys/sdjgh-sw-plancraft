@@ -32,6 +32,7 @@ export default function SubmitPage({ params }: { params: Promise<{ id: string }>
     if (p) {
       setProject(p);
       setAuthorNote(p.authorNote ?? "");
+      setCompleted(p.isCompleted ?? false);
       updateProject(id, { currentStep: Math.max(6, p.currentStep) });
     }
   }, [id]);
@@ -65,7 +66,7 @@ export default function SubmitPage({ params }: { params: Promise<{ id: string }>
       <div className="max-w-7xl mx-auto px-4 py-6 flex gap-5">
         <aside className="w-52 flex-shrink-0">
           <div className="bg-white rounded-2xl border border-[#EBE7E0] p-4 sticky top-20 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
-            <StepIndicator currentStep={project?.currentStep ?? 6} projectId={id} />
+            <StepIndicator currentStep={project?.currentStep ?? 6} projectId={id} isCompleted={project?.isCompleted} />
           </div>
         </aside>
 
@@ -139,25 +140,53 @@ export default function SubmitPage({ params }: { params: Promise<{ id: string }>
             />
           </div>
 
-          {isReady && !completed && (
-            <div className="bg-[#F4F1EC] border border-[#EBE7E0] rounded-2xl p-6 text-center">
-              <div className="text-3xl mb-2">🎉</div>
-              <h3 className="text-base font-bold text-[#1A1A1A] mb-1">모든 준비가 완료됐어요!</h3>
-              <p className="text-xs text-[#7A7067] mb-4">훌륭한 SW 기획서를 완성했네요. 공모전에 제출할 준비가 되었어요!</p>
-              <button
-                onClick={markComplete}
-                className="bg-[#C06070] text-white text-sm font-semibold px-6 py-2.5 rounded-full hover:bg-[#A8505F] transition-all duration-300 shadow-[0_4px_16px_rgba(192,96,112,0.25)]"
-              >
-                기획서 완성 완료 표시하기
-              </button>
-            </div>
-          )}
-
-          {completed && (
+          {/* 완료 / 대시보드 섹션 */}
+          {completed ? (
             <div className="bg-[#C06070] rounded-2xl p-6 text-center text-white">
               <div className="text-3xl mb-2">🏆</div>
               <h3 className="text-base font-bold mb-1">축하해요!</h3>
-              <p className="text-xs text-white/80">SW 기획서 작성을 완료했어요. 공모전에서 좋은 결과 있기를 응원해요!</p>
+              <p className="text-xs text-white/80 mb-5">SW 기획서 작성을 완료했어요. 공모전에서 좋은 결과 있기를 응원해요!</p>
+              <div className="flex items-center justify-center gap-3">
+                {project && (
+                  <button
+                    onClick={() => downloadFullSummary(project)}
+                    className="flex items-center gap-2 text-xs font-semibold px-5 py-2.5 rounded-full bg-white/20 text-white hover:bg-white/30 transition-all duration-200"
+                  >
+                    <Download className="w-3.5 h-3.5" /> 최종 요약 다운로드
+                  </button>
+                )}
+                <Link href="/dashboard">
+                  <button className="flex items-center gap-2 text-xs font-semibold px-5 py-2.5 rounded-full bg-white text-[#C06070] hover:bg-white/90 transition-all duration-200">
+                    대시보드로 돌아가기
+                  </button>
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-[#F4F1EC] border border-[#EBE7E0] rounded-2xl p-6">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-sm font-bold text-[#1A1A1A]">
+                    {isReady ? "모든 준비가 완료됐어요! 🎉" : `체크리스트 ${checkedCount}/${CHECKLIST.length} 완료`}
+                  </h3>
+                  <p className="text-xs text-[#7A7067] mt-1">
+                    {isReady
+                      ? "훌륭한 SW 기획서를 완성했네요. 완료 처리 후 대시보드로 돌아가세요."
+                      : "위 체크리스트를 모두 확인하면 완료 버튼이 활성화돼요."}
+                  </p>
+                </div>
+                <button
+                  onClick={markComplete}
+                  disabled={!isReady}
+                  className={`flex-shrink-0 text-xs font-semibold px-5 py-2.5 rounded-full transition-all duration-300 ${
+                    isReady
+                      ? "bg-[#C06070] text-white hover:bg-[#A8505F] shadow-[0_4px_16px_rgba(192,96,112,0.25)]"
+                      : "bg-[#EBE7E0] text-[#ADA8A0] cursor-not-allowed"
+                  }`}
+                >
+                  기획서 완성 완료
+                </button>
+              </div>
             </div>
           )}
 
@@ -167,7 +196,7 @@ export default function SubmitPage({ params }: { params: Promise<{ id: string }>
                 <ArrowLeft className="w-3.5 h-3.5" /> 이전: 기획서 작성
               </button>
             </Link>
-            {project && (
+            {!completed && project && (
               <button
                 onClick={() => downloadFullSummary(project)}
                 className="flex items-center gap-2 text-xs font-semibold px-5 py-2.5 rounded-full border border-[#C06070]/30 text-[#C06070] hover:bg-[#C06070]/5 transition-all duration-200"

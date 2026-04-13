@@ -26,7 +26,7 @@ export default function GuidePage() {
             <div className="w-6 h-6 rounded-lg bg-[#C06070] flex items-center justify-center">
               <Sparkles className="w-3 h-3 text-white" />
             </div>
-            <span className="text-sm font-semibold text-[#1A1A1A] tracking-tight">IdeaSpark</span>
+            <span className="text-sm font-semibold text-[#1A1A1A] tracking-tight">PlanCraft</span>
           </Link>
           <Link href="/dashboard" className="flex items-center gap-1.5 bg-[#C06070] text-white text-xs font-semibold px-4 py-2 rounded-full hover:bg-[#A8505F] transition-all duration-300">
             시작하기 <ArrowRight className="w-3.5 h-3.5" />
