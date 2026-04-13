@@ -1,7 +1,7 @@
 import Link from "next/link";
 import {
   ArrowRight, Lightbulb, Target, Users, Cpu,
-  PenLine, Trophy, Sparkles, Star, Heart
+  PenLine, Trophy, Star, Heart
 } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
 
@@ -21,9 +21,7 @@ export default function HomePage() {
       {/* Nav */}
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-4 bg-[#FBF9F6]/85 backdrop-blur-xl border-b border-[#EBE7E0]">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-[#C06070] flex items-center justify-center">
-            <Sparkles className="w-3.5 h-3.5 text-white" />
-          </div>
+          <img src="/plancraft-logo.jpg" className="w-7 h-7 rounded-lg object-cover" alt="PlanCraft" />
           <span className="text-sm font-semibold tracking-tight text-[#1A1A1A]">PlanCraft</span>
         </div>
         <div className="flex items-center gap-5">
@@ -123,9 +121,7 @@ export default function HomePage() {
 
               <div className="mt-4 pt-4 border-t border-[#EBE7E0]">
                 <div className="flex items-start gap-2.5">
-                  <div className="w-6 h-6 rounded-lg bg-[#C06070] flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Sparkles className="w-3 h-3 text-white" />
-                  </div>
+                  <img src="/plancraft-logo.jpg" className="w-6 h-6 rounded-lg object-cover flex-shrink-0 mt-0.5" alt="" />
                   <div>
                     <p className="text-[10px] text-[#ADA8A0] mb-0.5">AI 멘토 아이디어봇</p>
                     <p className="text-xs text-[#7A7067] leading-relaxed">이해관계자 분석이 완성됐어요! 이제 핵심 기능 설계부터 함께 잡아봐요.</p>
@@ -186,29 +182,19 @@ export default function HomePage() {
           </div>
         </ScrollReveal>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          {/* Wide */}
-          <ScrollReveal delay={0}>
-            <div className="lg:col-span-2 bg-white rounded-3xl border border-[#EBE7E0] p-8 hover:shadow-[0_4px_32px_rgba(0,0,0,0.05)] transition-all duration-300">
-              <div className="w-10 h-10 rounded-xl bg-[#C06070]/10 flex items-center justify-center mb-5">
-                <Sparkles className="w-4.5 h-4.5 text-[#C06070]" />
-              </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <ScrollReveal delay={0} className="h-full">
+            <div className="h-full bg-white rounded-3xl border border-[#EBE7E0] p-8 hover:shadow-[0_4px_32px_rgba(0,0,0,0.05)] transition-all duration-300">
+              <img src="/plancraft-logo.jpg" className="w-10 h-10 rounded-xl object-cover mb-5" alt="" />
               <h3 className="text-xl font-bold tracking-tight mb-2">AI 멘토 아이디어봇</h3>
-              <p className="text-sm text-[#7A7067] leading-relaxed mb-6 max-w-sm">
+              <p className="text-sm text-[#7A7067] leading-relaxed max-w-sm">
                 각 단계마다 전문 AI가 질문에 답하고, 막힌 부분을 함께 돌파해요. 혼자 고민하지 않아도 돼요.
               </p>
-              <div className="flex flex-wrap gap-2">
-                {["아이디어 도우미", "문제 정의 코치", "기능 설계 가이드", "기획서 피드백", "최종 점검"].map((tag) => (
-                  <span key={tag} className="text-xs border border-[#EBE7E0] text-[#7A7067] px-3 py-1.5 rounded-full bg-[#F4F1EC]">
-                    {tag}
-                  </span>
-                ))}
-              </div>
             </div>
           </ScrollReveal>
 
-          <ScrollReveal delay={80}>
-            <div className="bg-[#C06070] rounded-3xl p-8 text-white hover:shadow-[0_4px_32px_rgba(192,96,112,0.3)] transition-all duration-300">
+          <ScrollReveal delay={80} className="h-full">
+            <div className="h-full bg-[#C06070] rounded-3xl p-8 text-white hover:shadow-[0_4px_32px_rgba(192,96,112,0.3)] transition-all duration-300">
               <div className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center mb-5">
                 <Heart className="w-4.5 h-4.5 text-white" />
               </div>
@@ -219,8 +205,8 @@ export default function HomePage() {
             </div>
           </ScrollReveal>
 
-          <ScrollReveal delay={120}>
-            <div className="bg-white rounded-3xl border border-[#EBE7E0] p-8 hover:shadow-[0_4px_32px_rgba(0,0,0,0.05)] transition-all duration-300">
+          <ScrollReveal delay={120} className="h-full">
+            <div className="h-full bg-white rounded-3xl border border-[#EBE7E0] p-8 hover:shadow-[0_4px_32px_rgba(0,0,0,0.05)] transition-all duration-300">
               <div className="w-10 h-10 rounded-xl bg-[#F4F1EC] flex items-center justify-center mb-5">
                 <Trophy className="w-4.5 h-4.5 text-[#7A7067]" />
               </div>
@@ -231,8 +217,8 @@ export default function HomePage() {
             </div>
           </ScrollReveal>
 
-          <ScrollReveal delay={160}>
-            <div className="lg:col-span-2 bg-[#F4F1EC] rounded-3xl border border-[#EBE7E0] p-8 hover:shadow-[0_4px_32px_rgba(0,0,0,0.05)] transition-all duration-300">
+          <ScrollReveal delay={160} className="h-full">
+            <div className="h-full bg-[#F4F1EC] rounded-3xl border border-[#EBE7E0] p-8 hover:shadow-[0_4px_32px_rgba(0,0,0,0.05)] transition-all duration-300">
               <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center mb-5">
                 <PenLine className="w-4.5 h-4.5 text-[#7A7067]" />
               </div>
@@ -240,10 +226,6 @@ export default function HomePage() {
               <p className="text-sm text-[#7A7067] leading-relaxed max-w-sm">
                 기능을 체계적으로 구성하고, AI가 기획서 방향을 제안해요. 막히면 바로 멘토에게 물어봐요.
               </p>
-              <div className="mt-5 inline-flex items-center gap-2 text-xs text-[#C06070] font-medium">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#C06070] animate-pulse" />
-                AI 멘토가 실시간으로 함께해요
-              </div>
             </div>
           </ScrollReveal>
         </div>
@@ -271,20 +253,19 @@ export default function HomePage() {
       {/* CTA */}
       <ScrollReveal>
         <section className="px-8 pb-28 max-w-6xl mx-auto">
-          <div className="relative overflow-hidden bg-[#1A1A1A] rounded-3xl p-12 text-center">
-            {/* Blob inside CTA */}
-            <div className="absolute top-0 right-0 w-72 h-72 bg-[#C06070] blob opacity-20 pointer-events-none" />
+          <div className="relative overflow-hidden bg-[#C06070] rounded-3xl p-12 text-center">
+            <div className="absolute top-0 right-0 w-72 h-72 bg-white blob opacity-10 pointer-events-none" />
             <div className="relative z-10">
-              <p className="text-[#C06070] text-xs font-medium tracking-widest uppercase mb-4">지금 바로</p>
+              <p className="text-white/70 text-xs font-medium tracking-widest uppercase mb-4">지금 바로</p>
               <h2 className="text-3xl font-bold text-white tracking-tight mb-3">
                 공모전 참가를 망설이고 있나요?
               </h2>
-              <p className="text-white/45 text-sm mb-8 leading-relaxed">
+              <p className="text-white/70 text-sm mb-8 leading-relaxed">
                 처음이어도 괜찮아요. AI 멘토가 첫 아이디어부터 마지막 제출까지 함께해요.
               </p>
               <Link
                 href="/dashboard"
-                className="inline-flex items-center gap-2 bg-[#C06070] text-white px-7 py-3.5 rounded-full font-semibold text-sm hover:bg-[#A8505F] transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_24px_rgba(192,96,112,0.4)]"
+                className="inline-flex items-center gap-2 bg-white text-[#C06070] px-7 py-3.5 rounded-full font-semibold text-sm hover:bg-[#FBF9F6] transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_24px_rgba(0,0,0,0.12)]"
               >
                 무료로 시작하기 <ArrowRight className="w-4 h-4" />
               </Link>
@@ -297,12 +278,10 @@ export default function HomePage() {
       <footer className="border-t border-[#EBE7E0] px-8 py-8 bg-white">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded bg-[#C06070] flex items-center justify-center">
-              <Sparkles className="w-2.5 h-2.5 text-white" />
-            </div>
+            <img src="/plancraft-logo.jpg" className="w-5 h-5 rounded object-cover" alt="PlanCraft" />
             <span className="text-xs text-[#ADA8A0] font-medium">PlanCraft</span>
           </div>
-          <p className="text-xs text-[#ADA8A0]">© 2025 PlanCraft</p>
+          <p className="text-xs text-[#ADA8A0]">© 2026 PlanCraft</p>
         </div>
       </footer>
     </div>

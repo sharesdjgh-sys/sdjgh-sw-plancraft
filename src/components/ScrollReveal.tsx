@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, ReactNode } from "react";
 
-export default function ScrollReveal({ children, delay = 0 }: { children: ReactNode; delay?: number }) {
+export default function ScrollReveal({ children, delay = 0, className = "" }: { children: ReactNode; delay?: number; className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -22,7 +22,7 @@ export default function ScrollReveal({ children, delay = 0 }: { children: ReactN
   }, []);
 
   return (
-    <div ref={ref} className="reveal" style={{ transitionDelay: `${delay}ms` }}>
+    <div ref={ref} className={`reveal ${className}`} style={{ transitionDelay: `${delay}ms` }}>
       {children}
     </div>
   );

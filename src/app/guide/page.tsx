@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Lightbulb, Target, Users, Cpu, PenLine, Trophy, Sparkles } from "lucide-react";
+import { ArrowRight, Lightbulb, Target, Users, Cpu, PenLine, Trophy } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
 
 const GUIDE_STEPS = [
@@ -23,9 +23,7 @@ export default function GuidePage() {
       <header className="bg-white border-b border-[#EBE7E0] px-6 py-4 sticky top-0 z-40">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-lg bg-[#C06070] flex items-center justify-center">
-              <Sparkles className="w-3 h-3 text-white" />
-            </div>
+            <img src="/plancraft-logo.jpg" className="w-6 h-6 rounded-lg object-cover" alt="PlanCraft" />
             <span className="text-sm font-semibold text-[#1A1A1A] tracking-tight">PlanCraft</span>
           </Link>
           <Link href="/dashboard" className="flex items-center gap-1.5 bg-[#C06070] text-white text-xs font-semibold px-4 py-2 rounded-full hover:bg-[#A8505F] transition-all duration-300">
@@ -81,13 +79,13 @@ export default function GuidePage() {
         </div>
 
         <ScrollReveal>
-          <div className="mt-10 relative overflow-hidden bg-[#1A1A1A] rounded-3xl p-10 text-center">
-            <div className="absolute top-0 right-0 w-72 h-72 bg-[#C06070] blob opacity-20 pointer-events-none" />
+          <div className="mt-10 relative overflow-hidden bg-[#C06070] rounded-3xl p-10 text-center">
+            <div className="absolute top-0 right-0 w-72 h-72 bg-white blob opacity-10 pointer-events-none" />
             <div className="relative z-10">
-              <p className="text-[#C06070] text-xs font-medium tracking-widest uppercase mb-4">지금 바로</p>
+              <p className="text-white/70 text-xs font-medium tracking-widest uppercase mb-4">지금 바로</p>
               <h2 className="text-2xl font-bold text-white tracking-tight mb-3">시작할 준비가 됐나요?</h2>
-              <p className="text-sm text-white/45 mb-8 leading-relaxed">AI 멘토가 첫 질문부터 마지막 제출까지 함께해요.</p>
-              <Link href="/dashboard" className="inline-flex items-center gap-2 bg-[#C06070] text-white px-6 py-3 rounded-full text-sm font-semibold hover:bg-[#A8505F] transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_24px_rgba(192,96,112,0.4)]">
+              <p className="text-sm text-white/70 mb-8 leading-relaxed">AI 멘토가 첫 질문부터 마지막 제출까지 함께해요.</p>
+              <Link href="/dashboard" className="inline-flex items-center gap-2 bg-white text-[#C06070] px-6 py-3 rounded-full text-sm font-semibold hover:bg-[#FBF9F6] transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_24px_rgba(0,0,0,0.12)]">
                 무료로 시작하기 <ArrowRight className="w-4 h-4" />
               </Link>
             </div>

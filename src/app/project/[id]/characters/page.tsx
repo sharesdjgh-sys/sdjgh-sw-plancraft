@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import AiChat from "@/components/ai-assistant/AiChat";
 import StepIndicator from "@/components/progress-tracker/StepIndicator";
-import { Plus, Trash2, ArrowRight, Check, Save, Sparkles, User, Download, Wand2 } from "lucide-react";
+import { Plus, Trash2, ArrowRight, Check, Save, User, Download, Wand2 } from "lucide-react";
 import { getProject, updateProject, type Character, type Project } from "@/lib/storage";
 import { downloadCharacters } from "@/lib/download";
 
@@ -103,7 +103,7 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
               href="/dashboard"
               className="flex items-center gap-1.5 text-xs text-[#ADA8A0] hover:text-[#7A7067] transition-colors flex-shrink-0"
             >
-              <Sparkles className="w-3 h-3 text-[#C06070]" /> 대시보드
+              <img src="/plancraft-logo.jpg" className="w-3.5 h-3.5 rounded object-cover" alt="" /> 대시보드
             </Link>
             <span className="text-[#EBE7E0]">/</span>
             <span className="text-xs font-semibold text-[#1A1A1A] truncate">{project?.title ?? "..."}</span>

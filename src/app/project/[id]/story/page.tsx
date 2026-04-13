@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import AiChat from "@/components/ai-assistant/AiChat";
 import StepIndicator from "@/components/progress-tracker/StepIndicator";
 import { useRouter } from "next/navigation";
-import { Save, ArrowRight, Sparkles, Check, Download, Wand2 } from "lucide-react";
+import { Save, ArrowRight, Check, Download, Wand2 } from "lucide-react";
 import { getProject, updateProject, type Project } from "@/lib/storage";
 import { downloadStory } from "@/lib/download";
 
@@ -77,7 +77,7 @@ export default function StoryPage({ params }: { params: Promise<{ id: string }> 
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3 min-w-0">
             <Link href="/dashboard" className="flex items-center gap-1.5 text-xs text-[#ADA8A0] hover:text-[#7A7067] transition-colors flex-shrink-0">
-              <Sparkles className="w-3 h-3 text-[#C06070]" /> 대시보드
+              <img src="/plancraft-logo.jpg" className="w-3.5 h-3.5 rounded object-cover" alt="" /> 대시보드
             </Link>
             <span className="text-[#EBE7E0]">/</span>
             <span className="text-xs font-semibold text-[#1A1A1A] truncate">{project?.title ?? "..."}</span>

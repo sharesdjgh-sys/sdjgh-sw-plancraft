@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { STEPS, GENRES } from "@/lib/utils";
-import { Plus, ChevronRight, Sparkles, X, Trophy, Download, Upload, Trash2, User, Pencil, Search } from "lucide-react";
+import { Plus, ChevronRight, X, Trophy, Download, Upload, Trash2, User, Pencil, Search } from "lucide-react";
 import { getProjects, createProject, deleteProject, updateProject, type Project } from "@/lib/storage";
 import { exportAllProjects, importProjects } from "@/lib/download";
 
@@ -124,9 +124,7 @@ export default function DashboardPage() {
       <header className="bg-white border-b border-[#EBE7E0] px-6 py-4 sticky top-0 z-40">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-lg bg-[#C06070] flex items-center justify-center">
-              <Sparkles className="w-3 h-3 text-white" />
-            </div>
+            <img src="/plancraft-logo.jpg" className="w-6 h-6 rounded-lg object-cover" alt="PlanCraft" />
             <span className="text-sm font-semibold text-[#1A1A1A] tracking-tight">PlanCraft</span>
           </Link>
           <div className="flex items-center gap-2">
@@ -282,9 +280,7 @@ export default function DashboardPage() {
         {/* Projects */}
         {projects.length === 0 ? (
           <div className="text-center py-24 bg-white rounded-3xl border border-[#EBE7E0]">
-            <div className="w-14 h-14 rounded-2xl bg-[#F4F1EC] border border-[#EBE7E0] flex items-center justify-center mx-auto mb-5">
-              <Sparkles className="w-6 h-6 text-[#C06070]" />
-            </div>
+            <img src="/plancraft-logo.jpg" className="w-14 h-14 rounded-2xl object-cover mx-auto mb-5" alt="" />
             <p className="text-base font-bold text-[#1A1A1A] mb-1">아직 프로젝트가 없어요</p>
             <p className="text-sm text-[#7A7067] mb-6">첫 번째 SW 아이디어 프로젝트를 만들어볼까요?</p>
             <button
