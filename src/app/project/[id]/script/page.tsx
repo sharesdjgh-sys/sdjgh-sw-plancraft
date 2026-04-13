@@ -20,7 +20,7 @@ function CharacterPanel({ characters }: { characters: Character[] }) {
       >
         <div className="flex items-center gap-2">
           <Users className="w-3.5 h-3.5 text-[#C06070]" />
-          <span className="text-xs font-bold text-[#1A1A1A]">등장인물</span>
+          <span className="text-xs font-bold text-[#1A1A1A]">이해관계자</span>
           <span className="text-[10px] text-[#ADA8A0]">{characters.length}명</span>
         </div>
         {open ? <ChevronUp className="w-3.5 h-3.5 text-[#ADA8A0]" /> : <ChevronDown className="w-3.5 h-3.5 text-[#ADA8A0]" />}
@@ -118,7 +118,7 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
                   onClick={() => downloadEpisode({ ...project, episodes }, activeEp)}
                   className="flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] transition-all duration-200"
                 >
-                  <Download className="w-3.5 h-3.5" /> 이 화
+                  <Download className="w-3.5 h-3.5" /> 이 섹션
                 </button>
                 <button
                   onClick={() => downloadAllEpisodes({ ...project, episodes })}
@@ -148,7 +148,7 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
 
           <div className="bg-white rounded-2xl border border-[#EBE7E0] p-4 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold text-[#1A1A1A]">화 목록</span>
+              <span className="text-xs font-bold text-[#1A1A1A]">섹션 목록</span>
               <button onClick={addEpisode} className="text-[#C06070] hover:text-[#A8505F] transition-colors">
                 <Plus className="w-4 h-4" />
               </button>
@@ -164,7 +164,7 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
                       : "text-[#7A7067] hover:bg-[#F4F1EC]"
                   }`}
                 >
-                  <span>{ep.episodeNumber}화 {ep.title && `· ${ep.title.slice(0, 6)}`}</span>
+                  <span>섹션 {ep.episodeNumber} {ep.title && `· ${ep.title.slice(0, 6)}`}</span>
                   {ep.isCompleted && <CheckCircle className="w-3.5 h-3.5 text-green-500 flex-shrink-0" />}
                 </button>
               ))}
@@ -176,7 +176,7 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
           <div className="flex items-center justify-between mb-2">
             <div>
               <p className="text-[10px] font-medium text-[#C06070] uppercase tracking-widest mb-1">Step 05</p>
-              <h1 className="text-xl font-bold text-[#1A1A1A] tracking-tight">{ep?.episodeNumber}화 대본 작성</h1>
+              <h1 className="text-xl font-bold text-[#1A1A1A] tracking-tight">기획서 내용 작성</h1>
             </div>
             <label className="flex items-center gap-2 text-xs text-[#7A7067] cursor-pointer">
               <input
@@ -185,37 +185,37 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
                 onChange={(e) => updateEp("isCompleted", e.target.checked)}
                 className="rounded accent-[#C06070]"
               />
-              이 화 완료됨
+              이 섹션 완료됨
             </label>
           </div>
 
-          {/* 화 정보 */}
+          {/* 섹션 정보 */}
           {ep?.title && (
             <div className="bg-[#F4F1EC] rounded-2xl border border-[#EBE7E0] px-5 py-3 flex items-center gap-3">
               <FileText className="w-4 h-4 text-[#C06070] flex-shrink-0" />
               <div>
-                <p className="text-xs font-bold text-[#1A1A1A]">{ep.episodeNumber}화: {ep.title}</p>
+                <p className="text-xs font-bold text-[#1A1A1A]">섹션 {ep.episodeNumber}: {ep.title}</p>
                 {ep.synopsis && <p className="text-[10px] text-[#7A7067] mt-0.5 line-clamp-1">{ep.synopsis}</p>}
               </div>
               <Link
                 href={`/project/${id}/episodes`}
                 className="ml-auto text-[10px] text-[#ADA8A0] hover:text-[#C06070] transition-colors whitespace-nowrap"
               >
-                콘티 보기 →
+                기능 설계 보기 →
               </Link>
             </div>
           )}
 
-          {/* 대본 */}
+          {/* 기획서 내용 */}
           <div className="bg-white rounded-2xl border border-[#EBE7E0] shadow-[0_2px_12px_rgba(0,0,0,0.04)] overflow-hidden">
             <div className="flex items-center gap-2 px-5 py-4 border-b border-[#EBE7E0]">
               <FileText className="w-4 h-4 text-[#C06070]" />
-              <span className="text-sm font-bold text-[#1A1A1A]">대본</span>
+              <span className="text-sm font-bold text-[#1A1A1A]">기획서 내용</span>
             </div>
             <div className="p-5">
-              <p className="text-[10px] text-[#ADA8A0] mb-3">장면 묘사, 대사, 효과음을 자유롭게 써봐요</p>
+              <p className="text-[10px] text-[#ADA8A0] mb-3">각 섹션의 내용을 자유롭게 작성해봐요</p>
               <Textarea
-                placeholder={`대본을 작성해주세요.\n\n예시:\n[장면1: 학교 복도, 낮]\n(주인공이 급하게 달려온다)\n주인공: "늦었어! 어떡해!"\n친구: (손을 흔들며) "여기야!"`}
+                placeholder={`기획서를 작성해주세요.\n\n예시:\n[배경 및 필요성]\n매년 학교 급식에서 발생하는 잔반량은 전국적으로 ...\n\n[해결 방안]\n본 SW는 학생 식단 선호 데이터를 수집하여 ...\n\n[기대 효과]\n잔반량 30% 감소, 급식 만족도 향상 ...`}
                 value={scriptText}
                 onChange={(e) => updateEp("script", e.target.value)}
                 rows={26}
@@ -231,7 +231,7 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
           <div className="flex justify-between gap-3">
             <Link href={`/project/${id}/episodes`}>
               <button className="flex items-center gap-2 text-xs font-medium px-4 py-2.5 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] transition-all duration-200">
-                <ArrowLeft className="w-3.5 h-3.5" /> 이전: 콘티 제작
+                <ArrowLeft className="w-3.5 h-3.5" /> 이전: 기능 설계
               </button>
             </Link>
             <div className="flex gap-3">
@@ -256,8 +256,8 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
           <div className="flex-1 min-h-0">
             <AiChat
               step="script"
-              initialMessage="대본 작업을 도와드릴게요! 대사나 장면 묘사에 대해 도움이 필요하시면 말씀해 주세요!"
-              placeholder="대본·대사에 대해 질문하세요..."
+              initialMessage="기획서 작성을 도와드릴게요! 어떤 섹션부터 작성하실 건가요? 배경, 목적, 기능, 기대효과 순서로 작성하면 논리적인 기획서가 완성돼요."
+              placeholder="기획서 작성에 대해 질문하세요..."
             />
           </div>
         </aside>

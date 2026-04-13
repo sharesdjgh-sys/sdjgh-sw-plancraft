@@ -7,14 +7,14 @@ export function cn(...inputs: ClassValue[]) {
 
 export const STEPS = [
   { id: 1, label: "아이디어 발굴", icon: "💡", route: "idea" },
-  { id: 2, label: "스토리 구성", icon: "📖", route: "story" },
-  { id: 3, label: "캐릭터 설계", icon: "👤", route: "characters" },
-  { id: 4, label: "콘티 제작", icon: "🎬", route: "episodes" },
-  { id: 5, label: "대본 작성", icon: "✍️", route: "script" },
-  { id: 6, label: "제출 준비", icon: "🏆", route: "submit" },
+  { id: 2, label: "문제 정의", icon: "🎯", route: "story" },
+  { id: 3, label: "이해관계자 분석", icon: "👥", route: "characters" },
+  { id: 4, label: "기능 설계", icon: "⚙️", route: "episodes" },
+  { id: 5, label: "기획서 작성", icon: "📝", route: "script" },
+  { id: 6, label: "최종 검토", icon: "✅", route: "submit" },
 ];
 
 export const GENRES = [
-  "판타지", "로맨스", "액션", "SF", "일상", "학원",
-  "스포츠", "공포/스릴러", "개그/코미디", "역사", "음악", "기타"
+  "교육", "환경·에너지", "의료·건강", "사회복지", "교통·이동",
+  "안전·재난", "문화·예술", "농업·식품", "스포츠", "지역사회", "기타"
 ];

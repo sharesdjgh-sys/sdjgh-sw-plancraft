@@ -10,7 +10,7 @@ import { Plus, Trash2, ArrowRight, Check, Save, Sparkles, User, Download } from 
 import { getProject, updateProject, type Character, type Project } from "@/lib/storage";
 import { downloadCharacters } from "@/lib/download";
 
-const ROLES = ["주인공", "조력자", "악당(빌런)", "조연", "기타"];
+const ROLES = ["주요 사용자", "보조 사용자", "운영자", "이해관계자", "기타"];
 
 export default function CharactersPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -29,7 +29,7 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
   }, [id]);
 
   const addCharacter = () => {
-    const newChar: Character = { name: "", role: "주인공", age: "", appearance: "", personality: "", backstory: "" };
+    const newChar: Character = { name: "", role: "주요 사용자", age: "", appearance: "", personality: "", backstory: "" };
     setCharacters((c) => [...c, newChar]);
     setEditIdx(characters.length);
   };
@@ -102,13 +102,13 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
           <div className="flex items-center justify-between mb-2">
             <div>
               <p className="text-[10px] font-medium text-[#C06070] uppercase tracking-widest mb-1">Step 03</p>
-              <h1 className="text-xl font-bold text-[#1A1A1A] tracking-tight">캐릭터 설계</h1>
+              <h1 className="text-xl font-bold text-[#1A1A1A] tracking-tight">이해관계자 분석</h1>
             </div>
             <button
               onClick={addCharacter}
               className="flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] hover:border-[#C06070]/30 transition-all duration-200"
             >
-              <Plus className="w-3.5 h-3.5" /> 캐릭터 추가
+              <Plus className="w-3.5 h-3.5" /> 이해관계자 추가
             </button>
           </div>
 
@@ -117,13 +117,13 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
               <div className="w-12 h-12 rounded-2xl bg-[#F4F1EC] flex items-center justify-center mx-auto mb-4">
                 <User className="w-5 h-5 text-[#ADA8A0]" />
               </div>
-              <p className="text-sm font-semibold text-[#1A1A1A] mb-1">아직 캐릭터가 없어요</p>
-              <p className="text-xs text-[#7A7067] mb-5">첫 번째 캐릭터를 추가해봐요!</p>
+              <p className="text-sm font-semibold text-[#1A1A1A] mb-1">아직 이해관계자가 없어요</p>
+              <p className="text-xs text-[#7A7067] mb-5">첫 번째 이해관계자를 추가해봐요!</p>
               <button
                 onClick={addCharacter}
                 className="inline-flex items-center gap-2 bg-[#C06070] text-white text-xs font-medium px-5 py-2.5 rounded-full hover:bg-[#A8505F] transition-all duration-300"
               >
-                <Plus className="w-3.5 h-3.5" /> 캐릭터 추가하기
+                <Plus className="w-3.5 h-3.5" /> 이해관계자 추가하기
               </button>
             </div>
           ) : (
@@ -138,7 +138,7 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
                   <div className="flex items-center justify-between px-5 py-3.5">
                     <div className="flex items-center gap-3">
                       <span className="text-xl">
-                        {ch.role === "주인공" ? "🦸" : ch.role === "악당(빌런)" ? "😈" : "👤"}
+                        {ch.role === "주요 사용자" ? "🙋" : ch.role === "운영자" ? "⚙️" : "👤"}
                       </span>
                       <div>
                         <p className="text-sm font-bold text-[#1A1A1A]">{ch.name || "이름 없음"}</p>
@@ -165,11 +165,11 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
                     <div className="px-5 pb-5 space-y-3 border-t border-[#EBE7E0] pt-4">
                       <div className="grid grid-cols-3 gap-3">
                         <div>
-                          <label className="block text-xs font-semibold text-[#1A1A1A] mb-1.5">이름 *</label>
+                          <label className="block text-xs font-semibold text-[#1A1A1A] mb-1.5">대상 이름 *</label>
                           <Input
                             value={ch.name}
                             onChange={(e) => updateChar(idx, "name", e.target.value)}
-                            placeholder="캐릭터 이름"
+                            placeholder="예: 고등학생, 학교 선생님"
                           />
                         </div>
                         <div>
@@ -183,38 +183,38 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
                           </select>
                         </div>
                         <div>
-                          <label className="block text-xs font-semibold text-[#1A1A1A] mb-1.5">나이/학년</label>
+                          <label className="block text-xs font-semibold text-[#1A1A1A] mb-1.5">연령/특성</label>
                           <Input
                             value={ch.age}
                             onChange={(e) => updateChar(idx, "age", e.target.value)}
-                            placeholder="예: 17세, 고2"
+                            placeholder="예: 15~17세, 고등학생"
                           />
                         </div>
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-[#1A1A1A] mb-1.5">외모 묘사</label>
+                        <label className="block text-xs font-semibold text-[#1A1A1A] mb-1.5">현재 불편함</label>
                         <Textarea
                           value={ch.appearance}
                           onChange={(e) => updateChar(idx, "appearance", e.target.value)}
-                          placeholder="머리카락 색, 키, 특징적인 외모 등을 자세히 써주세요"
+                          placeholder="이 대상이 현재 겪고 있는 불편함이나 문제점을 구체적으로 써주세요"
                           rows={2}
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-[#1A1A1A] mb-1.5">성격</label>
+                        <label className="block text-xs font-semibold text-[#1A1A1A] mb-1.5">SW 사용 목적</label>
                         <Textarea
                           value={ch.personality}
                           onChange={(e) => updateChar(idx, "personality", e.target.value)}
-                          placeholder="어떤 성격인가요? 장점과 단점 모두 적어주세요"
+                          placeholder="이 SW를 통해 무엇을 얻고 싶어 하나요? 어떤 목적으로 사용하나요?"
                           rows={2}
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-[#1A1A1A] mb-1.5">배경 이야기</label>
+                        <label className="block text-xs font-semibold text-[#1A1A1A] mb-1.5">SW와의 관계</label>
                         <Textarea
                           value={ch.backstory}
                           onChange={(e) => updateChar(idx, "backstory", e.target.value)}
-                          placeholder="캐릭터의 과거, 목표, 동기는 무엇인가요?"
+                          placeholder="이 SW가 이 대상에게 어떤 영향을 미치나요? 직접 사용자인가요, 간접 영향을 받나요?"
                           rows={2}
                         />
                       </div>
@@ -235,7 +235,7 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
             </button>
             <Link href={`/project/${id}/episodes`}>
               <button className="flex items-center gap-2 text-xs font-semibold px-5 py-2.5 rounded-full bg-[#C06070] text-white hover:bg-[#A8505F] transition-all duration-300">
-                다음: 콘티 & 대본 <ArrowRight className="w-3.5 h-3.5" />
+                다음: 기능 설계 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </Link>
           </div>
@@ -244,8 +244,8 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
         <aside className="w-72 flex-shrink-0 h-[calc(100vh-5rem)] sticky top-20">
           <AiChat
             step="character"
-            initialMessage="캐릭터 설계를 도와드릴게요! 어떤 캐릭터를 만들고 싶으신가요? 주인공의 이름과 역할부터 알려주세요!"
-            placeholder="캐릭터에 대해 도움받고 싶은 것을 말씀해주세요..."
+            initialMessage="이해관계자 분석을 도와드릴게요! 이 SW를 사용하게 될 주요 대상이 누구인가요? 어떤 사람들이 혜택을 받을지 생각해봐요."
+            placeholder="이해관계자 분석에 대해 질문하세요..."
           />
         </aside>
       </div>

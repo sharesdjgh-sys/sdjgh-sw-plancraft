@@ -127,7 +127,7 @@ export default function DashboardPage() {
             <div className="w-6 h-6 rounded-lg bg-[#C06070] flex items-center justify-center">
               <Sparkles className="w-3 h-3 text-white" />
             </div>
-            <span className="text-sm font-semibold text-[#1A1A1A] tracking-tight">웹툰 메이커 AI</span>
+            <span className="text-sm font-semibold text-[#1A1A1A] tracking-tight">IdeaSpark</span>
           </Link>
           <div className="flex items-center gap-2">
             <input ref={importRef} type="file" accept=".json" className="hidden" onChange={handleImport} />
@@ -155,7 +155,7 @@ export default function DashboardPage() {
         <div className="flex items-end justify-between mb-8">
           <div>
             <p className="text-xs font-medium text-[#C06070] mb-1">{greeting()}</p>
-            <h1 className="text-2xl font-bold text-[#1A1A1A] tracking-tight">내 웹툰 프로젝트</h1>
+            <h1 className="text-2xl font-bold text-[#1A1A1A] tracking-tight">내 SW 아이디어</h1>
           </div>
           <button
             onClick={openCreate}
@@ -197,10 +197,10 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h2 className="text-lg font-bold text-[#1A1A1A] tracking-tight">
-                    {editingId ? "프로젝트 정보 수정" : "새 웹툰 프로젝트"}
+                    {editingId ? "프로젝트 정보 수정" : "새 SW 아이디어 프로젝트"}
                   </h2>
                   <p className="text-xs text-[#ADA8A0] mt-0.5">
-                    {editingId ? "수정할 내용을 입력해주세요." : "어떤 이야기를 만들어볼까요?"}
+                    {editingId ? "수정할 내용을 입력해주세요." : "어떤 문제를 해결하고 싶으신가요?"}
                   </p>
                 </div>
                 <button onClick={() => setShowModal(false)} className="text-[#ADA8A0] hover:text-[#7A7067] transition-colors">
@@ -210,16 +210,16 @@ export default function DashboardPage() {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-[#1A1A1A] mb-1.5">웹툰 제목 *</label>
+                    <label className="block text-xs font-semibold text-[#1A1A1A] mb-1.5">프로젝트 제목 *</label>
                     <Input
-                      placeholder="예: 마법을 잃은 탐정"
+                      placeholder="예: 급식 잔반 줄이기 앱"
                       value={form.title}
                       onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-[#1A1A1A] mb-1.5">작가 이름</label>
+                    <label className="block text-xs font-semibold text-[#1A1A1A] mb-1.5">팀/작성자 이름</label>
                     <Input
                       placeholder="예: 홍길동"
                       value={form.author}
@@ -229,13 +229,13 @@ export default function DashboardPage() {
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-[#1A1A1A] mb-1.5">장르</label>
+                    <label className="block text-xs font-semibold text-[#1A1A1A] mb-1.5">SW 분야</label>
                     <select
                       value={form.genre}
                       onChange={(e) => setForm((f) => ({ ...f, genre: e.target.value }))}
                       className={selectClass}
                     >
-                      <option value="">장르 선택</option>
+                      <option value="">분야 선택</option>
                       {GENRES.map((g) => (
                         <option key={g} value={g}>{g}</option>
                       ))}
@@ -251,9 +251,9 @@ export default function DashboardPage() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-[#1A1A1A] mb-1.5">참가 대회명</label>
+                  <label className="block text-xs font-semibold text-[#1A1A1A] mb-1.5">참가 공모전명</label>
                   <Input
-                    placeholder="예: 2026 AI 웹툰 창작 대회"
+                    placeholder="예: 창의적 코딩 활동을 통한 SW교육 저변 확대"
                     value={form.targetCompetition}
                     onChange={(e) => setForm((f) => ({ ...f, targetCompetition: e.target.value }))}
                   />
@@ -286,7 +286,7 @@ export default function DashboardPage() {
               <Sparkles className="w-6 h-6 text-[#C06070]" />
             </div>
             <p className="text-base font-bold text-[#1A1A1A] mb-1">아직 프로젝트가 없어요</p>
-            <p className="text-sm text-[#7A7067] mb-6">첫 번째 웹툰 프로젝트를 만들어볼까요?</p>
+            <p className="text-sm text-[#7A7067] mb-6">첫 번째 SW 아이디어 프로젝트를 만들어볼까요?</p>
             <button
               onClick={openCreate}
               className="inline-flex items-center gap-2 bg-[#C06070] text-white text-sm font-medium px-5 py-2.5 rounded-full hover:bg-[#A8505F] transition-all duration-300 shadow-[0_4px_16px_rgba(192,96,112,0.25)]"

@@ -73,41 +73,41 @@ export default function StoryPage({ params }: { params: Promise<{ id: string }> 
         <main className="flex-1 min-w-0 space-y-4">
           <div className="mb-2">
             <p className="text-[10px] font-medium text-[#C06070] uppercase tracking-widest mb-1">Step 02</p>
-            <h1 className="text-xl font-bold text-[#1A1A1A] tracking-tight">스토리 구성</h1>
+            <h1 className="text-xl font-bold text-[#1A1A1A] tracking-tight">문제 정의</h1>
           </div>
 
           <div className="bg-white rounded-2xl border border-[#EBE7E0] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
-            <label className="block text-xs font-bold text-[#1A1A1A] mb-1">한 줄 소개 (로그라인)</label>
-            <p className="text-[10px] text-[#ADA8A0] mb-3">독자가 읽었을 때 이야기가 궁금해지는 한 문장</p>
-            <Input placeholder="예: 마법을 잃은 마법사가 평범한 고등학생이 되어 사건을 해결하는 이야기" value={story.logline} onChange={(e) => setStory((s) => ({ ...s, logline: e.target.value }))} />
+            <label className="block text-xs font-bold text-[#1A1A1A] mb-1">아이디어 한 줄 소개</label>
+            <p className="text-[10px] text-[#ADA8A0] mb-3">심사위원이 읽었을 때 SW가 궁금해지는 한 문장</p>
+            <Input placeholder="예: 급식 잔반 데이터를 분석해 학교 식단을 개선하는 AI 추천 시스템" value={story.logline} onChange={(e) => setStory((s) => ({ ...s, logline: e.target.value }))} />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-white rounded-2xl border border-[#EBE7E0] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
-              <label className="block text-xs font-bold text-[#1A1A1A] mb-1">주제 / 메시지</label>
-              <p className="text-[10px] text-[#ADA8A0] mb-3">독자에게 전달하고 싶은 메시지</p>
-              <Textarea placeholder="이 웹툰으로 독자에게 전달하고 싶은 메시지는 무엇인가요?" value={story.theme} onChange={(e) => setStory((s) => ({ ...s, theme: e.target.value }))} rows={4} />
+              <label className="block text-xs font-bold text-[#1A1A1A] mb-1">해결하려는 문제</label>
+              <p className="text-[10px] text-[#ADA8A0] mb-3">왜 이 문제가 중요한지, 현재 어떤 불편함이 있는지</p>
+              <Textarea placeholder="어떤 사회적 문제 또는 불편함을 해결하려 하나요? 현재 상황과 문제의 심각성을 구체적으로 써봐요." value={story.theme} onChange={(e) => setStory((s) => ({ ...s, theme: e.target.value }))} rows={4} />
             </div>
             <div className="bg-white rounded-2xl border border-[#EBE7E0] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
-              <label className="block text-xs font-bold text-[#1A1A1A] mb-1">배경 / 세계관</label>
-              <p className="text-[10px] text-[#ADA8A0] mb-3">이야기가 펼쳐지는 시간과 공간</p>
-              <Textarea placeholder="배경 설정을 설명해주세요" value={story.setting} onChange={(e) => setStory((s) => ({ ...s, setting: e.target.value }))} rows={4} />
+              <label className="block text-xs font-bold text-[#1A1A1A] mb-1">배경 및 필요성</label>
+              <p className="text-[10px] text-[#ADA8A0] mb-3">문제가 발생하는 환경, 관련 통계나 사례</p>
+              <Textarea placeholder="문제가 발생하는 배경과 이 SW가 왜 필요한지 설명해주세요." value={story.setting} onChange={(e) => setStory((s) => ({ ...s, setting: e.target.value }))} rows={4} />
             </div>
           </div>
 
           <div className="bg-white rounded-2xl border border-[#EBE7E0] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
-            <label className="block text-xs font-bold text-[#1A1A1A] mb-1">전체 줄거리 (기승전결)</label>
-            <p className="text-[10px] text-[#ADA8A0] mb-3">이야기의 흐름을 4단계로 정리해보세요</p>
+            <label className="block text-xs font-bold text-[#1A1A1A] mb-1">기능 개요</label>
+            <p className="text-[10px] text-[#ADA8A0] mb-3">SW가 어떻게 문제를 해결하는지 전체적인 흐름을 정리해보세요</p>
             <Textarea
-              placeholder={`기: 주인공 소개와 사건의 발단\n승: 갈등이 심화되는 과정\n전: 가장 큰 위기와 반전\n결: 결말과 해결`}
+              placeholder={`문제 인식: 어떤 상황에서 SW가 필요한가\n해결 방식: SW가 어떻게 작동하는가\n주요 기능: 핵심 기능 목록\n기대 효과: 사용 후 어떤 변화가 생기는가`}
               value={story.plotOutline}
               onChange={(e) => setStory((s) => ({ ...s, plotOutline: e.target.value }))}
               rows={10}
             />
             <div className="flex items-center gap-3 mt-3 pt-3 border-t border-[#EBE7E0]">
-              <label className="text-xs font-semibold text-[#1A1A1A] whitespace-nowrap">총 화 수</label>
-              <Input type="number" min="1" max="100" value={story.totalEpisodes} onChange={(e) => setStory((s) => ({ ...s, totalEpisodes: e.target.value }))} className="w-20" />
-              <span className="text-xs text-[#ADA8A0]">화</span>
+              <label className="text-xs font-semibold text-[#1A1A1A] whitespace-nowrap">핵심 기능 수</label>
+              <Input type="number" min="1" max="20" value={story.totalEpisodes} onChange={(e) => setStory((s) => ({ ...s, totalEpisodes: e.target.value }))} className="w-20" />
+              <span className="text-xs text-[#ADA8A0]">개</span>
             </div>
           </div>
 
@@ -117,14 +117,14 @@ export default function StoryPage({ params }: { params: Promise<{ id: string }> 
             </button>
             <Link href={`/project/${id}/characters`}>
               <button className="flex items-center gap-2 text-xs font-semibold px-5 py-2.5 rounded-full bg-[#C06070] text-white hover:bg-[#A8505F] transition-all duration-300">
-                다음: 캐릭터 설계 <ArrowRight className="w-3.5 h-3.5" />
+                다음: 이해관계자 분석 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </Link>
           </div>
         </main>
 
         <aside className="w-72 flex-shrink-0 h-[calc(100vh-5rem)] sticky top-20">
-          <AiChat step="story" initialMessage="안녕하세요! 스토리 구성을 도와드릴게요. 어떤 이야기를 만들고 싶으신가요?" placeholder="스토리에 대해 질문하세요..." />
+          <AiChat step="story" initialMessage="문제 정의를 도와드릴게요! 해결하려는 문제의 핵심이 무엇인가요? 어떤 상황에서 불편함을 느꼈는지 편하게 말씀해 주세요." placeholder="문제 정의에 대해 질문하세요..." />
         </aside>
       </div>
     </div>

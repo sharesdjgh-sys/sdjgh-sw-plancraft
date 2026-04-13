@@ -75,7 +75,7 @@ export default function AiChat({ step, placeholder, initialMessage }: AiChatProp
           <Sparkles className="w-3.5 h-3.5 text-white" />
         </div>
         <div>
-          <p className="text-xs font-bold text-[#1A1A1A]">AI 멘토 웹툰이</p>
+          <p className="text-xs font-bold text-[#1A1A1A]">AI 멘토 아이디어봇</p>
           <div className="flex items-center gap-1">
             <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
             <p className="text-[10px] text-[#ADA8A0]">항상 준비됐어요</p>

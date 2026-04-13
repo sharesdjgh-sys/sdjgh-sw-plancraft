@@ -1,17 +1,17 @@
 import Link from "next/link";
 import {
-  ArrowRight, Lightbulb, BookOpen, Users, Film,
+  ArrowRight, Lightbulb, Target, Users, Cpu,
   PenLine, Trophy, Sparkles, Star, Heart
 } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
 
 const STEPS = [
-  { icon: Lightbulb, label: "아이디어 발굴", desc: "AI와 함께 주제·소재 브레인스토밍" },
-  { icon: BookOpen,  label: "스토리 구성",  desc: "기승전결 플롯을 체계적으로 설계" },
-  { icon: Users,     label: "캐릭터 설계",  desc: "매력적인 인물과 관계도 완성" },
-  { icon: Film,      label: "콘티 제작",    desc: "패널 구성과 연출 방향 계획" },
-  { icon: PenLine,   label: "대본 작성",    desc: "대사·지문·효과음까지 완성" },
-  { icon: Trophy,    label: "제출 준비",    desc: "대회 규정 최종 점검 및 마무리" },
+  { icon: Lightbulb, label: "아이디어 발굴", desc: "AI와 함께 공모전 아이디어 브레인스토밍" },
+  { icon: Target,    label: "문제 정의",     desc: "해결할 문제와 배경을 구체적으로 명확화" },
+  { icon: Users,     label: "이해관계자 분석", desc: "누구를 위한 SW인지 사용자와 환경 파악" },
+  { icon: Cpu,       label: "기능 설계",     desc: "핵심 기능 구성과 구현 흐름 계획" },
+  { icon: PenLine,   label: "기획서 작성",   desc: "공모전 수준의 기획서 완성" },
+  { icon: Trophy,    label: "최종 검토",     desc: "공모전 규정 점검 및 제출 준비" },
 ];
 
 export default function HomePage() {
@@ -24,7 +24,7 @@ export default function HomePage() {
           <div className="w-7 h-7 rounded-lg bg-[#C06070] flex items-center justify-center">
             <Sparkles className="w-3.5 h-3.5 text-white" />
           </div>
-          <span className="text-sm font-semibold tracking-tight text-[#1A1A1A]">웹툰 메이커 AI</span>
+          <span className="text-sm font-semibold tracking-tight text-[#1A1A1A]">IdeaSpark</span>
         </div>
         <div className="flex items-center gap-5">
           <Link href="/guide" className="text-sm text-[#7A7067] hover:text-[#1A1A1A] transition-colors duration-200">
@@ -50,19 +50,19 @@ export default function HomePage() {
             {/* Badge */}
             <div className="hero-enter inline-flex items-center gap-2 border border-[#C06070]/25 bg-[#C06070]/[0.07] text-[#C06070] px-3.5 py-1.5 rounded-full text-xs font-medium mb-7">
               <Star className="w-3 h-3 fill-[#C06070]" />
-              AI 창작 챌린지 대회 공식 준비 플랫폼
+              SW 아이디어 공모전 공식 준비 플랫폼
             </div>
 
             {/* Headline */}
             <h1 className="hero-enter-2 text-[clamp(2.6rem,6vw,4.5rem)] font-bold tracking-tight leading-[1.08] mb-6">
-              내 이야기를<br />
-              <span className="font-serif italic text-[#C06070]">웹툰</span>으로<br />
+              내 아이디어를<br />
+              <span className="font-serif italic text-[#C06070]">기획서</span>로<br />
               완성해봐요
             </h1>
 
             <p className="hero-enter-3 text-[#7A7067] text-lg leading-relaxed max-w-md mb-10">
               아이디어가 막막해도 괜찮아요.<br />
-              AI 멘토가 아이디어 발굴부터 대회 제출까지<br />
+              AI 멘토가 아이디어 발굴부터 기획서 제출까지<br />
               6단계 전 과정을 함께해요.
             </p>
 
@@ -77,7 +77,7 @@ export default function HomePage() {
                 href="/guide"
                 className="text-sm text-[#7A7067] hover:text-[#1A1A1A] transition-colors duration-200 underline underline-offset-4 decoration-[#EBE7E0]"
               >
-                제작 가이드 보기
+                준비 가이드 보기
               </Link>
             </div>
           </div>
@@ -89,8 +89,8 @@ export default function HomePage() {
                 <span className="text-[10px] font-medium text-[#ADA8A0] uppercase tracking-wider">진행 중인 프로젝트</span>
                 <span className="text-[10px] bg-[#C06070]/10 text-[#C06070] px-2.5 py-1 rounded-full font-medium">3 / 6단계</span>
               </div>
-              <p className="text-base font-bold text-[#1A1A1A] mb-1">나의 첫 번째 웹툰</p>
-              <p className="text-xs text-[#ADA8A0] mb-4">판타지 · 2026 AI 창작 챌린지</p>
+              <p className="text-base font-bold text-[#1A1A1A] mb-1">급식 잔반 줄이기 앱</p>
+              <p className="text-xs text-[#ADA8A0] mb-4">교육 · SW 아이디어 공모전</p>
 
               <div className="w-full bg-[#F4F1EC] rounded-full h-1.5 mb-5">
                 <div className="bg-[#C06070] h-1.5 rounded-full" style={{ width: "45%" }} />
@@ -98,10 +98,10 @@ export default function HomePage() {
 
               <div className="space-y-2">
                 {[
-                  { label: "스토리 구성", done: true },
-                  { label: "캐릭터 설계", done: true },
-                  { label: "콘티 제작", done: false, current: true },
-                  { label: "대본 작성", done: false },
+                  { label: "문제 정의", done: true },
+                  { label: "이해관계자 분석", done: true },
+                  { label: "기능 설계", done: false, current: true },
+                  { label: "기획서 작성", done: false },
                 ].map((item) => (
                   <div
                     key={item.label}
@@ -127,8 +127,8 @@ export default function HomePage() {
                     <Sparkles className="w-3 h-3 text-white" />
                   </div>
                   <div>
-                    <p className="text-[10px] text-[#ADA8A0] mb-0.5">AI 멘토 웹툰이</p>
-                    <p className="text-xs text-[#7A7067] leading-relaxed">캐릭터 설계가 완성됐어요! 이제 1화 콘티부터 함께 잡아봐요.</p>
+                    <p className="text-[10px] text-[#ADA8A0] mb-0.5">AI 멘토 아이디어봇</p>
+                    <p className="text-xs text-[#7A7067] leading-relaxed">이해관계자 분석이 완성됐어요! 이제 핵심 기능 설계부터 함께 잡아봐요.</p>
                   </div>
                 </div>
               </div>
@@ -143,7 +143,7 @@ export default function HomePage() {
           <div className="text-center mb-14">
             <p className="text-xs font-medium text-[#C06070] uppercase tracking-widest mb-3">Process</p>
             <h2 className="text-3xl font-bold tracking-tight">
-              아이디어에서 완성까지,<br />
+              아이디어에서 기획서까지,<br />
               <span className="font-serif italic">딱 6단계</span>
             </h2>
           </div>
@@ -193,12 +193,12 @@ export default function HomePage() {
               <div className="w-10 h-10 rounded-xl bg-[#C06070]/10 flex items-center justify-center mb-5">
                 <Sparkles className="w-4.5 h-4.5 text-[#C06070]" />
               </div>
-              <h3 className="text-xl font-bold tracking-tight mb-2">AI 멘토 웹툰이</h3>
+              <h3 className="text-xl font-bold tracking-tight mb-2">AI 멘토 아이디어봇</h3>
               <p className="text-sm text-[#7A7067] leading-relaxed mb-6 max-w-sm">
                 각 단계마다 전문 AI가 질문에 답하고, 막힌 부분을 함께 돌파해요. 혼자 고민하지 않아도 돼요.
               </p>
               <div className="flex flex-wrap gap-2">
-                {["아이디어 도우미", "스토리 코치", "캐릭터 설계", "연출 가이드", "대본 피드백"].map((tag) => (
+                {["아이디어 도우미", "문제 정의 코치", "기능 설계 가이드", "기획서 피드백", "최종 점검"].map((tag) => (
                   <span key={tag} className="text-xs border border-[#EBE7E0] text-[#7A7067] px-3 py-1.5 rounded-full bg-[#F4F1EC]">
                     {tag}
                   </span>
@@ -214,7 +214,7 @@ export default function HomePage() {
               </div>
               <h3 className="text-xl font-bold tracking-tight mb-2">처음이어도 OK</h3>
               <p className="text-sm text-white/70 leading-relaxed">
-                그림 실력이 없어도, 글쓰기가 익숙하지 않아도. AI가 처음부터 함께해요.
+                코딩 경험이 없어도, 기획서를 써본 적 없어도. AI가 처음부터 함께해요.
               </p>
             </div>
           </ScrollReveal>
@@ -224,7 +224,7 @@ export default function HomePage() {
               <div className="w-10 h-10 rounded-xl bg-[#F4F1EC] flex items-center justify-center mb-5">
                 <Trophy className="w-4.5 h-4.5 text-[#7A7067]" />
               </div>
-              <h3 className="text-xl font-bold tracking-tight mb-2">대회 맞춤 일정</h3>
+              <h3 className="text-xl font-bold tracking-tight mb-2">공모전 맞춤 일정</h3>
               <p className="text-sm text-[#7A7067] leading-relaxed">
                 마감일을 입력하면 단계별 일정을 자동으로 계산해 드려요.
               </p>
@@ -236,9 +236,9 @@ export default function HomePage() {
               <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center mb-5">
                 <PenLine className="w-4.5 h-4.5 text-[#7A7067]" />
               </div>
-              <h3 className="text-xl font-bold tracking-tight mb-2">대본 & 콘티 편집기</h3>
+              <h3 className="text-xl font-bold tracking-tight mb-2">기능 설계 & 기획서 편집기</h3>
               <p className="text-sm text-[#7A7067] leading-relaxed max-w-sm">
-                화별 대본을 체계적으로 관리하고, AI가 연출 방향을 제안해요. 막히면 바로 멘토에게 물어봐요.
+                기능을 체계적으로 구성하고, AI가 기획서 방향을 제안해요. 막히면 바로 멘토에게 물어봐요.
               </p>
               <div className="mt-5 inline-flex items-center gap-2 text-xs text-[#C06070] font-medium">
                 <div className="w-1.5 h-1.5 rounded-full bg-[#C06070] animate-pulse" />
@@ -255,14 +255,14 @@ export default function HomePage() {
           <div className="max-w-2xl mx-auto bg-white rounded-3xl border border-[#EBE7E0] p-10 text-center shadow-[0_4px_32px_rgba(0,0,0,0.04)]">
             <div className="text-3xl font-serif italic text-[#C06070] mb-6">"</div>
             <p className="text-lg font-medium text-[#1A1A1A] leading-relaxed tracking-tight mb-6">
-              아이디어는 있었는데 어떻게 시작할지 몰랐어요.<br />
-              AI 멘토와 대화하다보니 어느새 스토리가 완성됐어요.
+              아이디어는 있었는데 어떻게 기획서로 정리할지 몰랐어요.<br />
+              AI 멘토와 대화하다보니 어느새 기획서가 완성됐어요.
             </p>
             <div className="flex items-center justify-center gap-2">
               <div className="w-7 h-7 rounded-full bg-[#F4F1EC] flex items-center justify-center">
                 <span className="text-xs font-bold text-[#C06070]">김</span>
               </div>
-              <span className="text-xs text-[#ADA8A0]">김○○, 고등학교 2학년 · 대회 최우수상 수상</span>
+              <span className="text-xs text-[#ADA8A0]">김○○, 고등학교 2학년 · 공모전 최우수상 수상</span>
             </div>
           </div>
         </section>
@@ -277,10 +277,10 @@ export default function HomePage() {
             <div className="relative z-10">
               <p className="text-[#C06070] text-xs font-medium tracking-widest uppercase mb-4">지금 바로</p>
               <h2 className="text-3xl font-bold text-white tracking-tight mb-3">
-                대회 참가를 망설이고 있나요?
+                공모전 참가를 망설이고 있나요?
               </h2>
               <p className="text-white/45 text-sm mb-8 leading-relaxed">
-                처음이어도 괜찮아요. AI 멘토가 첫 질문부터 마지막 제출까지 함께해요.
+                처음이어도 괜찮아요. AI 멘토가 첫 아이디어부터 마지막 제출까지 함께해요.
               </p>
               <Link
                 href="/dashboard"
@@ -300,9 +300,9 @@ export default function HomePage() {
             <div className="w-5 h-5 rounded bg-[#C06070] flex items-center justify-center">
               <Sparkles className="w-2.5 h-2.5 text-white" />
             </div>
-            <span className="text-xs text-[#ADA8A0] font-medium">웹툰 메이커 AI</span>
+            <span className="text-xs text-[#ADA8A0] font-medium">IdeaSpark</span>
           </div>
-          <p className="text-xs text-[#ADA8A0]">© 2025 웹툰 메이커 AI</p>
+          <p className="text-xs text-[#ADA8A0]">© 2025 IdeaSpark</p>
         </div>
       </footer>
     </div>

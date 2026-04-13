@@ -6,11 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import AiChat from "@/components/ai-assistant/AiChat";
 import StepIndicator from "@/components/progress-tracker/StepIndicator";
-import { Plus, Trash2, Save, ArrowRight, CheckCircle, Sparkles, Check, Download, Film } from "lucide-react";
+import { Plus, Trash2, Save, ArrowRight, CheckCircle, Sparkles, Check, Download, Cpu } from "lucide-react";
 import { getProject, updateProject, type Episode, type Cut, type Project } from "@/lib/storage";
 import { downloadEpisode, downloadAllEpisodes } from "@/lib/download";
 
-const ANGLES = ["풀샷", "미디엄샷", "클로즈업", "익스트림 클로즈업", "버드뷰", "웜뷰", "오버더숄더"];
+const ANGLES = ["사용자 입력", "시스템 처리", "데이터 조회", "결과 출력", "알림 발송", "조건 분기", "오류 처리"];
 
 export default function EpisodesPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -67,7 +67,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
   };
 
   const addCut = () => {
-    const newCut: Cut = { angle: "미디엄샷", description: "", dialogue: "", soundEffect: "" };
+    const newCut: Cut = { angle: "사용자 입력", description: "", dialogue: "", soundEffect: "" };
     const updated = [...(episodes[activeEp]?.cuts ?? []), newCut];
     updateEp("cuts", updated);
   };
@@ -121,7 +121,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
                   onClick={() => downloadEpisode({ ...project, episodes }, activeEp)}
                   className="flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] transition-all duration-200"
                 >
-                  <Download className="w-3.5 h-3.5" /> 이 화
+                  <Download className="w-3.5 h-3.5" /> 이 기능
                 </button>
                 <button
                   onClick={() => downloadAllEpisodes({ ...project, episodes })}
@@ -151,7 +151,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
 
           <div className="bg-white rounded-2xl border border-[#EBE7E0] p-4 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold text-[#1A1A1A]">화 목록</span>
+              <span className="text-xs font-bold text-[#1A1A1A]">기능 목록</span>
               <button onClick={addEpisode} className="text-[#C06070] hover:text-[#A8505F] transition-colors">
                 <Plus className="w-4 h-4" />
               </button>
@@ -167,7 +167,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
                       : "text-[#7A7067] hover:bg-[#F4F1EC]"
                   }`}
                 >
-                  <span>{ep.episodeNumber}화 {ep.title && `· ${ep.title.slice(0, 6)}`}</span>
+                  <span>기능 {ep.episodeNumber} {ep.title && `· ${ep.title.slice(0, 6)}`}</span>
                   {ep.isCompleted && <CheckCircle className="w-3.5 h-3.5 text-green-500 flex-shrink-0" />}
                 </button>
               ))}
@@ -179,7 +179,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
           <div className="flex items-center justify-between mb-2">
             <div>
               <p className="text-[10px] font-medium text-[#C06070] uppercase tracking-widest mb-1">Step 04</p>
-              <h1 className="text-xl font-bold text-[#1A1A1A] tracking-tight">{ep?.episodeNumber}화 콘티 제작</h1>
+              <h1 className="text-xl font-bold text-[#1A1A1A] tracking-tight">기능 {ep?.episodeNumber} 설계</h1>
             </div>
             <label className="flex items-center gap-2 text-xs text-[#7A7067] cursor-pointer">
               <input
@@ -188,22 +188,22 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
                 onChange={(e) => updateEp("isCompleted", e.target.checked)}
                 className="rounded accent-[#C06070]"
               />
-              이 화 완료됨
+              이 기능 완료됨
             </label>
           </div>
 
           {/* 제목 & 줄거리 */}
           <div className="bg-white rounded-2xl border border-[#EBE7E0] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
-            <label className="block text-xs font-bold text-[#1A1A1A] mb-1">{ep?.episodeNumber}화 제목 & 줄거리</label>
-            <p className="text-[10px] text-[#ADA8A0] mb-3">이번 화에서 일어나는 일을 간략히 정리해봐요</p>
+            <label className="block text-xs font-bold text-[#1A1A1A] mb-1">기능 {ep?.episodeNumber} 이름 & 설명</label>
+            <p className="text-[10px] text-[#ADA8A0] mb-3">이 기능이 무엇을 하는지 간략히 정리해봐요</p>
             <div className="space-y-3">
               <Input
-                placeholder={`${ep?.episodeNumber}화 제목`}
+                placeholder={`기능 ${ep?.episodeNumber} 이름 (예: 식단 추천, 잔반 분석)`}
                 value={ep?.title ?? ""}
                 onChange={(e) => updateEp("title", e.target.value)}
               />
               <Textarea
-                placeholder={`${ep?.episodeNumber}화에서 일어나는 일을 간략히 정리하세요`}
+                placeholder={`기능 ${ep?.episodeNumber}이 어떻게 동작하는지 간략히 설명해주세요`}
                 value={ep?.synopsis ?? ""}
                 onChange={(e) => updateEp("synopsis", e.target.value)}
                 rows={3}
@@ -215,29 +215,29 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
           <div className="bg-white rounded-2xl border border-[#EBE7E0] shadow-[0_2px_12px_rgba(0,0,0,0.04)] overflow-hidden">
             <div className="flex items-center justify-between px-5 py-4 border-b border-[#EBE7E0]">
               <div className="flex items-center gap-2">
-                <Film className="w-4 h-4 text-[#C06070]" />
-                <span className="text-sm font-bold text-[#1A1A1A]">컷 구성</span>
+                <Cpu className="w-4 h-4 text-[#C06070]" />
+                <span className="text-sm font-bold text-[#1A1A1A]">처리 단계 구성</span>
               </div>
               <button
                 onClick={addCut}
                 className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] hover:border-[#C06070]/30 transition-all duration-200"
               >
-                <Plus className="w-3.5 h-3.5" /> 컷 추가
+                <Plus className="w-3.5 h-3.5" /> 단계 추가
               </button>
             </div>
 
             <div className="p-5 space-y-3">
-              <p className="text-[10px] text-[#ADA8A0]">컷별로 앵글, 장면 묘사, 대사, 효과음을 설계해봐요</p>
+              <p className="text-[10px] text-[#ADA8A0]">단계별로 처리 유형, 동작 설명, 입출력 데이터, 예외 처리를 설계해봐요</p>
 
               {(!ep?.cuts || ep.cuts.length === 0) ? (
                 <div className="text-center py-12 bg-[#FBF9F6] rounded-xl border border-dashed border-[#EBE7E0]">
-                  <Film className="w-8 h-8 text-[#D4CFC9] mx-auto mb-3" />
-                  <p className="text-xs text-[#ADA8A0] mb-3">아직 컷이 없어요. 첫 번째 컷을 추가해봐요!</p>
+                  <Cpu className="w-8 h-8 text-[#D4CFC9] mx-auto mb-3" />
+                  <p className="text-xs text-[#ADA8A0] mb-3">아직 단계가 없어요. 첫 번째 처리 단계를 추가해봐요!</p>
                   <button
                     onClick={addCut}
                     className="inline-flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-full bg-[#C06070] text-white hover:bg-[#A8505F] transition-all duration-200"
                   >
-                    <Plus className="w-3.5 h-3.5" /> 컷 추가
+                    <Plus className="w-3.5 h-3.5" /> 단계 추가
                   </button>
                 </div>
               ) : (
@@ -246,7 +246,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
                     <div key={cutIdx} className="border border-[#EBE7E0] rounded-xl overflow-hidden">
                       <div className="flex items-center justify-between px-4 py-2.5 bg-[#FBF9F6] border-b border-[#EBE7E0]">
                         <div className="flex items-center gap-3">
-                          <span className="text-xs font-bold text-[#C06070] w-10">컷 {cutIdx + 1}</span>
+                          <span className="text-xs font-bold text-[#C06070] w-10">단계 {cutIdx + 1}</span>
                           <select
                             value={cut.angle}
                             onChange={(e) => updateCut(cutIdx, "angle", e.target.value)}
@@ -265,30 +265,30 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
 
                       <div className="p-4 grid grid-cols-2 gap-3">
                         <div className="col-span-2">
-                          <label className="block text-[10px] font-semibold text-[#7A7067] mb-1.5">장면 묘사</label>
+                          <label className="block text-[10px] font-semibold text-[#7A7067] mb-1.5">동작 설명</label>
                           <Textarea
                             value={cut.description}
                             onChange={(e) => updateCut(cutIdx, "description", e.target.value)}
-                            placeholder="이 컷에서 무슨 일이 일어나는지, 인물 위치와 표정 등을 적어봐요"
+                            placeholder="이 단계에서 시스템이 어떤 동작을 수행하는지 구체적으로 써봐요"
                             rows={2}
                             className="text-xs"
                           />
                         </div>
                         <div>
-                          <label className="block text-[10px] font-semibold text-[#7A7067] mb-1.5">대사</label>
+                          <label className="block text-[10px] font-semibold text-[#7A7067] mb-1.5">입력 데이터</label>
                           <Input
                             value={cut.dialogue}
                             onChange={(e) => updateCut(cutIdx, "dialogue", e.target.value)}
-                            placeholder='예: "늦었어, 어떡해!"'
+                            placeholder="예: 학생 ID, 메뉴 선택값"
                             className="text-xs"
                           />
                         </div>
                         <div>
-                          <label className="block text-[10px] font-semibold text-[#7A7067] mb-1.5">효과음</label>
+                          <label className="block text-[10px] font-semibold text-[#7A7067] mb-1.5">출력/결과</label>
                           <Input
                             value={cut.soundEffect}
                             onChange={(e) => updateCut(cutIdx, "soundEffect", e.target.value)}
-                            placeholder="예: 쾅! 스르륵... 두근두근"
+                            placeholder="예: 추천 식단 목록, 오류 메시지"
                             className="text-xs"
                           />
                         </div>
@@ -300,7 +300,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
                     onClick={addCut}
                     className="w-full py-2.5 rounded-xl border border-dashed border-[#EBE7E0] text-xs text-[#ADA8A0] hover:border-[#C06070]/30 hover:text-[#C06070] hover:bg-[#FBF9F6] transition-all duration-200 flex items-center justify-center gap-1.5"
                   >
-                    <Plus className="w-3.5 h-3.5" /> 컷 추가
+                    <Plus className="w-3.5 h-3.5" /> 단계 추가
                   </button>
                 </div>
               )}
@@ -317,7 +317,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
             </button>
             <Link href={`/project/${id}/script`}>
               <button className="flex items-center gap-2 text-xs font-semibold px-5 py-2.5 rounded-full bg-[#C06070] text-white hover:bg-[#A8505F] transition-all duration-300">
-                다음: 대본 작성 <ArrowRight className="w-3.5 h-3.5" />
+                다음: 기획서 작성 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </Link>
           </div>
@@ -326,8 +326,8 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
         <aside className="w-72 flex-shrink-0 h-[calc(100vh-5rem)] sticky top-20">
           <AiChat
             step="panel"
-            initialMessage="콘티 작업을 도와드릴게요! 장면 연출이나 앵글 선택에 대해 궁금한 점이 있으면 말씀해 주세요!"
-            placeholder="콘티·연출에 대해 질문하세요..."
+            initialMessage="기능 설계를 도와드릴게요! 어떤 핵심 기능을 만들고 싶으신가요? 기능의 입력·처리·출력 흐름을 함께 정리해봐요."
+            placeholder="기능 설계에 대해 질문하세요..."
           />
         </aside>
       </div>

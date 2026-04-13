@@ -43,7 +43,7 @@ export default function IdeaPage({ params }: { params: Promise<{ id: string }> }
             onClick={goNext}
             className="flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-full bg-[#C06070] text-white hover:bg-[#A8505F] transition-all duration-300 flex-shrink-0"
           >
-            스토리 구성으로 <ArrowRight className="w-3 h-3" />
+            문제 정의로 <ArrowRight className="w-3 h-3" />
           </button>
         </div>
       </header>
@@ -60,14 +60,14 @@ export default function IdeaPage({ params }: { params: Promise<{ id: string }> }
             <p className="text-[10px] font-medium text-[#C06070] uppercase tracking-widest mb-1">Step 01</p>
             <h1 className="text-xl font-bold text-[#1A1A1A] tracking-tight">아이디어 발굴</h1>
             <p className="text-xs text-[#ADA8A0] mt-1">
-              AI 멘토와 자유롭게 대화하며 웹툰 아이디어를 구체화해봐요. 막막해도 괜찮아요!
+              AI 멘토와 자유롭게 대화하며 SW 아이디어를 구체화해봐요. 막막해도 괜찮아요!
             </p>
           </div>
 
           <div className="h-[calc(100vh-15rem)]">
             <AiChat
               step="idea"
-              initialMessage="안녕하세요! 웹툰 멘토 웹툰이예요 😊 어떤 이야기를 만들고 싶으신가요? 막막해도 괜찮아요. 좋아하는 장르나 떠오르는 주제가 있으면 편하게 말해봐요!"
+              initialMessage="안녕하세요! SW 아이디어 멘토 아이디어봇이에요 😊 어떤 문제를 SW로 해결하고 싶으신가요? 막막해도 괜찮아요. 학교나 일상에서 불편하거나 개선하고 싶은 점이 있으면 편하게 말해봐요!"
               placeholder="아이디어에 대해 자유롭게 이야기해봐요..."
             />
           </div>
@@ -77,7 +77,7 @@ export default function IdeaPage({ params }: { params: Promise<{ id: string }> }
               onClick={goNext}
               className="flex items-center gap-2 text-xs font-semibold px-5 py-2.5 rounded-full bg-[#C06070] text-white hover:bg-[#A8505F] transition-all duration-300"
             >
-              다음: 스토리 구성 <ArrowRight className="w-3.5 h-3.5" />
+              다음: 문제 정의 <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
         </main>

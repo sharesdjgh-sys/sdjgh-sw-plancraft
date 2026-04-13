@@ -10,14 +10,14 @@ import { getProject, updateProject } from "@/lib/storage";
 import { downloadFullSummary } from "@/lib/download";
 
 const CHECKLIST = [
-  { id: "story", label: "스토리 기승전결이 완성되었나요?" },
-  { id: "characters", label: "주요 캐릭터가 모두 설정되었나요?" },
-  { id: "script", label: "모든 화의 대본이 작성되었나요?" },
-  { id: "format", label: "대회 규정 형식(파일형식, 페이지 수 등)을 확인했나요?" },
-  { id: "title", label: "웹툰 제목이 정해졌나요?" },
-  { id: "authorNote", label: "작가 노트를 준비했나요?" },
-  { id: "proofread", label: "오탈자와 문법 오류를 확인했나요?" },
-  { id: "consistent", label: "캐릭터 외모와 이름이 전체적으로 일관되나요?" },
+  { id: "idea", label: "아이디어 한 줄 소개가 명확하게 작성되었나요?" },
+  { id: "problem", label: "해결하려는 문제의 배경과 필요성을 구체적으로 설명했나요?" },
+  { id: "stakeholder", label: "주요 사용자와 이해관계자를 분석했나요?" },
+  { id: "features", label: "핵심 기능 3~5가지가 명확하게 정의되었나요?" },
+  { id: "proposal", label: "기획서 전체 내용이 논리적으로 연결되어 있나요?" },
+  { id: "format", label: "공모전 제출 규정(파일 형식, 분량 등)을 확인했나요?" },
+  { id: "proofread", label: "오탈자와 어색한 표현을 점검했나요?" },
+  { id: "motivation", label: "지원 동기를 진심을 담아 작성했나요?" },
 ];
 
 export default function SubmitPage({ params }: { params: Promise<{ id: string }> }) {
@@ -124,12 +124,12 @@ export default function SubmitPage({ params }: { params: Promise<{ id: string }>
             </div>
           </div>
 
-          {/* 작가 노트 */}
+          {/* 지원 동기 */}
           <div className="bg-white rounded-2xl border border-[#EBE7E0] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
-            <label className="block text-xs font-bold text-[#1A1A1A] mb-1">작가 노트 (선택)</label>
-            <p className="text-[10px] text-[#ADA8A0] mb-3">작품에 대한 소개, 제작 동기, 독자에게 하고 싶은 말을 써봐요.</p>
+            <label className="block text-xs font-bold text-[#1A1A1A] mb-1">지원 동기 (선택)</label>
+            <p className="text-[10px] text-[#ADA8A0] mb-3">이 아이디어를 공모전에 제출하게 된 계기, 문제 해결에 대한 열정, 심사위원에게 하고 싶은 말을 써봐요.</p>
             <Textarea
-              placeholder="작품 소개나 제작 동기를 자유롭게 써보세요."
+              placeholder="이 SW 아이디어를 떠올리게 된 계기와 공모전에 참여하는 이유를 자유롭게 써보세요."
               value={authorNote}
               onChange={(e) => {
                 setAuthorNote(e.target.value);
@@ -143,12 +143,12 @@ export default function SubmitPage({ params }: { params: Promise<{ id: string }>
             <div className="bg-[#F4F1EC] border border-[#EBE7E0] rounded-2xl p-6 text-center">
               <div className="text-3xl mb-2">🎉</div>
               <h3 className="text-base font-bold text-[#1A1A1A] mb-1">모든 준비가 완료됐어요!</h3>
-              <p className="text-xs text-[#7A7067] mb-4">훌륭한 웹툰을 만들었네요. 대회에 제출할 준비가 되었어요!</p>
+              <p className="text-xs text-[#7A7067] mb-4">훌륭한 SW 기획서를 완성했네요. 공모전에 제출할 준비가 되었어요!</p>
               <button
                 onClick={markComplete}
                 className="bg-[#C06070] text-white text-sm font-semibold px-6 py-2.5 rounded-full hover:bg-[#A8505F] transition-all duration-300 shadow-[0_4px_16px_rgba(192,96,112,0.25)]"
               >
-                웹툰 완성 완료 표시하기
+                기획서 완성 완료 표시하기
               </button>
             </div>
           )}
@@ -157,14 +157,14 @@ export default function SubmitPage({ params }: { params: Promise<{ id: string }>
             <div className="bg-[#C06070] rounded-2xl p-6 text-center text-white">
               <div className="text-3xl mb-2">🏆</div>
               <h3 className="text-base font-bold mb-1">축하해요!</h3>
-              <p className="text-xs text-white/80">웹툰 제작을 완료했어요. 대회에서 좋은 결과 있기를 응원해요!</p>
+              <p className="text-xs text-white/80">SW 기획서 작성을 완료했어요. 공모전에서 좋은 결과 있기를 응원해요!</p>
             </div>
           )}
 
           <div className="flex items-center justify-between">
             <Link href={`/project/${id}/script`}>
               <button className="flex items-center gap-2 text-xs font-medium px-4 py-2.5 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] transition-all duration-200">
-                <ArrowLeft className="w-3.5 h-3.5" /> 이전: 대본 작성
+                <ArrowLeft className="w-3.5 h-3.5" /> 이전: 기획서 작성
               </button>
             </Link>
             {project && (
@@ -181,7 +181,7 @@ export default function SubmitPage({ params }: { params: Promise<{ id: string }>
         <aside className="w-72 flex-shrink-0 h-[calc(100vh-5rem)] sticky top-20">
           <AiChat
             step="completion"
-            initialMessage="거의 다 왔어요! 제출 전 최종 점검을 도와드릴게요. 작가 노트 작성이나 마지막으로 확인하고 싶은 부분이 있으시면 말씀해 주세요!"
+            initialMessage="거의 다 왔어요! 제출 전 최종 점검을 도와드릴게요. 지원 동기 작성이나 기획서 마지막 검토에서 도움이 필요하시면 말씀해 주세요!"
             placeholder="마지막 점검에 도움을 요청하세요..."
           />
         </aside>
