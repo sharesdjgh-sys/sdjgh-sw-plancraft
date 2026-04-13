@@ -45,7 +45,7 @@ export type Project = {
   episodes: Episode[];
 };
 
-const KEY = "webtoon_projects";
+const KEY = "ideaspark_projects";
 
 export function getProjects(): Project[] {
   if (typeof window === "undefined") return [];
