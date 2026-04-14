@@ -62,7 +62,7 @@ export default function GuidePage() {
                       </div>
                       <h3 className="text-base font-bold text-[#1A1A1A] tracking-tight mb-1">{s.title}</h3>
                       <p className="text-xs text-[#7A7067] mb-4 leading-relaxed">{s.desc}</p>
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         {s.tips.map((tip, i) => (
                           <div key={i} className="flex items-start gap-2 text-xs text-[#7A7067] bg-[#FBF9F6] rounded-xl px-3 py-2.5 border border-[#EBE7E0]">
                             <div className="w-1 h-1 rounded-full bg-[#D4547A] flex-shrink-0 mt-1.5" />
