@@ -11,7 +11,7 @@ interface StepIndicatorProps {
 }
 
 export default function StepIndicator({ currentStep, projectId, isCompleted }: StepIndicatorProps) {
-  const progress = isCompleted ? 100 : Math.round(((currentStep - 1) / STEPS.length) * 100);
+  const progress = isCompleted ? 100 : Math.round((currentStep / STEPS.length) * 100);
 
   return (
     <div className="w-full">

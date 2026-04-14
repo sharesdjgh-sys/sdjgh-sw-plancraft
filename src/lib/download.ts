@@ -24,8 +24,28 @@ export function importProjects(file: File): Promise<void> {
     reader.onload = (e) => {
       try {
         const parsed = JSON.parse(e.target?.result as string);
-        if (!Array.isArray(parsed)) throw new Error();
-        saveProjects(parsed);
+
+        let incoming: Project[];
+        if (Array.isArray(parsed)) {
+          // 전체 백업 파일 형식
+          incoming = parsed;
+        } else if (parsed && typeof parsed === "object" && typeof parsed.id === "string" && typeof parsed.title === "string") {
+          // 자동 저장된 단일 프로젝트 파일 형식
+          incoming = [parsed];
+        } else {
+          throw new Error();
+        }
+
+        const existing = getProjects();
+        for (const project of incoming) {
+          const idx = existing.findIndex((p) => p.id === project.id);
+          if (idx !== -1) {
+            existing[idx] = project; // 동일 ID → 덮어쓰기
+          } else {
+            existing.unshift(project); // 새 프로젝트 → 맨 앞에 추가
+          }
+        }
+        saveProjects(existing);
         resolve();
       } catch {
         reject(new Error("올바른 백업 파일이 아니에요."));

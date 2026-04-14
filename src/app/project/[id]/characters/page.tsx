@@ -1,15 +1,17 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, use, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import AiChat from "@/components/ai-assistant/AiChat";
+import AiChat, { type AiChatHandle } from "@/components/ai-assistant/AiChat";
 import StepIndicator from "@/components/progress-tracker/StepIndicator";
+import EmptyContentModal from "@/components/EmptyContentModal";
 import { Plus, Trash2, ArrowRight, Check, Save, User, Download, Wand2 } from "lucide-react";
 import { getProject, updateProject, type Character, type Project } from "@/lib/storage";
 import { downloadCharacters } from "@/lib/download";
+import { saveProjectToDir } from "@/lib/fileStorage";
 
 const ROLES = ["주요 사용자", "보조 사용자", "운영자", "이해관계자", "기타"];
 
@@ -22,6 +24,8 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [autofilling, setAutofilling] = useState(false);
+  const [showEmptyModal, setShowEmptyModal] = useState(false);
+  const aiChatRef = useRef<AiChatHandle>(null);
 
   useEffect(() => {
     const p = getProject(id);
@@ -47,22 +51,35 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
     if (editIdx === idx) setEditIdx(null);
   };
 
-  const save = () => {
+  const save = async () => {
     setSaving(true);
     updateProject(id, {
       characters,
       currentStep: Math.max(3, project?.currentStep ?? 1),
     });
+    await saveProjectToDir(id, getProject(id));
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
 
-  const goNext = () => {
+  const goNext = async () => {
+    if (characters.length === 0) { setShowEmptyModal(true); return; }
     updateProject(id, {
       characters,
       currentStep: Math.max(3, project?.currentStep ?? 1),
     });
+    await saveProjectToDir(id, getProject(id));
+    router.push(`/project/${id}/episodes`);
+  };
+
+  const goNextAnyway = async () => {
+    setShowEmptyModal(false);
+    updateProject(id, {
+      characters,
+      currentStep: Math.max(3, project?.currentStep ?? 1),
+    });
+    await saveProjectToDir(id, getProject(id));
     router.push(`/project/${id}/episodes`);
   };
 
@@ -96,6 +113,17 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
 
   return (
     <div className="min-h-screen bg-[#FBF9F6]">
+      {showEmptyModal && (
+        <EmptyContentModal
+          title="이해관계자를 추가해주세요"
+          description="SW를 사용할 주요 이해관계자를 한 명 이상 추가해야 다음 단계로 넘어갈 수 있어요. 어려우면 AI 도움을 받아봐요!"
+          autofilling={autofilling}
+          onAutofill={() => { setShowEmptyModal(false); autofill(); }}
+          onAskMentor={() => { setShowEmptyModal(false); aiChatRef.current?.focusInput(); }}
+          onGoAnyway={goNextAnyway}
+          onClose={() => setShowEmptyModal(false)}
+        />
+      )}
       <header className="bg-white border-b border-[#EBE7E0] px-6 py-3.5 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3 min-w-0">
@@ -103,7 +131,7 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
               href="/dashboard"
               className="flex items-center gap-1.5 text-xs text-[#ADA8A0] hover:text-[#7A7067] transition-colors flex-shrink-0"
             >
-              <img src="/plancraft-logo.jpg" className="w-3.5 h-3.5 rounded object-cover" alt="" /> 대시보드
+              <img src="/plancraft-logo-remove.png" className="w-3.5 h-3.5 rounded object-cover" alt="" /> 대시보드
             </Link>
             <span className="text-[#EBE7E0]">/</span>
             <span className="text-xs font-semibold text-[#1A1A1A] truncate">{project?.title ?? "..."}</span>
@@ -287,6 +315,7 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
 
         <aside className="w-72 flex-shrink-0 h-[calc(100vh-5rem)] sticky top-20">
           <AiChat
+            ref={aiChatRef}
             step="character"
             initialMessage="이해관계자 분석을 도와드릴게요! 이 SW를 사용하게 될 주요 대상이 누구인가요? 어떤 사람들이 혜택을 받을지 생각해봐요."
             placeholder="이해관계자 분석에 대해 질문하세요..."

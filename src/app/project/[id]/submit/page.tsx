@@ -8,6 +8,7 @@ import StepIndicator from "@/components/progress-tracker/StepIndicator";
 import { Trophy, CheckCircle, Circle, ArrowLeft, Download } from "lucide-react";
 import { getProject, updateProject } from "@/lib/storage";
 import { downloadFullSummary } from "@/lib/download";
+import { saveProjectToDir } from "@/lib/fileStorage";
 
 const CHECKLIST = [
   { id: "idea", label: "아이디어 한 줄 소개가 명확하게 작성되었나요?" },
@@ -41,8 +42,9 @@ export default function SubmitPage({ params }: { params: Promise<{ id: string }>
   const checkedCount = Object.values(checks).filter(Boolean).length;
   const isReady = checkedCount === CHECKLIST.length;
 
-  const markComplete = () => {
+  const markComplete = async () => {
     updateProject(id, { isCompleted: true });
+    await saveProjectToDir(id, getProject(id));
     setCompleted(true);
   };
 
@@ -55,7 +57,7 @@ export default function SubmitPage({ params }: { params: Promise<{ id: string }>
               href="/dashboard"
               className="flex items-center gap-1.5 text-xs text-[#ADA8A0] hover:text-[#7A7067] transition-colors flex-shrink-0"
             >
-              <img src="/plancraft-logo.jpg" className="w-3.5 h-3.5 rounded object-cover" alt="" /> 대시보드
+              <img src="/plancraft-logo-remove.png" className="w-3.5 h-3.5 rounded object-cover" alt="" /> 대시보드
             </Link>
             <span className="text-[#EBE7E0]">/</span>
             <span className="text-xs font-semibold text-[#1A1A1A] truncate">{project?.title ?? "..."}</span>

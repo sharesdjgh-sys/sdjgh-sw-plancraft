@@ -30,7 +30,7 @@ export default function HomePage() {
       {/* Nav */}
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-4 bg-[#FBF9F6]/85 backdrop-blur-xl border-b border-[#EBE7E0]">
         <div className="flex items-center gap-2">
-          <img src="/plancraft-logo.jpg" className="w-7 h-7 rounded-lg object-cover" alt="PlanCraft" />
+          <img src="/plancraft-logo-remove.png" className="w-7 h-7 rounded-lg object-cover" alt="PlanCraft" />
           <span className="text-sm font-semibold tracking-tight text-[#1A1A1A]">PlanCraft</span>
         </div>
         <div className="flex items-center gap-5">
@@ -130,7 +130,7 @@ export default function HomePage() {
 
               <div className="mt-4 pt-4 border-t border-[#EBE7E0]">
                 <div className="flex items-start gap-2.5">
-                  <img src="/plancraft-logo.jpg" className="w-6 h-6 rounded-lg object-cover flex-shrink-0 mt-0.5" alt="" />
+                  <img src="/plancraft-logo-remove.png" className="w-6 h-6 rounded-lg object-cover flex-shrink-0 mt-0.5" alt="" />
                   <div>
                     <p className="text-[10px] text-[#ADA8A0] mb-0.5">AI 멘토 아이디어봇</p>
                     <p className="text-xs text-[#7A7067] leading-relaxed">이해관계자 분석이 완성됐어요! 이제 핵심 기능 설계부터 함께 잡아봐요.</p>
@@ -195,7 +195,7 @@ export default function HomePage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <ScrollReveal delay={0} className="h-full">
             <div className="h-full bg-white rounded-3xl border border-[#EBE7E0] p-8 hover:shadow-[0_4px_32px_rgba(0,0,0,0.05)] transition-all duration-300">
-              <img src="/plancraft-logo.jpg" className="w-10 h-10 rounded-xl object-cover mb-5" alt="" />
+              <img src="/plancraft-logo-remove.png" className="w-10 h-10 rounded-xl object-cover mb-5" alt="" />
               <h3 className="text-xl font-bold tracking-tight mb-2">AI 멘토 아이디어봇</h3>
               <p className="text-sm text-[#7A7067] leading-relaxed max-w-sm">
                 각 단계마다 전문 AI가 질문에 답하고, 막힌 부분을 함께 돌파해요. 혼자 고민하지 않아도 돼요.
@@ -271,7 +271,7 @@ export default function HomePage() {
       <footer className="border-t border-[#EBE7E0] px-8 py-8 bg-white">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <img src="/plancraft-logo.jpg" className="w-5 h-5 rounded object-cover" alt="PlanCraft" />
+            <img src="/plancraft-logo-remove.png" className="w-5 h-5 rounded object-cover" alt="PlanCraft" />
             <span className="text-xs text-[#ADA8A0] font-medium">PlanCraft</span>
           </div>
           <p className="text-xs text-[#ADA8A0]">© 2026 PlanCraft</p>

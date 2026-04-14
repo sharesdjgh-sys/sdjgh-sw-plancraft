@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, Sparkles, User } from "lucide-react";
 
@@ -22,6 +22,10 @@ function stripMarkdown(text: string): string {
     .trim();
 }
 
+export interface AiChatHandle {
+  focusInput: () => void;
+}
+
 interface AiChatProps {
   step: string;
   placeholder?: string;
@@ -30,7 +34,10 @@ interface AiChatProps {
   onMessagesChange?: (messages: Message[]) => void;
 }
 
-export default function AiChat({ step, placeholder, initialMessage, initialMessages, onMessagesChange }: AiChatProps) {
+const AiChat = forwardRef<AiChatHandle, AiChatProps>(function AiChat(
+  { step, placeholder, initialMessage, initialMessages, onMessagesChange },
+  ref
+) {
   const [messages, setMessages] = useState<Message[]>(() => {
     if (initialMessages && initialMessages.length > 0) return initialMessages;
     if (initialMessage) return [{ role: "assistant", content: initialMessage }];
@@ -39,6 +46,14 @@ export default function AiChat({ step, placeholder, initialMessage, initialMessa
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  useImperativeHandle(ref, () => ({
+    focusInput: () => {
+      inputRef.current?.focus();
+      inputRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    },
+  }));
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -142,6 +157,7 @@ export default function AiChat({ step, placeholder, initialMessage, initialMessa
       <div className="p-3 border-t border-[#EBE7E0] bg-white">
         <div className="flex gap-2 items-end">
           <Textarea
+            ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -160,4 +176,6 @@ export default function AiChat({ step, placeholder, initialMessage, initialMessa
       </div>
     </div>
   );
-}
+});
+
+export default AiChat;
