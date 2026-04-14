@@ -5,6 +5,15 @@ import {
 } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
 
+const STEP_COLORS = [
+  "#D4547A", // 01 Rose
+  "#E06E48", // 02 Coral
+  "#D49E40", // 03 Amber
+  "#50A882", // 04 Sage
+  "#8060C0", // 05 Violet
+  "#B85890", // 06 Mauve
+];
+
 const STEPS = [
   { icon: Lightbulb, label: "아이디어 발굴", desc: "AI와 함께 공모전 아이디어 브레인스토밍" },
   { icon: Target,    label: "문제 정의",     desc: "해결할 문제와 배경을 구체적으로 명확화" },
@@ -148,16 +157,17 @@ export default function HomePage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {STEPS.map((step, i) => {
             const Icon = step.icon;
+            const color = STEP_COLORS[i];
             return (
               <ScrollReveal key={step.label} delay={i * 55}>
-                <div className="group bg-white rounded-2xl border border-[#EBE7E0] p-5 hover:border-[#D4547A]/30 hover:shadow-[0_4px_24px_rgba(212,84,122,0.08)] transition-all duration-300 cursor-default">
+                <div className="rounded-2xl border border-[#EBE7E0] p-5 transition-all duration-300 cursor-default" style={{ backgroundColor: color + "0d" }}>
                   <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-[#F4F1EC] flex items-center justify-center flex-shrink-0 group-hover:bg-[#D4547A]/10 transition-colors duration-300">
-                      <Icon className="w-4.5 h-4.5 text-[#7A7067] group-hover:text-[#D4547A] transition-colors duration-300" />
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: color + "1a" }}>
+                      <Icon className="w-4.5 h-4.5" style={{ color }} />
                     </div>
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-[10px] font-mono text-[#ADA8A0]">{String(i + 1).padStart(2, "0")}</span>
+                        <span className="text-[10px] font-mono font-semibold" style={{ color }}>{String(i + 1).padStart(2, "0")}</span>
                         <h3 className="text-sm font-semibold text-[#1A1A1A]">{step.label}</h3>
                       </div>
                       <p className="text-xs text-[#ADA8A0] leading-relaxed">{step.desc}</p>
