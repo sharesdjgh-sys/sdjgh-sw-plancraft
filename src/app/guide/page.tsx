@@ -60,7 +60,7 @@ export default function GuidePage() {
             const color = STEP_COLORS[idx];
             return (
               <ScrollReveal key={s.step} delay={idx * 55}>
-                <div className="relative bg-white rounded-2xl border border-[#EBE7E0] p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
+                <div className="relative rounded-2xl border border-[#EBE7E0] p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)]" style={{ backgroundColor: color + "0d" }}>
                   <div
                     className="w-11 h-11 rounded-xl flex items-center justify-center absolute top-6 right-6"
                     style={{ backgroundColor: color + "1a" }}
