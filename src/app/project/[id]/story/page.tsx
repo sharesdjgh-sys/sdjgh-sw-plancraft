@@ -9,6 +9,7 @@ import StepIndicator from "@/components/progress-tracker/StepIndicator";
 import EmptyContentModal from "@/components/EmptyContentModal";
 import { useRouter } from "next/navigation";
 import { Save, ArrowRight, Check, Download, Wand2 } from "lucide-react";
+import MobileChatSheet, { type MobileChatSheetHandle } from "@/components/mobile/MobileChatSheet";
 import { getProject, updateProject, type Project } from "@/lib/storage";
 import { downloadStory } from "@/lib/download";
 import { saveProjectToDir } from "@/lib/fileStorage";
@@ -23,6 +24,7 @@ export default function StoryPage({ params }: { params: Promise<{ id: string }> 
   const [autofilling, setAutofilling] = useState(false);
   const [showEmptyModal, setShowEmptyModal] = useState(false);
   const aiChatRef = useRef<AiChatHandle>(null);
+  const mobileChatRef = useRef<MobileChatSheetHandle>(null);
 
   useEffect(() => {
     const p = getProject(id);
@@ -98,7 +100,7 @@ export default function StoryPage({ params }: { params: Promise<{ id: string }> 
           description="아이디어 한 줄 소개, 해결하려는 문제 등 주요 내용을 하나 이상 작성해야 다음 단계로 넘어갈 수 있어요. 어려우면 AI 도움을 받아봐요!"
           autofilling={autofilling}
           onAutofill={() => { setShowEmptyModal(false); autofill(); }}
-          onAskMentor={() => { setShowEmptyModal(false); aiChatRef.current?.focusInput(); }}
+          onAskMentor={() => { setShowEmptyModal(false); aiChatRef.current?.focusInput(); mobileChatRef.current?.openAndFocus(); }}
           onGoAnyway={goNextAnyway}
           onClose={() => setShowEmptyModal(false)}
         />
@@ -124,7 +126,7 @@ export default function StoryPage({ params }: { params: Promise<{ id: string }> 
                 </button>
                 <button
                   onClick={() => downloadStory({ ...project, story })}
-                  className="flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] transition-all duration-200"
+                  className="hidden sm:flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] transition-all duration-200"
                 >
                   <Download className="w-3.5 h-3.5" /> 다운로드
                 </button>
@@ -141,14 +143,14 @@ export default function StoryPage({ params }: { params: Promise<{ id: string }> 
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 py-6 flex gap-5">
-        <aside className="w-52 flex-shrink-0">
+      <div className="max-w-7xl mx-auto px-4 py-6 flex flex-col md:flex-row gap-4 md:gap-5">
+        <aside className="hidden md:block w-52 flex-shrink-0">
           <div className="bg-white rounded-2xl border border-[#EBE7E0] p-4 sticky top-20 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
             <StepIndicator currentStep={project?.currentStep ?? 1} projectId={id} isCompleted={project?.isCompleted} />
           </div>
         </aside>
 
-        <main className="flex-1 min-w-0 space-y-4">
+        <main className="flex-1 min-w-0 space-y-4 pb-20 lg:pb-0">
           <div className="mb-2">
             <p className="text-[10px] font-medium text-[#D4547A] uppercase tracking-widest mb-1">Step 02</p>
             <h1 className="text-xl font-bold text-[#1A1A1A] tracking-tight">문제 정의</h1>
@@ -160,7 +162,7 @@ export default function StoryPage({ params }: { params: Promise<{ id: string }> 
             <Input placeholder="예: 급식 잔반 데이터를 분석해 학교 식단을 개선하는 AI 추천 시스템" value={story.logline} onChange={(e) => setStory((s) => ({ ...s, logline: e.target.value }))} />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="bg-white rounded-2xl border border-[#EBE7E0] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
               <label className="block text-xs font-bold text-[#1A1A1A] mb-1">해결하려는 문제</label>
               <p className="text-[10px] text-[#ADA8A0] mb-3">왜 이 문제가 중요한지, 현재 어떤 불편함이 있는지</p>
@@ -199,10 +201,17 @@ export default function StoryPage({ params }: { params: Promise<{ id: string }> 
           </div>
         </main>
 
-        <aside className="w-72 flex-shrink-0 h-[calc(100vh-5rem)] sticky top-20">
+        <aside className="hidden lg:flex w-72 flex-shrink-0 h-[calc(100vh-5rem)] sticky top-20">
           <AiChat ref={aiChatRef} step="story" initialMessage="문제 정의를 도와드릴게요! 해결하려는 문제의 핵심이 무엇인가요? 어떤 상황에서 불편함을 느꼈는지 편하게 말씀해 주세요." placeholder="문제 정의에 대해 질문하세요..." />
         </aside>
       </div>
+
+      <MobileChatSheet
+        ref={mobileChatRef}
+        step="story"
+        initialMessage="문제 정의를 도와드릴게요! 해결하려는 문제의 핵심이 무엇인가요? 어떤 상황에서 불편함을 느꼈는지 편하게 말씀해 주세요."
+        placeholder="문제 정의에 대해 질문하세요..."
+      />
     </div>
   );
 }

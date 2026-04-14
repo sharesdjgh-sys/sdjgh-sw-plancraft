@@ -51,6 +51,7 @@ const AiChat = forwardRef<AiChatHandle, AiChatProps>(function AiChat(
   const inputRef = useRef<HTMLTextAreaElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null);
+  const manualStopRef = useRef(false);
 
   useImperativeHandle(ref, () => ({
     focusInput: () => {
@@ -71,16 +72,11 @@ const AiChat = forwardRef<AiChatHandle, AiChatProps>(function AiChat(
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const toggleListening = () => {
+  const startRecognition = () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const w = window as any;
     const SpeechRecognitionAPI = w.SpeechRecognition ?? w.webkitSpeechRecognition;
     if (!SpeechRecognitionAPI) return;
-
-    if (isListening) {
-      recognitionRef.current?.stop();
-      return;
-    }
 
     const recognition = new SpeechRecognitionAPI();
     recognition.lang = "ko-KR";
@@ -92,12 +88,40 @@ const AiChat = forwardRef<AiChatHandle, AiChatProps>(function AiChat(
       const transcript = e.results[0][0].transcript as string;
       setInput((prev) => (prev ? prev + " " + transcript : transcript));
     };
-    recognition.onend = () => setIsListening(false);
-    recognition.onerror = () => setIsListening(false);
+    recognition.onend = () => {
+      // 사용자가 직접 멈추지 않았으면 자동 재시작
+      if (!manualStopRef.current) {
+        startRecognition();
+      } else {
+        setIsListening(false);
+      }
+    };
+    recognition.onerror = () => {
+      if (!manualStopRef.current) {
+        startRecognition();
+      } else {
+        setIsListening(false);
+      }
+    };
 
     recognitionRef.current = recognition;
     recognition.start();
+  };
+
+  const toggleListening = () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const w = window as any;
+    if (!w.SpeechRecognition && !w.webkitSpeechRecognition) return;
+
+    if (isListening) {
+      manualStopRef.current = true;
+      recognitionRef.current?.stop();
+      return;
+    }
+
+    manualStopRef.current = false;
     setIsListening(true);
+    startRecognition();
   };
 
   const send = async () => {

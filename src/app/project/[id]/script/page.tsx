@@ -8,6 +8,7 @@ import AiChat, { type AiChatHandle } from "@/components/ai-assistant/AiChat";
 import StepIndicator from "@/components/progress-tracker/StepIndicator";
 import EmptyContentModal from "@/components/EmptyContentModal";
 import { Save, ArrowRight, ArrowLeft, Check, Download, FileText, CheckCircle, Wand2 } from "lucide-react";
+import MobileChatSheet, { type MobileChatSheetHandle } from "@/components/mobile/MobileChatSheet";
 import { getProject, updateProject, type Episode, type Project, type Character } from "@/lib/storage";
 import { downloadProposalScript } from "@/lib/download";
 import { saveProjectToDir } from "@/lib/fileStorage";
@@ -81,6 +82,7 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
   const [autofilling, setAutofilling] = useState(false);
   const [showEmptyModal, setShowEmptyModal] = useState(false);
   const aiChatRef = useRef<AiChatHandle>(null);
+  const mobileChatRef = useRef<MobileChatSheetHandle>(null);
 
   useEffect(() => {
     const p = getProject(id);
@@ -158,7 +160,7 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
           description="기획서를 작성해야 다음 단계로 넘어갈 수 있어요. AI 자동채우기로 초안을 먼저 생성하거나 AI 멘토에게 도움을 요청해봐요!"
           autofilling={autofilling}
           onAutofill={() => { setShowEmptyModal(false); autofill(); }}
-          onAskMentor={() => { setShowEmptyModal(false); aiChatRef.current?.focusInput(); }}
+          onAskMentor={() => { setShowEmptyModal(false); aiChatRef.current?.focusInput(); mobileChatRef.current?.openAndFocus(); }}
           onGoAnyway={goNextAnyway}
           onClose={() => setShowEmptyModal(false)}
         />
@@ -186,7 +188,7 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
             {project && (
               <button
                 onClick={() => downloadProposalScript({ ...project, proposalScript })}
-                className="flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] transition-all duration-200"
+                className="hidden sm:flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] transition-all duration-200"
               >
                 <Download className="w-3.5 h-3.5" /> 기획서 다운로드
               </button>
@@ -202,9 +204,9 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 py-6 flex gap-5">
+      <div className="max-w-7xl mx-auto px-4 py-6 flex flex-col md:flex-row gap-4 md:gap-5">
         {/* Left sidebar */}
-        <aside className="w-52 flex-shrink-0 space-y-3 sticky top-20 self-start">
+        <aside className="hidden md:flex md:flex-col w-52 flex-shrink-0 space-y-3 sticky top-20 self-start">
           <div className="bg-white rounded-2xl border border-[#EBE7E0] p-4 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
             <StepIndicator currentStep={project?.currentStep ?? 1} projectId={id} isCompleted={project?.isCompleted} />
           </div>
@@ -212,7 +214,7 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
           <FeatureListPanel episodes={project?.episodes ?? []} />
         </aside>
 
-        <main className="flex-1 min-w-0 space-y-4">
+        <main className="flex-1 min-w-0 space-y-4 pb-20 lg:pb-0">
           <div>
             <p className="text-[10px] font-medium text-[#D4547A] uppercase tracking-widest mb-1">Step 05</p>
             <h1 className="text-xl font-bold text-[#1A1A1A] tracking-tight">기획서 내용 작성</h1>
@@ -263,7 +265,7 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
           </div>
         </main>
 
-        <aside className="w-72 flex-shrink-0 sticky top-20 flex flex-col gap-3" style={{ height: "calc(100vh - 5rem)" }}>
+        <aside className="hidden lg:flex w-72 flex-shrink-0 sticky top-20 flex-col gap-3" style={{ height: "calc(100vh - 5rem)" }}>
           <CharacterPanel characters={project?.characters ?? []} />
           <div className="flex-1 min-h-0">
             <AiChat
@@ -275,6 +277,13 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
           </div>
         </aside>
       </div>
+
+      <MobileChatSheet
+        ref={mobileChatRef}
+        step="script"
+        initialMessage="기획서 작성을 도와드릴게요! 배경 및 필요성, 해결 방안, 핵심 기능, 기대 효과 순서로 작성하면 논리적인 기획서가 완성돼요."
+        placeholder="기획서 작성에 대해 질문하세요..."
+      />
     </div>
   );
 }

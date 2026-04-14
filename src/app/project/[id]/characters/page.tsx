@@ -9,6 +9,7 @@ import AiChat, { type AiChatHandle } from "@/components/ai-assistant/AiChat";
 import StepIndicator from "@/components/progress-tracker/StepIndicator";
 import EmptyContentModal from "@/components/EmptyContentModal";
 import { Plus, Trash2, ArrowRight, Check, Save, User, Download, Wand2 } from "lucide-react";
+import MobileChatSheet, { type MobileChatSheetHandle } from "@/components/mobile/MobileChatSheet";
 import { getProject, updateProject, type Character, type Project } from "@/lib/storage";
 import { downloadCharacters } from "@/lib/download";
 import { saveProjectToDir } from "@/lib/fileStorage";
@@ -26,6 +27,7 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
   const [autofilling, setAutofilling] = useState(false);
   const [showEmptyModal, setShowEmptyModal] = useState(false);
   const aiChatRef = useRef<AiChatHandle>(null);
+  const mobileChatRef = useRef<MobileChatSheetHandle>(null);
 
   useEffect(() => {
     const p = getProject(id);
@@ -119,7 +121,7 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
           description="SW를 사용할 주요 이해관계자를 한 명 이상 추가해야 다음 단계로 넘어갈 수 있어요. 어려우면 AI 도움을 받아봐요!"
           autofilling={autofilling}
           onAutofill={() => { setShowEmptyModal(false); autofill(); }}
-          onAskMentor={() => { setShowEmptyModal(false); aiChatRef.current?.focusInput(); }}
+          onAskMentor={() => { setShowEmptyModal(false); aiChatRef.current?.focusInput(); mobileChatRef.current?.openAndFocus(); }}
           onGoAnyway={goNextAnyway}
           onClose={() => setShowEmptyModal(false)}
         />
@@ -148,7 +150,7 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
                 </button>
                 <button
                   onClick={() => downloadCharacters({ ...project, characters })}
-                  className="flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] transition-all duration-200"
+                  className="hidden sm:flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] transition-all duration-200"
                 >
                   <Download className="w-3.5 h-3.5" /> 다운로드
                 </button>
@@ -165,14 +167,14 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 py-6 flex gap-5">
-        <aside className="w-52 flex-shrink-0">
+      <div className="max-w-7xl mx-auto px-4 py-6 flex flex-col md:flex-row gap-4 md:gap-5">
+        <aside className="hidden md:block w-52 flex-shrink-0">
           <div className="bg-white rounded-2xl border border-[#EBE7E0] p-4 sticky top-20 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
             <StepIndicator currentStep={project?.currentStep ?? 1} projectId={id} isCompleted={project?.isCompleted} />
           </div>
         </aside>
 
-        <main className="flex-1 min-w-0 space-y-4">
+        <main className="flex-1 min-w-0 space-y-4 pb-20 lg:pb-0">
           <div className="flex items-center justify-between mb-2">
             <div>
               <p className="text-[10px] font-medium text-[#D4547A] uppercase tracking-widest mb-1">Step 03</p>
@@ -237,7 +239,7 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
 
                   {editIdx === idx && (
                     <div className="px-5 pb-5 space-y-3 border-t border-[#EBE7E0] pt-4">
-                      <div className="grid grid-cols-3 gap-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div>
                           <label className="block text-xs font-semibold text-[#1A1A1A] mb-1.5">대상 이름 *</label>
                           <Input
@@ -313,7 +315,7 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
           </div>
         </main>
 
-        <aside className="w-72 flex-shrink-0 h-[calc(100vh-5rem)] sticky top-20">
+        <aside className="hidden lg:flex w-72 flex-shrink-0 h-[calc(100vh-5rem)] sticky top-20">
           <AiChat
             ref={aiChatRef}
             step="character"
@@ -322,6 +324,13 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
           />
         </aside>
       </div>
+
+      <MobileChatSheet
+        ref={mobileChatRef}
+        step="character"
+        initialMessage="이해관계자 분석을 도와드릴게요! 이 SW를 사용하게 될 주요 대상이 누구인가요? 어떤 사람들이 혜택을 받을지 생각해봐요."
+        placeholder="이해관계자 분석에 대해 질문하세요..."
+      />
     </div>
   );
 }

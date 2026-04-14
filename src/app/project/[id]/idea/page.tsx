@@ -50,8 +50,8 @@ export default function IdeaPage({ params }: { params: Promise<{ id: string }> }
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 py-6 flex gap-5">
-        <aside className="w-52 flex-shrink-0">
+      <div className="max-w-7xl mx-auto px-4 py-6 flex flex-col md:flex-row gap-4 md:gap-5">
+        <aside className="hidden md:block w-52 flex-shrink-0">
           <div className="bg-white rounded-2xl border border-[#EBE7E0] p-4 sticky top-20 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
             <StepIndicator currentStep={project?.currentStep ?? 1} projectId={id} isCompleted={project?.isCompleted} />
           </div>
@@ -66,7 +66,7 @@ export default function IdeaPage({ params }: { params: Promise<{ id: string }> }
             </p>
           </div>
 
-          <div className="h-[calc(100vh-15rem)]">
+          <div className="h-[calc(100vh-18rem)] md:h-[calc(100vh-15rem)]">
             <AiChat
               key={project?.id ?? "loading"}
               step="idea"

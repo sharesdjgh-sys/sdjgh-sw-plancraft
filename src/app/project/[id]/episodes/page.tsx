@@ -9,6 +9,7 @@ import AiChat, { type AiChatHandle } from "@/components/ai-assistant/AiChat";
 import StepIndicator from "@/components/progress-tracker/StepIndicator";
 import EmptyContentModal from "@/components/EmptyContentModal";
 import { Plus, Trash2, Save, ArrowRight, CheckCircle, Check, Download, Cpu, Wand2 } from "lucide-react";
+import MobileChatSheet, { type MobileChatSheetHandle } from "@/components/mobile/MobileChatSheet";
 import { getProject, updateProject, type Episode, type Cut, type Project } from "@/lib/storage";
 import { downloadEpisode, downloadAllEpisodes } from "@/lib/download";
 import { saveProjectToDir } from "@/lib/fileStorage";
@@ -28,6 +29,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
   const [autofilling, setAutofilling] = useState(false);
   const [showEmptyModal, setShowEmptyModal] = useState(false);
   const aiChatRef = useRef<AiChatHandle>(null);
+  const mobileChatRef = useRef<MobileChatSheetHandle>(null);
 
   useEffect(() => {
     const p = getProject(id);
@@ -171,7 +173,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
           description="핵심 기능의 이름을 하나 이상 작성해야 다음 단계로 넘어갈 수 있어요. 어려우면 AI 도움을 받아봐요!"
           autofilling={autofilling}
           onAutofill={() => { setShowEmptyModal(false); autofill(); }}
-          onAskMentor={() => { setShowEmptyModal(false); aiChatRef.current?.focusInput(); }}
+          onAskMentor={() => { setShowEmptyModal(false); aiChatRef.current?.focusInput(); mobileChatRef.current?.openAndFocus(); }}
           onGoAnyway={goNextAnyway}
           onClose={() => setShowEmptyModal(false)}
         />
@@ -200,13 +202,13 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
                 </button>
                 <button
                   onClick={() => downloadEpisode({ ...project, episodes }, activeEp)}
-                  className="flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] transition-all duration-200"
+                  className="hidden sm:flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] transition-all duration-200"
                 >
                   <Download className="w-3.5 h-3.5" /> 이 기능
                 </button>
                 <button
                   onClick={() => downloadAllEpisodes({ ...project, episodes })}
-                  className="flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] transition-all duration-200"
+                  className="hidden sm:flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] transition-all duration-200"
                 >
                   <Download className="w-3.5 h-3.5" /> 전체
                 </button>
@@ -223,9 +225,9 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 py-6 flex gap-5">
+      <div className="max-w-7xl mx-auto px-4 py-6 flex flex-col md:flex-row gap-4 md:gap-5">
         {/* Left sidebar */}
-        <aside className="w-52 flex-shrink-0 space-y-3 sticky top-20 self-start">
+        <aside className="hidden md:flex md:flex-col w-52 flex-shrink-0 space-y-3 sticky top-20 self-start">
           <div className="bg-white rounded-2xl border border-[#EBE7E0] p-4 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
             <StepIndicator currentStep={project?.currentStep ?? 1} projectId={id} isCompleted={project?.isCompleted} />
           </div>
@@ -256,7 +258,31 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
           </div>
         </aside>
 
-        <main className="flex-1 min-w-0 space-y-4">
+        <main className="flex-1 min-w-0 space-y-4 pb-20 lg:pb-0">
+          {/* 모바일 기능 탭 */}
+          <div className="md:hidden flex gap-2 overflow-x-auto pb-1">
+            {episodes.map((ep, i) => (
+              <button
+                key={i}
+                onClick={() => setActiveEp(i)}
+                className={`flex-shrink-0 flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border transition-all duration-200 ${
+                  activeEp === i
+                    ? "bg-[#D4547A] text-white border-[#D4547A]"
+                    : "bg-white text-[#7A7067] border-[#EBE7E0]"
+                }`}
+              >
+                기능 {ep.episodeNumber}{ep.title ? ` · ${ep.title.slice(0, 6)}` : ""}
+                {ep.isCompleted && <CheckCircle className="w-3 h-3 flex-shrink-0" />}
+              </button>
+            ))}
+            <button
+              onClick={addEpisode}
+              className="flex-shrink-0 flex items-center gap-1 text-xs px-3 py-1.5 rounded-full border border-dashed border-[#EBE7E0] text-[#ADA8A0]"
+            >
+              <Plus className="w-3 h-3" /> 추가
+            </button>
+          </div>
+
           <div className="flex items-center justify-between mb-2">
             <div>
               <p className="text-[10px] font-medium text-[#D4547A] uppercase tracking-widest mb-1">Step 04</p>
@@ -344,7 +370,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
                         </button>
                       </div>
 
-                      <div className="p-4 grid grid-cols-2 gap-3">
+                      <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div className="col-span-2">
                           <label className="block text-[10px] font-semibold text-[#7A7067] mb-1.5">동작 설명</label>
                           <Textarea
@@ -402,7 +428,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
           </div>
         </main>
 
-        <aside className="w-72 flex-shrink-0 h-[calc(100vh-5rem)] sticky top-20">
+        <aside className="hidden lg:flex w-72 flex-shrink-0 h-[calc(100vh-5rem)] sticky top-20">
           <AiChat
             ref={aiChatRef}
             step="panel"
@@ -411,6 +437,13 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
           />
         </aside>
       </div>
+
+      <MobileChatSheet
+        ref={mobileChatRef}
+        step="panel"
+        initialMessage="기능 설계를 도와드릴게요! 어떤 핵심 기능을 만들고 싶으신가요? 기능의 입력·처리·출력 흐름을 함께 정리해봐요."
+        placeholder="기능 설계에 대해 질문하세요..."
+      />
     </div>
   );
 }

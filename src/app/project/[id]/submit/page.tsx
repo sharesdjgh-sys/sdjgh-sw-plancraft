@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, use, useRef } from "react";
 import Link from "next/link";
 import { Textarea } from "@/components/ui/textarea";
-import AiChat from "@/components/ai-assistant/AiChat";
+import AiChat, { type AiChatHandle } from "@/components/ai-assistant/AiChat";
 import StepIndicator from "@/components/progress-tracker/StepIndicator";
+import MobileChatSheet, { type MobileChatSheetHandle } from "@/components/mobile/MobileChatSheet";
 import { Trophy, CheckCircle, Circle, ArrowLeft, Download } from "lucide-react";
 import { getProject, updateProject } from "@/lib/storage";
 import { downloadFullSummary } from "@/lib/download";
@@ -27,6 +28,8 @@ export default function SubmitPage({ params }: { params: Promise<{ id: string }>
   const [checks, setChecks] = useState<Record<string, boolean>>({});
   const [authorNote, setAuthorNote] = useState("");
   const [completed, setCompleted] = useState(false);
+  const aiChatRef = useRef<AiChatHandle>(null);
+  const mobileChatRef = useRef<MobileChatSheetHandle>(null);
 
   useEffect(() => {
     const p = getProject(id);
@@ -65,14 +68,14 @@ export default function SubmitPage({ params }: { params: Promise<{ id: string }>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 py-6 flex gap-5">
-        <aside className="w-52 flex-shrink-0">
+      <div className="max-w-7xl mx-auto px-4 py-6 flex flex-col md:flex-row gap-4 md:gap-5">
+        <aside className="hidden md:block w-52 flex-shrink-0">
           <div className="bg-white rounded-2xl border border-[#EBE7E0] p-4 sticky top-20 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
             <StepIndicator currentStep={project?.currentStep ?? 6} projectId={id} isCompleted={project?.isCompleted} />
           </div>
         </aside>
 
-        <main className="flex-1 min-w-0 space-y-4">
+        <main className="flex-1 min-w-0 space-y-4 pb-20 lg:pb-0">
           <div>
             <p className="text-[10px] font-medium text-[#D4547A] uppercase tracking-widest mb-1">Step 06</p>
             <h1 className="text-xl font-bold text-[#1A1A1A] tracking-tight flex items-center gap-2">
@@ -209,14 +212,22 @@ export default function SubmitPage({ params }: { params: Promise<{ id: string }>
           </div>
         </main>
 
-        <aside className="w-72 flex-shrink-0 h-[calc(100vh-5rem)] sticky top-20">
+        <aside className="hidden lg:flex w-72 flex-shrink-0 h-[calc(100vh-5rem)] sticky top-20">
           <AiChat
+            ref={aiChatRef}
             step="completion"
             initialMessage="거의 다 왔어요! 제출 전 최종 점검을 도와드릴게요. 지원 동기 작성이나 기획서 마지막 검토에서 도움이 필요하시면 말씀해 주세요!"
             placeholder="마지막 점검에 도움을 요청하세요..."
           />
         </aside>
       </div>
+
+      <MobileChatSheet
+        ref={mobileChatRef}
+        step="completion"
+        initialMessage="거의 다 왔어요! 제출 전 최종 점검을 도와드릴게요. 지원 동기 작성이나 기획서 마지막 검토에서 도움이 필요하시면 말씀해 주세요!"
+        placeholder="마지막 점검에 도움을 요청하세요..."
+      />
     </div>
   );
 }
