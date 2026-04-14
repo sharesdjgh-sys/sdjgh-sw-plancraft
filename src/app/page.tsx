@@ -241,32 +241,15 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Testimonial-style quote */}
-      <ScrollReveal>
-        <section className="px-8 pb-24">
-          <div className="max-w-2xl mx-auto bg-white rounded-3xl border border-[#EBE7E0] p-10 text-center shadow-[0_4px_32px_rgba(0,0,0,0.04)]">
-            <div className="text-3xl font-serif italic text-[#D4547A] mb-6">"</div>
-            <p className="text-lg font-medium text-[#1A1A1A] leading-relaxed tracking-tight mb-6">
-              아이디어는 있었는데 어떻게 기획서로 정리할지 몰랐어요.<br />
-              AI 멘토와 대화하다보니 어느새 기획서가 완성됐어요.
-            </p>
-            <div className="flex items-center justify-center gap-2">
-              <div className="w-7 h-7 rounded-full bg-[#F4F1EC] flex items-center justify-center">
-                <span className="text-xs font-bold text-[#D4547A]">김</span>
-              </div>
-              <span className="text-xs text-[#ADA8A0]">김○○, 고등학교 2학년 · 공모전 최우수상 수상</span>
-            </div>
-          </div>
-        </section>
-      </ScrollReveal>
-
-      {/* CTA */}
+{/* CTA */}
       <ScrollReveal>
         <section className="px-8 pb-28 max-w-6xl mx-auto">
+          <div className="text-center mb-4">
+            <p className="text-xs font-medium text-[#D4547A] uppercase tracking-widest">Get Started</p>
+          </div>
           <div className="relative overflow-hidden bg-[#D4547A] rounded-3xl p-12 text-center">
             <div className="absolute top-0 right-0 w-72 h-72 bg-white blob opacity-10 pointer-events-none" />
             <div className="relative z-10">
-              <p className="text-white/70 text-xs font-medium tracking-widest uppercase mb-4">지금 바로</p>
               <h2 className="text-3xl font-bold text-white tracking-tight mb-3">
                 공모전 참가를 망설이고 있나요?
               </h2>
