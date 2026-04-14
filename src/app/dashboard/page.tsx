@@ -102,13 +102,6 @@ export default function DashboardPage() {
   const selectClass =
     "flex h-11 w-full rounded-xl border border-[#EBE7E0] bg-white px-4 py-2 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#D4547A]/20 focus:border-[#D4547A]/40 transition-all duration-200";
 
-  const greeting = () => {
-    const h = new Date().getHours();
-    if (h < 12) return "좋은 아침이에요";
-    if (h < 18) return "안녕하세요";
-    return "오늘도 수고했어요";
-  };
-
   const filtered = projects
     .filter((p) => p.title.toLowerCase().includes(search.toLowerCase()))
     .sort((a, b) => {
@@ -156,8 +149,8 @@ export default function DashboardPage() {
         {/* Welcome */}
         <div className="flex items-end justify-between mb-8">
           <div>
-            <p className="text-xs font-medium text-[#D4547A] mb-1">{greeting()}</p>
-            <h1 className="text-2xl font-bold text-[#1A1A1A] tracking-tight">내 SW 아이디어</h1>
+            <p className="text-xs font-medium text-[#D4547A] mb-1">생각을 아이디어로 만들어보세요</p>
+            <h1 className="text-2xl font-bold text-[#1A1A1A] tracking-tight">내 소프트웨어 아이디어 목록</h1>
           </div>
           <button
             onClick={openCreate}
