@@ -50,12 +50,11 @@ export default function GuidePage() {
             const Icon = s.icon;
             return (
               <ScrollReveal key={s.step} delay={idx * 55}>
-                <div className="bg-white rounded-2xl border border-[#EBE7E0] p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
-                  <div className="flex items-start gap-5">
-                    <div className="w-11 h-11 rounded-xl bg-[#D4547A]/10 flex items-center justify-center flex-shrink-0">
-                      <Icon className="w-5 h-5 text-[#D4547A]" />
-                    </div>
-                    <div className="flex-1 min-w-0">
+                <div className="relative bg-white rounded-2xl border border-[#EBE7E0] p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
+                  <div className="w-11 h-11 rounded-xl bg-[#D4547A]/10 flex items-center justify-center absolute top-6 right-6">
+                    <Icon className="w-5 h-5 text-[#D4547A]" />
+                  </div>
+                  <div>
                       <div className="flex items-center gap-3 mb-2">
                         <span className="text-[10px] font-mono text-[#ADA8A0]">STEP {String(s.step).padStart(2, "0")}</span>
                         <span className="text-[10px] border border-[#EBE7E0] text-[#ADA8A0] px-2.5 py-0.5 rounded-full bg-[#F4F1EC]">예상 {s.time}</span>
@@ -71,7 +70,6 @@ export default function GuidePage() {
                         ))}
                       </div>
                     </div>
-                  </div>
                 </div>
               </ScrollReveal>
             );
