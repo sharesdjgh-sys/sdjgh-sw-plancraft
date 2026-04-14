@@ -96,7 +96,7 @@ export default function DashboardPage() {
   };
 
   const selectClass =
-    "flex h-11 w-full rounded-xl border border-[#EBE7E0] bg-white px-4 py-2 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#C06070]/20 focus:border-[#C06070]/40 transition-all duration-200";
+    "flex h-11 w-full rounded-xl border border-[#EBE7E0] bg-white px-4 py-2 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#D4547A]/20 focus:border-[#D4547A]/40 transition-all duration-200";
 
   const greeting = () => {
     const h = new Date().getHours();
@@ -152,12 +152,12 @@ export default function DashboardPage() {
         {/* Welcome */}
         <div className="flex items-end justify-between mb-8">
           <div>
-            <p className="text-xs font-medium text-[#C06070] mb-1">{greeting()}</p>
+            <p className="text-xs font-medium text-[#D4547A] mb-1">{greeting()}</p>
             <h1 className="text-2xl font-bold text-[#1A1A1A] tracking-tight">내 SW 아이디어</h1>
           </div>
           <button
             onClick={openCreate}
-            className="flex items-center gap-2 bg-[#C06070] text-white text-sm font-medium px-4 py-2.5 rounded-full hover:bg-[#A8505F] transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_16px_rgba(192,96,112,0.25)]"
+            className="flex items-center gap-2 bg-[#D4547A] text-white text-sm font-medium px-4 py-2.5 rounded-full hover:bg-[#B8405F] transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_16px_rgba(212,84,122,0.25)]"
           >
             <Plus className="w-4 h-4" /> 새 프로젝트
           </button>
@@ -173,13 +173,13 @@ export default function DashboardPage() {
                 placeholder="프로젝트 검색..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-9 pr-3 h-9 rounded-xl border border-[#EBE7E0] bg-white text-xs text-[#1A1A1A] placeholder-[#ADA8A0] focus:outline-none focus:ring-2 focus:ring-[#C06070]/20 focus:border-[#C06070]/40 transition-all duration-200"
+                className="w-full pl-9 pr-3 h-9 rounded-xl border border-[#EBE7E0] bg-white text-xs text-[#1A1A1A] placeholder-[#ADA8A0] focus:outline-none focus:ring-2 focus:ring-[#D4547A]/20 focus:border-[#D4547A]/40 transition-all duration-200"
               />
             </div>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-              className="h-9 px-3 rounded-xl border border-[#EBE7E0] bg-white text-xs text-[#7A7067] focus:outline-none focus:ring-2 focus:ring-[#C06070]/20 transition-all duration-200"
+              className="h-9 px-3 rounded-xl border border-[#EBE7E0] bg-white text-xs text-[#7A7067] focus:outline-none focus:ring-2 focus:ring-[#D4547A]/20 transition-all duration-200"
             >
               <option value="recent">최근 순</option>
               <option value="progress">진행률 순</option>
@@ -260,7 +260,7 @@ export default function DashboardPage() {
                   <button
                     type="submit"
                     disabled={creating}
-                    className="flex-1 bg-[#C06070] text-white h-11 rounded-full text-sm font-semibold hover:bg-[#A8505F] transition-all duration-300 disabled:opacity-50 shadow-[0_4px_16px_rgba(192,96,112,0.25)]"
+                    className="flex-1 bg-[#D4547A] text-white h-11 rounded-full text-sm font-semibold hover:bg-[#B8405F] transition-all duration-300 disabled:opacity-50 shadow-[0_4px_16px_rgba(212,84,122,0.25)]"
                   >
                     {creating ? "저장 중..." : editingId ? "저장하기" : "시작하기"}
                   </button>
@@ -285,7 +285,7 @@ export default function DashboardPage() {
             <p className="text-sm text-[#7A7067] mb-6">첫 번째 SW 아이디어 프로젝트를 만들어볼까요?</p>
             <button
               onClick={openCreate}
-              className="inline-flex items-center gap-2 bg-[#C06070] text-white text-sm font-medium px-5 py-2.5 rounded-full hover:bg-[#A8505F] transition-all duration-300 shadow-[0_4px_16px_rgba(192,96,112,0.25)]"
+              className="inline-flex items-center gap-2 bg-[#D4547A] text-white text-sm font-medium px-5 py-2.5 rounded-full hover:bg-[#B8405F] transition-all duration-300 shadow-[0_4px_16px_rgba(212,84,122,0.25)]"
             >
               <Plus className="w-4 h-4" /> 새 프로젝트 만들기
             </button>
@@ -303,13 +303,13 @@ export default function DashboardPage() {
               return (
                 <div key={p.id} className="relative group">
                   <Link href={getProjectHref(p)}>
-                  <div className="bg-white rounded-2xl border border-[#EBE7E0] p-5 hover:border-[#C06070]/30 hover:shadow-[0_4px_24px_rgba(192,96,112,0.08)] transition-all duration-300 cursor-pointer">
+                  <div className="bg-white rounded-2xl border border-[#EBE7E0] p-5 hover:border-[#D4547A]/30 hover:shadow-[0_4px_24px_rgba(212,84,122,0.08)] transition-all duration-300 cursor-pointer">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex-1 min-w-0 pr-2">
                         <h3 className="text-sm font-bold text-[#1A1A1A] mb-1.5">{p.title}</h3>
                         <div className="flex items-center gap-2 flex-wrap">
                           {p.author && (
-                            <span className="flex items-center gap-1 text-[10px] text-[#C06070] font-medium">
+                            <span className="flex items-center gap-1 text-[10px] text-[#D4547A] font-medium">
                               <User className="w-3 h-3" /> {p.author}
                             </span>
                           )}
@@ -353,11 +353,11 @@ export default function DashboardPage() {
                     <div className="mb-3.5">
                       <div className="flex justify-between text-xs mb-2">
                         <span className="text-[#7A7067]">{STEPS[p.currentStep - 1]?.label ?? "완료"}</span>
-                        <span className="font-semibold text-[#C06070]">{progress}%</span>
+                        <span className="font-semibold text-[#D4547A]">{progress}%</span>
                       </div>
                       <div className="w-full bg-[#F4F1EC] rounded-full h-1.5">
                         <div
-                          className="bg-[#C06070] h-1.5 rounded-full transition-all duration-500"
+                          className="bg-[#D4547A] h-1.5 rounded-full transition-all duration-500"
                           style={{ width: `${progress}%` }}
                         />
                       </div>
@@ -365,7 +365,7 @@ export default function DashboardPage() {
 
                     <div className="flex items-center gap-3">
                       {p.targetCompetition && (
-                        <div className="flex items-center gap-1 text-xs text-[#C06070]">
+                        <div className="flex items-center gap-1 text-xs text-[#D4547A]">
                           <Trophy className="w-3 h-3" />
                           <span className="truncate max-w-[140px]">{p.targetCompetition}</span>
                         </div>

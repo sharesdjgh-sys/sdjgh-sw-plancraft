@@ -72,14 +72,14 @@ export default function SubmitPage({ params }: { params: Promise<{ id: string }>
 
         <main className="flex-1 min-w-0 space-y-4">
           <div>
-            <p className="text-[10px] font-medium text-[#C06070] uppercase tracking-widest mb-1">Step 06</p>
+            <p className="text-[10px] font-medium text-[#D4547A] uppercase tracking-widest mb-1">Step 06</p>
             <h1 className="text-xl font-bold text-[#1A1A1A] tracking-tight flex items-center gap-2">
-              제출 준비 <Trophy className="w-5 h-5 text-[#C06070]" />
+              제출 준비 <Trophy className="w-5 h-5 text-[#D4547A]" />
             </h1>
           </div>
 
           {/* 진행률 */}
-          <div className="bg-[#C06070] rounded-2xl p-6 text-white shadow-[0_4px_24px_rgba(192,96,112,0.25)]">
+          <div className="bg-[#D4547A] rounded-2xl p-6 text-white shadow-[0_4px_24px_rgba(212,84,122,0.25)]">
             <div className="flex items-center justify-between mb-3">
               <div>
                 <p className="text-base font-bold">최종 점검 체크리스트</p>
@@ -113,7 +113,7 @@ export default function SubmitPage({ params }: { params: Promise<{ id: string }>
                   className="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-[#F4F1EC] transition-colors text-left"
                 >
                   {checks[item.id] ? (
-                    <CheckCircle className="w-4.5 h-4.5 text-[#C06070] flex-shrink-0" />
+                    <CheckCircle className="w-4.5 h-4.5 text-[#D4547A] flex-shrink-0" />
                   ) : (
                     <Circle className="w-4.5 h-4.5 text-[#D4CFC9] flex-shrink-0" />
                   )}
@@ -142,7 +142,7 @@ export default function SubmitPage({ params }: { params: Promise<{ id: string }>
 
           {/* 완료 / 대시보드 섹션 */}
           {completed ? (
-            <div className="bg-[#C06070] rounded-2xl p-6 text-center text-white">
+            <div className="bg-[#D4547A] rounded-2xl p-6 text-center text-white">
               <div className="text-3xl mb-2">🏆</div>
               <h3 className="text-base font-bold mb-1">축하해요!</h3>
               <p className="text-xs text-white/80 mb-5">SW 기획서 작성을 완료했어요. 공모전에서 좋은 결과 있기를 응원해요!</p>
@@ -156,7 +156,7 @@ export default function SubmitPage({ params }: { params: Promise<{ id: string }>
                   </button>
                 )}
                 <Link href="/dashboard">
-                  <button className="flex items-center gap-2 text-xs font-semibold px-5 py-2.5 rounded-full bg-white text-[#C06070] hover:bg-white/90 transition-all duration-200">
+                  <button className="flex items-center gap-2 text-xs font-semibold px-5 py-2.5 rounded-full bg-white text-[#D4547A] hover:bg-white/90 transition-all duration-200">
                     대시보드로 돌아가기
                   </button>
                 </Link>
@@ -180,7 +180,7 @@ export default function SubmitPage({ params }: { params: Promise<{ id: string }>
                   disabled={!isReady}
                   className={`flex-shrink-0 text-xs font-semibold px-5 py-2.5 rounded-full transition-all duration-300 ${
                     isReady
-                      ? "bg-[#C06070] text-white hover:bg-[#A8505F] shadow-[0_4px_16px_rgba(192,96,112,0.25)]"
+                      ? "bg-[#D4547A] text-white hover:bg-[#B8405F] shadow-[0_4px_16px_rgba(212,84,122,0.25)]"
                       : "bg-[#EBE7E0] text-[#ADA8A0] cursor-not-allowed"
                   }`}
                 >
@@ -199,7 +199,7 @@ export default function SubmitPage({ params }: { params: Promise<{ id: string }>
             {!completed && project && (
               <button
                 onClick={() => downloadFullSummary(project)}
-                className="flex items-center gap-2 text-xs font-semibold px-5 py-2.5 rounded-full border border-[#C06070]/30 text-[#C06070] hover:bg-[#C06070]/5 transition-all duration-200"
+                className="flex items-center gap-2 text-xs font-semibold px-5 py-2.5 rounded-full border border-[#D4547A]/30 text-[#D4547A] hover:bg-[#D4547A]/5 transition-all duration-200"
               >
                 <Download className="w-3.5 h-3.5" /> 최종 요약 다운로드
               </button>

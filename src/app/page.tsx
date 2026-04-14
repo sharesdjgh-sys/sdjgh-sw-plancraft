@@ -40,21 +40,21 @@ export default function HomePage() {
       {/* Hero */}
       <section className="relative min-h-[100dvh] flex items-center px-8 pt-20 overflow-hidden">
         {/* Decorative blobs */}
-        <div className="absolute top-24 right-[8%] w-[420px] h-[420px] bg-[#C06070] blob blob-anim pointer-events-none" />
+        <div className="absolute top-24 right-[8%] w-[420px] h-[420px] bg-[#D4547A] blob blob-anim pointer-events-none" />
         <div className="absolute bottom-12 left-[5%] w-[280px] h-[280px] bg-[#E8C9A0] blob pointer-events-none opacity-25" />
 
         <div className="relative z-10 max-w-6xl mx-auto w-full grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-16 items-center py-16">
           <div>
             {/* Badge */}
-            <div className="hero-enter inline-flex items-center gap-2 border border-[#C06070]/25 bg-[#C06070]/[0.07] text-[#C06070] px-3.5 py-1.5 rounded-full text-xs font-medium mb-7">
-              <Star className="w-3 h-3 fill-[#C06070]" />
+            <div className="hero-enter inline-flex items-center gap-2 border border-[#D4547A]/25 bg-[#D4547A]/[0.07] text-[#D4547A] px-3.5 py-1.5 rounded-full text-xs font-medium mb-7">
+              <Star className="w-3 h-3 fill-[#D4547A]" />
               SW 아이디어 공모전 공식 준비 플랫폼
             </div>
 
             {/* Headline */}
             <h1 className="hero-enter-2 text-[clamp(2.6rem,6vw,4.5rem)] font-bold tracking-tight leading-[1.08] mb-6">
               내 아이디어를<br />
-              <span className="font-serif italic text-[#C06070]">기획서</span>로<br />
+              <span className="font-serif italic text-[#D4547A]">기획서</span>로<br />
               완성해봐요
             </h1>
 
@@ -67,7 +67,7 @@ export default function HomePage() {
             <div className="hero-enter-3 flex items-center gap-4 flex-wrap">
               <Link
                 href="/dashboard"
-                className="flex items-center gap-2 bg-[#C06070] text-white px-6 py-3.5 rounded-full font-semibold text-sm hover:bg-[#A8505F] transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_24px_rgba(192,96,112,0.35)]"
+                className="flex items-center gap-2 bg-[#D4547A] text-white px-6 py-3.5 rounded-full font-semibold text-sm hover:bg-[#B8405F] transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_24px_rgba(212,84,122,0.35)]"
               >
                 지금 시작하기 <ArrowRight className="w-4 h-4" />
               </Link>
@@ -85,13 +85,13 @@ export default function HomePage() {
             <div className="bg-white rounded-3xl border border-[#EBE7E0] p-6 shadow-[0_8px_48px_rgba(0,0,0,0.06)]">
               <div className="flex items-center justify-between mb-4">
                 <span className="text-[10px] font-medium text-[#ADA8A0] uppercase tracking-wider">진행 중인 프로젝트</span>
-                <span className="text-[10px] bg-[#C06070]/10 text-[#C06070] px-2.5 py-1 rounded-full font-medium">3 / 6단계</span>
+                <span className="text-[10px] bg-[#D4547A]/10 text-[#D4547A] px-2.5 py-1 rounded-full font-medium">3 / 6단계</span>
               </div>
               <p className="text-base font-bold text-[#1A1A1A] mb-1">급식 잔반 줄이기 앱</p>
               <p className="text-xs text-[#ADA8A0] mb-4">교육 · SW 아이디어 공모전</p>
 
               <div className="w-full bg-[#F4F1EC] rounded-full h-1.5 mb-5">
-                <div className="bg-[#C06070] h-1.5 rounded-full" style={{ width: "45%" }} />
+                <div className="bg-[#D4547A] h-1.5 rounded-full" style={{ width: "45%" }} />
               </div>
 
               <div className="space-y-2">
@@ -105,12 +105,12 @@ export default function HomePage() {
                     key={item.label}
                     className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs ${
                       item.done ? "bg-[#F4F1EC] text-[#ADA8A0]" :
-                      item.current ? "bg-[#C06070]/8 text-[#C06070] border border-[#C06070]/15" :
+                      item.current ? "bg-[#D4547A]/8 text-[#D4547A] border border-[#D4547A]/15" :
                       "text-[#D4CFC9]"
                     }`}
                   >
                     <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
-                      item.done ? "bg-[#ADA8A0]" : item.current ? "bg-[#C06070]" : "bg-[#EBE7E0]"
+                      item.done ? "bg-[#ADA8A0]" : item.current ? "bg-[#D4547A]" : "bg-[#EBE7E0]"
                     }`} />
                     <span>{item.label}</span>
                     {item.done && <span className="ml-auto text-[10px]">완료</span>}
@@ -137,7 +137,7 @@ export default function HomePage() {
       <section className="px-8 py-24 max-w-6xl mx-auto">
         <ScrollReveal>
           <div className="text-center mb-14">
-            <p className="text-xs font-medium text-[#C06070] uppercase tracking-widest mb-3">Process</p>
+            <p className="text-xs font-medium text-[#D4547A] uppercase tracking-widest mb-3">Process</p>
             <h2 className="text-3xl font-bold tracking-tight">
               아이디어에서 기획서까지,<br />
               <span className="font-serif italic">딱 6단계</span>
@@ -150,10 +150,10 @@ export default function HomePage() {
             const Icon = step.icon;
             return (
               <ScrollReveal key={step.label} delay={i * 55}>
-                <div className="group bg-white rounded-2xl border border-[#EBE7E0] p-5 hover:border-[#C06070]/30 hover:shadow-[0_4px_24px_rgba(192,96,112,0.08)] transition-all duration-300 cursor-default">
+                <div className="group bg-white rounded-2xl border border-[#EBE7E0] p-5 hover:border-[#D4547A]/30 hover:shadow-[0_4px_24px_rgba(212,84,122,0.08)] transition-all duration-300 cursor-default">
                   <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-[#F4F1EC] flex items-center justify-center flex-shrink-0 group-hover:bg-[#C06070]/10 transition-colors duration-300">
-                      <Icon className="w-4.5 h-4.5 text-[#7A7067] group-hover:text-[#C06070] transition-colors duration-300" />
+                    <div className="w-10 h-10 rounded-xl bg-[#F4F1EC] flex items-center justify-center flex-shrink-0 group-hover:bg-[#D4547A]/10 transition-colors duration-300">
+                      <Icon className="w-4.5 h-4.5 text-[#7A7067] group-hover:text-[#D4547A] transition-colors duration-300" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2 mb-1">
@@ -174,7 +174,7 @@ export default function HomePage() {
       <section className="px-8 pb-24 max-w-6xl mx-auto">
         <ScrollReveal>
           <div className="text-center mb-14">
-            <p className="text-xs font-medium text-[#C06070] uppercase tracking-widest mb-3">Why us</p>
+            <p className="text-xs font-medium text-[#D4547A] uppercase tracking-widest mb-3">Why us</p>
             <h2 className="text-3xl font-bold tracking-tight">
               끝까지 완성할 수 있는<br />
               <span className="font-serif italic">이유가 있어요</span>
@@ -194,7 +194,7 @@ export default function HomePage() {
           </ScrollReveal>
 
           <ScrollReveal delay={80} className="h-full">
-            <div className="h-full bg-[#C06070] rounded-3xl p-8 text-white hover:shadow-[0_4px_32px_rgba(192,96,112,0.3)] transition-all duration-300">
+            <div className="h-full bg-[#D4547A] rounded-3xl p-8 text-white hover:shadow-[0_4px_32px_rgba(212,84,122,0.3)] transition-all duration-300">
               <div className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center mb-5">
                 <Heart className="w-4.5 h-4.5 text-white" />
               </div>
@@ -235,14 +235,14 @@ export default function HomePage() {
       <ScrollReveal>
         <section className="px-8 pb-24">
           <div className="max-w-2xl mx-auto bg-white rounded-3xl border border-[#EBE7E0] p-10 text-center shadow-[0_4px_32px_rgba(0,0,0,0.04)]">
-            <div className="text-3xl font-serif italic text-[#C06070] mb-6">"</div>
+            <div className="text-3xl font-serif italic text-[#D4547A] mb-6">"</div>
             <p className="text-lg font-medium text-[#1A1A1A] leading-relaxed tracking-tight mb-6">
               아이디어는 있었는데 어떻게 기획서로 정리할지 몰랐어요.<br />
               AI 멘토와 대화하다보니 어느새 기획서가 완성됐어요.
             </p>
             <div className="flex items-center justify-center gap-2">
               <div className="w-7 h-7 rounded-full bg-[#F4F1EC] flex items-center justify-center">
-                <span className="text-xs font-bold text-[#C06070]">김</span>
+                <span className="text-xs font-bold text-[#D4547A]">김</span>
               </div>
               <span className="text-xs text-[#ADA8A0]">김○○, 고등학교 2학년 · 공모전 최우수상 수상</span>
             </div>
@@ -253,7 +253,7 @@ export default function HomePage() {
       {/* CTA */}
       <ScrollReveal>
         <section className="px-8 pb-28 max-w-6xl mx-auto">
-          <div className="relative overflow-hidden bg-[#C06070] rounded-3xl p-12 text-center">
+          <div className="relative overflow-hidden bg-[#D4547A] rounded-3xl p-12 text-center">
             <div className="absolute top-0 right-0 w-72 h-72 bg-white blob opacity-10 pointer-events-none" />
             <div className="relative z-10">
               <p className="text-white/70 text-xs font-medium tracking-widest uppercase mb-4">지금 바로</p>
@@ -265,7 +265,7 @@ export default function HomePage() {
               </p>
               <Link
                 href="/dashboard"
-                className="inline-flex items-center gap-2 bg-white text-[#C06070] px-7 py-3.5 rounded-full font-semibold text-sm hover:bg-[#FBF9F6] transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_24px_rgba(0,0,0,0.12)]"
+                className="inline-flex items-center gap-2 bg-white text-[#D4547A] px-7 py-3.5 rounded-full font-semibold text-sm hover:bg-[#FBF9F6] transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_24px_rgba(0,0,0,0.12)]"
               >
                 무료로 시작하기 <ArrowRight className="w-4 h-4" />
               </Link>

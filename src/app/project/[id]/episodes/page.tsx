@@ -144,7 +144,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
   const ep = episodes[activeEp];
 
   const selectClass =
-    "flex h-9 w-full rounded-xl border border-[#EBE7E0] bg-white px-3 py-1.5 text-xs text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#C06070]/20 focus:border-[#C06070]/40 transition-all duration-200";
+    "flex h-9 w-full rounded-xl border border-[#EBE7E0] bg-white px-3 py-1.5 text-xs text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#D4547A]/20 focus:border-[#D4547A]/40 transition-all duration-200";
 
   return (
     <div className="min-h-screen bg-[#FBF9F6]">
@@ -166,7 +166,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
                 <button
                   onClick={autofill}
                   disabled={autofilling}
-                  className="flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-full border border-[#C06070]/30 text-[#C06070] hover:bg-[#C06070]/5 transition-all duration-200 disabled:opacity-50"
+                  className="flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-full border border-[#D4547A]/30 text-[#D4547A] hover:bg-[#D4547A]/5 transition-all duration-200 disabled:opacity-50"
                 >
                   <Wand2 className="w-3.5 h-3.5" /> {autofilling ? "채우는 중..." : "AI 자동채우기"}
                 </button>
@@ -187,7 +187,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
             <button
               onClick={save}
               disabled={saving}
-              className="flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-full bg-[#C06070] text-white hover:bg-[#A8505F] transition-all duration-300 disabled:opacity-50"
+              className="flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-full bg-[#D4547A] text-white hover:bg-[#B8405F] transition-all duration-300 disabled:opacity-50"
             >
               {saved ? <><Check className="w-3.5 h-3.5" /> 저장됨</> : saving ? "저장 중..." : <><Save className="w-3.5 h-3.5" /> 저장</>}
             </button>
@@ -205,7 +205,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
           <div className="bg-white rounded-2xl border border-[#EBE7E0] p-4 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
             <div className="flex items-center justify-between mb-3">
               <span className="text-xs font-bold text-[#1A1A1A]">기능 목록</span>
-              <button onClick={addEpisode} className="text-[#C06070] hover:text-[#A8505F] transition-colors">
+              <button onClick={addEpisode} className="text-[#D4547A] hover:text-[#B8405F] transition-colors">
                 <Plus className="w-4 h-4" />
               </button>
             </div>
@@ -216,7 +216,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
                   onClick={() => setActiveEp(i)}
                   className={`w-full text-left px-3 py-2 rounded-xl text-xs flex items-center justify-between transition-all duration-200 ${
                     activeEp === i
-                      ? "bg-[#C06070]/8 text-[#C06070] font-semibold border border-[#C06070]/20"
+                      ? "bg-[#D4547A]/8 text-[#D4547A] font-semibold border border-[#D4547A]/20"
                       : "text-[#7A7067] hover:bg-[#F4F1EC]"
                   }`}
                 >
@@ -231,7 +231,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
         <main className="flex-1 min-w-0 space-y-4">
           <div className="flex items-center justify-between mb-2">
             <div>
-              <p className="text-[10px] font-medium text-[#C06070] uppercase tracking-widest mb-1">Step 04</p>
+              <p className="text-[10px] font-medium text-[#D4547A] uppercase tracking-widest mb-1">Step 04</p>
               <h1 className="text-xl font-bold text-[#1A1A1A] tracking-tight">기능 {ep?.episodeNumber} 설계</h1>
             </div>
             <label className="flex items-center gap-2 text-xs text-[#7A7067] cursor-pointer">
@@ -239,7 +239,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
                 type="checkbox"
                 checked={ep?.isCompleted ?? false}
                 onChange={(e) => updateEp("isCompleted", e.target.checked)}
-                className="rounded accent-[#C06070]"
+                className="rounded accent-[#D4547A]"
               />
               이 기능 완료됨
             </label>
@@ -268,12 +268,12 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
           <div className="bg-white rounded-2xl border border-[#EBE7E0] shadow-[0_2px_12px_rgba(0,0,0,0.04)] overflow-hidden">
             <div className="flex items-center justify-between px-5 py-4 border-b border-[#EBE7E0]">
               <div className="flex items-center gap-2">
-                <Cpu className="w-4 h-4 text-[#C06070]" />
+                <Cpu className="w-4 h-4 text-[#D4547A]" />
                 <span className="text-sm font-bold text-[#1A1A1A]">처리 단계 구성</span>
               </div>
               <button
                 onClick={addCut}
-                className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] hover:border-[#C06070]/30 transition-all duration-200"
+                className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] hover:border-[#D4547A]/30 transition-all duration-200"
               >
                 <Plus className="w-3.5 h-3.5" /> 단계 추가
               </button>
@@ -288,7 +288,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
                   <p className="text-xs text-[#ADA8A0] mb-3">아직 단계가 없어요. 첫 번째 처리 단계를 추가해봐요!</p>
                   <button
                     onClick={addCut}
-                    className="inline-flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-full bg-[#C06070] text-white hover:bg-[#A8505F] transition-all duration-200"
+                    className="inline-flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-full bg-[#D4547A] text-white hover:bg-[#B8405F] transition-all duration-200"
                   >
                     <Plus className="w-3.5 h-3.5" /> 단계 추가
                   </button>
@@ -299,7 +299,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
                     <div key={cutIdx} className="border border-[#EBE7E0] rounded-xl overflow-hidden">
                       <div className="flex items-center justify-between px-4 py-2.5 bg-[#FBF9F6] border-b border-[#EBE7E0]">
                         <div className="flex items-center gap-3">
-                          <span className="text-xs font-bold text-[#C06070] w-10">단계 {cutIdx + 1}</span>
+                          <span className="text-xs font-bold text-[#D4547A] w-10">단계 {cutIdx + 1}</span>
                           <select
                             value={cut.angle}
                             onChange={(e) => updateCut(cutIdx, "angle", e.target.value)}
@@ -351,7 +351,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
 
                   <button
                     onClick={addCut}
-                    className="w-full py-2.5 rounded-xl border border-dashed border-[#EBE7E0] text-xs text-[#ADA8A0] hover:border-[#C06070]/30 hover:text-[#C06070] hover:bg-[#FBF9F6] transition-all duration-200 flex items-center justify-center gap-1.5"
+                    className="w-full py-2.5 rounded-xl border border-dashed border-[#EBE7E0] text-xs text-[#ADA8A0] hover:border-[#D4547A]/30 hover:text-[#D4547A] hover:bg-[#FBF9F6] transition-all duration-200 flex items-center justify-center gap-1.5"
                   >
                     <Plus className="w-3.5 h-3.5" /> 단계 추가
                   </button>
@@ -368,7 +368,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
             >
               저장
             </button>
-            <button onClick={goNext} className="flex items-center gap-2 text-xs font-semibold px-5 py-2.5 rounded-full bg-[#C06070] text-white hover:bg-[#A8505F] transition-all duration-300">
+            <button onClick={goNext} className="flex items-center gap-2 text-xs font-semibold px-5 py-2.5 rounded-full bg-[#D4547A] text-white hover:bg-[#B8405F] transition-all duration-300">
               다음: 기획서 작성 <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>

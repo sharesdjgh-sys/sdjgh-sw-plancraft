@@ -92,7 +92,7 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
   };
 
   const selectClass =
-    "flex h-10 w-full rounded-xl border border-[#EBE7E0] bg-white px-3 py-2 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#C06070]/20 focus:border-[#C06070]/40 transition-all duration-200";
+    "flex h-10 w-full rounded-xl border border-[#EBE7E0] bg-white px-3 py-2 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#D4547A]/20 focus:border-[#D4547A]/40 transition-all duration-200";
 
   return (
     <div className="min-h-screen bg-[#FBF9F6]">
@@ -114,7 +114,7 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
                 <button
                   onClick={autofill}
                   disabled={autofilling}
-                  className="flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-full border border-[#C06070]/30 text-[#C06070] hover:bg-[#C06070]/5 transition-all duration-200 disabled:opacity-50"
+                  className="flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-full border border-[#D4547A]/30 text-[#D4547A] hover:bg-[#D4547A]/5 transition-all duration-200 disabled:opacity-50"
                 >
                   <Wand2 className="w-3.5 h-3.5" /> {autofilling ? "채우는 중..." : "AI 자동채우기"}
                 </button>
@@ -129,7 +129,7 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
             <button
               onClick={save}
               disabled={saving}
-              className="flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-full bg-[#C06070] text-white hover:bg-[#A8505F] transition-all duration-300 disabled:opacity-50"
+              className="flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-full bg-[#D4547A] text-white hover:bg-[#B8405F] transition-all duration-300 disabled:opacity-50"
             >
               {saved ? <><Check className="w-3.5 h-3.5" /> 저장됨</> : saving ? "저장 중..." : <><Save className="w-3.5 h-3.5" /> 저장</>}
             </button>
@@ -147,12 +147,12 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
         <main className="flex-1 min-w-0 space-y-4">
           <div className="flex items-center justify-between mb-2">
             <div>
-              <p className="text-[10px] font-medium text-[#C06070] uppercase tracking-widest mb-1">Step 03</p>
+              <p className="text-[10px] font-medium text-[#D4547A] uppercase tracking-widest mb-1">Step 03</p>
               <h1 className="text-xl font-bold text-[#1A1A1A] tracking-tight">이해관계자 분석</h1>
             </div>
             <button
               onClick={addCharacter}
-              className="flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] hover:border-[#C06070]/30 transition-all duration-200"
+              className="flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] hover:border-[#D4547A]/30 transition-all duration-200"
             >
               <Plus className="w-3.5 h-3.5" /> 이해관계자 추가
             </button>
@@ -167,7 +167,7 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
               <p className="text-xs text-[#7A7067] mb-5">첫 번째 이해관계자를 추가해봐요!</p>
               <button
                 onClick={addCharacter}
-                className="inline-flex items-center gap-2 bg-[#C06070] text-white text-xs font-medium px-5 py-2.5 rounded-full hover:bg-[#A8505F] transition-all duration-300"
+                className="inline-flex items-center gap-2 bg-[#D4547A] text-white text-xs font-medium px-5 py-2.5 rounded-full hover:bg-[#B8405F] transition-all duration-300"
               >
                 <Plus className="w-3.5 h-3.5" /> 이해관계자 추가하기
               </button>
@@ -178,7 +178,7 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
                 <div
                   key={idx}
                   className={`bg-white rounded-2xl border transition-all duration-200 shadow-[0_2px_12px_rgba(0,0,0,0.04)] ${
-                    editIdx === idx ? "border-[#C06070]/30" : "border-[#EBE7E0]"
+                    editIdx === idx ? "border-[#D4547A]/30" : "border-[#EBE7E0]"
                   }`}
                 >
                   <div className="flex items-center justify-between px-5 py-3.5">
@@ -279,7 +279,7 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
             >
               저장
             </button>
-            <button onClick={goNext} className="flex items-center gap-2 text-xs font-semibold px-5 py-2.5 rounded-full bg-[#C06070] text-white hover:bg-[#A8505F] transition-all duration-300">
+            <button onClick={goNext} className="flex items-center gap-2 text-xs font-semibold px-5 py-2.5 rounded-full bg-[#D4547A] text-white hover:bg-[#B8405F] transition-all duration-300">
               다음: 기능 설계 <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>

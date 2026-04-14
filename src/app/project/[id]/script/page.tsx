@@ -24,8 +24,8 @@ function FeatureListPanel({ episodes }: { episodes: Episode[] }) {
             key={i}
             className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#FBF9F6] border border-[#EBE7E0]"
           >
-            <div className="w-4 h-4 rounded-full bg-[#C06070]/10 flex items-center justify-center flex-shrink-0">
-              <span className="text-[8px] font-bold text-[#C06070]">{ep.episodeNumber}</span>
+            <div className="w-4 h-4 rounded-full bg-[#D4547A]/10 flex items-center justify-center flex-shrink-0">
+              <span className="text-[8px] font-bold text-[#D4547A]">{ep.episodeNumber}</span>
             </div>
             <span className="text-xs text-[#1A1A1A] truncate flex-1">
               {ep.title || `기능 ${ep.episodeNumber}`}
@@ -54,8 +54,8 @@ function CharacterPanel({ characters }: { characters: Character[] }) {
         <div className="px-4 pb-3 space-y-2">
           {characters.map((ch, i) => (
             <div key={i} className="flex items-start gap-2 px-2.5 py-2 rounded-xl bg-[#FBF9F6] border border-[#EBE7E0]">
-              <div className="w-5 h-5 rounded-full bg-[#C06070]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <span className="text-[8px] font-bold text-[#C06070]">{(ch.name || "?")[0]}</span>
+              <div className="w-5 h-5 rounded-full bg-[#D4547A]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <span className="text-[8px] font-bold text-[#D4547A]">{(ch.name || "?")[0]}</span>
               </div>
               <div className="min-w-0">
                 <p className="text-xs font-semibold text-[#1A1A1A] leading-tight">{ch.name || "이름 없음"}</p>
@@ -151,7 +151,7 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
             <button
               onClick={autofill}
               disabled={autofilling}
-              className="flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-full border border-[#C06070]/30 text-[#C06070] hover:bg-[#C06070]/5 transition-all duration-200 disabled:opacity-50"
+              className="flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-full border border-[#D4547A]/30 text-[#D4547A] hover:bg-[#D4547A]/5 transition-all duration-200 disabled:opacity-50"
             >
               <Wand2 className="w-3.5 h-3.5" /> {autofilling ? "채우는 중..." : "AI 자동채우기"}
             </button>
@@ -166,7 +166,7 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
             <button
               onClick={save}
               disabled={saving}
-              className="flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-full bg-[#C06070] text-white hover:bg-[#A8505F] transition-all duration-300 disabled:opacity-50"
+              className="flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-full bg-[#D4547A] text-white hover:bg-[#B8405F] transition-all duration-300 disabled:opacity-50"
             >
               {saved ? <><Check className="w-3.5 h-3.5" /> 저장됨</> : saving ? "저장 중..." : <><Save className="w-3.5 h-3.5" /> 저장</>}
             </button>
@@ -186,14 +186,14 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
 
         <main className="flex-1 min-w-0 space-y-4">
           <div>
-            <p className="text-[10px] font-medium text-[#C06070] uppercase tracking-widest mb-1">Step 05</p>
+            <p className="text-[10px] font-medium text-[#D4547A] uppercase tracking-widest mb-1">Step 05</p>
             <h1 className="text-xl font-bold text-[#1A1A1A] tracking-tight">기획서 내용 작성</h1>
           </div>
 
           {/* 기획서 내용 */}
           <div className="bg-white rounded-2xl border border-[#EBE7E0] shadow-[0_2px_12px_rgba(0,0,0,0.04)] overflow-hidden">
             <div className="flex items-center gap-2 px-5 py-4 border-b border-[#EBE7E0]">
-              <FileText className="w-4 h-4 text-[#C06070]" />
+              <FileText className="w-4 h-4 text-[#D4547A]" />
               <span className="text-sm font-bold text-[#1A1A1A]">기획서 내용</span>
             </div>
             <div className="p-5">
@@ -228,7 +228,7 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
               >
                 저장
               </button>
-              <button onClick={goNext} className="flex items-center gap-2 text-xs font-semibold px-5 py-2.5 rounded-full bg-[#C06070] text-white hover:bg-[#A8505F] transition-all duration-300">
+              <button onClick={goNext} className="flex items-center gap-2 text-xs font-semibold px-5 py-2.5 rounded-full bg-[#D4547A] text-white hover:bg-[#B8405F] transition-all duration-300">
                 다음: 제출 준비 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>

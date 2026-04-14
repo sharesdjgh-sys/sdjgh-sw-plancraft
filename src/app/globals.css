@@ -8,9 +8,9 @@
   --text:         #1A1A1A;
   --text-muted:   #7A7067;
   --text-soft:    #ADA8A0;
-  --accent:       #C06070;
-  --accent-light: #F9EEF1;
-  --accent-hover: #A8505F;
+  --accent:       #D4547A;
+  --accent-light: #FCEEF3;
+  --accent-hover: #B8405F;
 }
 
 @theme inline {

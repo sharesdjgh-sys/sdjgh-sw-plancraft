@@ -26,7 +26,7 @@ export default function GuidePage() {
             <img src="/plancraft-logo.jpg" className="w-6 h-6 rounded-lg object-cover" alt="PlanCraft" />
             <span className="text-sm font-semibold text-[#1A1A1A] tracking-tight">PlanCraft</span>
           </Link>
-          <Link href="/dashboard" className="flex items-center gap-1.5 bg-[#C06070] text-white text-xs font-semibold px-4 py-2 rounded-full hover:bg-[#A8505F] transition-all duration-300">
+          <Link href="/dashboard" className="flex items-center gap-1.5 bg-[#D4547A] text-white text-xs font-semibold px-4 py-2 rounded-full hover:bg-[#B8405F] transition-all duration-300">
             시작하기 <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
@@ -35,7 +35,7 @@ export default function GuidePage() {
       <main className="max-w-4xl mx-auto px-6 py-12">
         <ScrollReveal>
           <div className="mb-12">
-            <p className="text-xs font-medium text-[#C06070] uppercase tracking-widest mb-3">Guide</p>
+            <p className="text-xs font-medium text-[#D4547A] uppercase tracking-widest mb-3">Guide</p>
             <h1 className="text-3xl font-bold text-[#1A1A1A] tracking-tight mb-3">
               SW 아이디어 공모전 가이드
             </h1>
@@ -52,8 +52,8 @@ export default function GuidePage() {
               <ScrollReveal key={s.step} delay={idx * 55}>
                 <div className="bg-white rounded-2xl border border-[#EBE7E0] p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
                   <div className="flex items-start gap-5">
-                    <div className="w-11 h-11 rounded-xl bg-[#C06070]/10 flex items-center justify-center flex-shrink-0">
-                      <Icon className="w-5 h-5 text-[#C06070]" />
+                    <div className="w-11 h-11 rounded-xl bg-[#D4547A]/10 flex items-center justify-center flex-shrink-0">
+                      <Icon className="w-5 h-5 text-[#D4547A]" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-3 mb-2">
@@ -65,7 +65,7 @@ export default function GuidePage() {
                       <div className="grid grid-cols-2 gap-2">
                         {s.tips.map((tip, i) => (
                           <div key={i} className="flex items-start gap-2 text-xs text-[#7A7067] bg-[#FBF9F6] rounded-xl px-3 py-2.5 border border-[#EBE7E0]">
-                            <div className="w-1 h-1 rounded-full bg-[#C06070] flex-shrink-0 mt-1.5" />
+                            <div className="w-1 h-1 rounded-full bg-[#D4547A] flex-shrink-0 mt-1.5" />
                             <span className="leading-relaxed">{tip}</span>
                           </div>
                         ))}
@@ -79,13 +79,13 @@ export default function GuidePage() {
         </div>
 
         <ScrollReveal>
-          <div className="mt-10 relative overflow-hidden bg-[#C06070] rounded-3xl p-10 text-center">
+          <div className="mt-10 relative overflow-hidden bg-[#D4547A] rounded-3xl p-10 text-center">
             <div className="absolute top-0 right-0 w-72 h-72 bg-white blob opacity-10 pointer-events-none" />
             <div className="relative z-10">
               <p className="text-white/70 text-xs font-medium tracking-widest uppercase mb-4">지금 바로</p>
               <h2 className="text-2xl font-bold text-white tracking-tight mb-3">시작할 준비가 됐나요?</h2>
               <p className="text-sm text-white/70 mb-8 leading-relaxed">AI 멘토가 첫 질문부터 마지막 제출까지 함께해요.</p>
-              <Link href="/dashboard" className="inline-flex items-center gap-2 bg-white text-[#C06070] px-6 py-3 rounded-full text-sm font-semibold hover:bg-[#FBF9F6] transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_24px_rgba(0,0,0,0.12)]">
+              <Link href="/dashboard" className="inline-flex items-center gap-2 bg-white text-[#D4547A] px-6 py-3 rounded-full text-sm font-semibold hover:bg-[#FBF9F6] transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_24px_rgba(0,0,0,0.12)]">
                 무료로 시작하기 <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
