@@ -2,6 +2,15 @@ import Link from "next/link";
 import { ArrowRight, Lightbulb, Target, Users, Cpu, PenLine, Trophy } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
 
+const STEP_COLORS = [
+  "#D4547A", // 01 Rose
+  "#E06E48", // 02 Coral
+  "#D49E40", // 03 Amber
+  "#50A882", // 04 Sage
+  "#8060C0", // 05 Violet
+  "#B85890", // 06 Mauve
+];
+
 const GUIDE_STEPS = [
   { icon: Lightbulb, step: 1, title: "아이디어 발굴", time: "1~2일", desc: "해결하고 싶은 사회 문제나 불편함을 SW로 풀 아이디어를 찾는 단계예요.",
     tips: ["일상 속 불편하거나 개선하고 싶은 점을 찾아봐요", "학교, 지역사회, 환경 등 주변 문제에 관심을 가져요", "공모전 주제 '창의적 코딩 활동'과 연결되는 아이디어를 탐색해요", "AI 멘토와 자유롭게 대화하며 아이디어를 구체화해봐요"] },
@@ -48,15 +57,19 @@ export default function GuidePage() {
         <div className="space-y-3">
           {GUIDE_STEPS.map((s, idx) => {
             const Icon = s.icon;
+            const color = STEP_COLORS[idx];
             return (
               <ScrollReveal key={s.step} delay={idx * 55}>
                 <div className="relative bg-white rounded-2xl border border-[#EBE7E0] p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
-                  <div className="w-11 h-11 rounded-xl bg-[#D4547A]/10 flex items-center justify-center absolute top-6 right-6">
-                    <Icon className="w-5 h-5 text-[#D4547A]" />
+                  <div
+                    className="w-11 h-11 rounded-xl flex items-center justify-center absolute top-6 right-6"
+                    style={{ backgroundColor: color + "1a" }}
+                  >
+                    <Icon className="w-5 h-5" style={{ color }} />
                   </div>
                   <div>
                       <div className="flex items-center gap-3 mb-2">
-                        <span className="text-[10px] font-mono text-[#ADA8A0]">STEP {String(s.step).padStart(2, "0")}</span>
+                        <span className="text-[10px] font-mono font-semibold" style={{ color }}> STEP {String(s.step).padStart(2, "0")}</span>
                         <span className="text-[10px] border border-[#EBE7E0] text-[#ADA8A0] px-2.5 py-0.5 rounded-full bg-[#F4F1EC]">예상 {s.time}</span>
                       </div>
                       <h3 className="text-base font-bold text-[#1A1A1A] tracking-tight mb-1">{s.title}</h3>
@@ -64,7 +77,7 @@ export default function GuidePage() {
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         {s.tips.map((tip, i) => (
                           <div key={i} className="flex items-start gap-2 text-xs text-[#7A7067] bg-[#FBF9F6] rounded-xl px-3 py-2.5 border border-[#EBE7E0]">
-                            <div className="w-1 h-1 rounded-full bg-[#D4547A] flex-shrink-0 mt-1.5" />
+                            <div className="w-1 h-1 rounded-full flex-shrink-0 mt-1.5" style={{ backgroundColor: color }} />
                             <span className="leading-relaxed">{tip}</span>
                           </div>
                         ))}
