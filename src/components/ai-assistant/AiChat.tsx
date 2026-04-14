@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Textarea } from "@/components/ui/textarea";
-import { Send, Sparkles, User } from "lucide-react";
+import { Send, Sparkles, User, Mic, MicOff } from "lucide-react";
 
 type Message = { role: "user" | "assistant"; content: string };
 
@@ -45,8 +45,12 @@ const AiChat = forwardRef<AiChatHandle, AiChatProps>(function AiChat(
   });
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isListening, setIsListening] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recognitionRef = useRef<any>(null);
 
   useImperativeHandle(ref, () => ({
     focusInput: () => {
@@ -56,8 +60,45 @@ const AiChat = forwardRef<AiChatHandle, AiChatProps>(function AiChat(
   }));
 
   useEffect(() => {
+    const mq = window.matchMedia("(pointer: coarse)");
+    setIsMobile(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
+  useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  const toggleListening = () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const w = window as any;
+    const SpeechRecognitionAPI = w.SpeechRecognition ?? w.webkitSpeechRecognition;
+    if (!SpeechRecognitionAPI) return;
+
+    if (isListening) {
+      recognitionRef.current?.stop();
+      return;
+    }
+
+    const recognition = new SpeechRecognitionAPI();
+    recognition.lang = "ko-KR";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    recognition.onresult = (e: any) => {
+      const transcript = e.results[0][0].transcript as string;
+      setInput((prev) => (prev ? prev + " " + transcript : transcript));
+    };
+    recognition.onend = () => setIsListening(false);
+    recognition.onerror = () => setIsListening(false);
+
+    recognitionRef.current = recognition;
+    recognition.start();
+    setIsListening(true);
+  };
 
   const send = async () => {
     if (!input.trim() || loading) return;
@@ -165,6 +206,23 @@ const AiChat = forwardRef<AiChatHandle, AiChatProps>(function AiChat(
             className="resize-none min-h-[52px] max-h-[100px] text-xs"
             rows={2}
           />
+          {isMobile && (
+            <button
+              type="button"
+              onClick={toggleListening}
+              className={`w-9 h-9 flex-shrink-0 rounded-xl flex items-center justify-center transition-all duration-200 ${
+                isListening
+                  ? "bg-red-500 animate-pulse"
+                  : "bg-[#EBE7E0] hover:bg-[#D4547A] group"
+              }`}
+              title={isListening ? "녹음 중지" : "음성 입력"}
+            >
+              {isListening
+                ? <MicOff className="w-3.5 h-3.5 text-white" />
+                : <Mic className="w-3.5 h-3.5 text-[#7A7067] group-hover:text-white" />
+              }
+            </button>
+          )}
           <button
             onClick={send}
             disabled={loading || !input.trim()}
