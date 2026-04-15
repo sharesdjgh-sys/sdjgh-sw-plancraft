@@ -137,27 +137,81 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
       const res = await fetch("/api/ai/autofill", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ideaChat: project.ideaChat, step: "episodes" }),
+        body: JSON.stringify({
+          ideaChat: project.ideaChat,
+          step: "episodes",
+          existingContent: {
+            episodes: episodes.map((ep) => ({ title: ep.title, synopsis: ep.synopsis })),
+          },
+        }),
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       if (Array.isArray(data.episodes)) {
-        setEpisodes((prev) =>
-          data.episodes.map((ep: { title: string; synopsis: string }, i: number) => ({
-            episodeNumber: i + 1,
-            title: ep.title ?? "",
-            synopsis: ep.synopsis ?? "",
-            cuts: prev[i]?.cuts ?? [],
-            script: prev[i]?.script ?? "",
-            isCompleted: prev[i]?.isCompleted ?? false,
-          }))
-        );
+        setEpisodes((prev) => {
+          const maxLen = Math.max(prev.length, data.episodes.length);
+          return Array.from({ length: maxLen }, (_, i) => {
+            const existing = prev[i];
+            const aiEp = data.episodes[i] as { title: string | null; synopsis: string | null } | undefined;
+            if (!existing) {
+              // AI가 추가 제안한 새 기능 슬롯
+              return {
+                episodeNumber: i + 1,
+                title: aiEp?.title ?? "",
+                synopsis: aiEp?.synopsis ?? "",
+                cuts: [],
+                script: "",
+                isCompleted: false,
+              };
+            }
+            return {
+              ...existing,
+              // 기존 내용이 있으면 유지, 비어있으면 AI 내용으로 채움
+              title: existing.title.trim() ? existing.title : (aiEp?.title ?? existing.title),
+              synopsis: existing.synopsis.trim() ? existing.synopsis : (aiEp?.synopsis ?? existing.synopsis),
+            };
+          });
+        });
         setActiveEp(0);
       }
     } catch {
       alert("자동채우기에 실패했어요. 다시 시도해주세요.");
     } finally {
       setAutofilling(false);
+    }
+  };
+
+  const [autofillingCuts, setAutofillingCuts] = useState(false);
+
+  const autofillCuts = async () => {
+    const currentEp = episodes[activeEp];
+    if (!project?.ideaChat || project.ideaChat.length === 0) {
+      alert("먼저 아이디어 발굴 단계에서 AI와 대화해주세요!");
+      return;
+    }
+    setAutofillingCuts(true);
+    try {
+      const res = await fetch("/api/ai/autofill", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ideaChat: project.ideaChat,
+          step: "cuts",
+          existingContent: {
+            episodeTitle: currentEp?.title || "기능",
+            episodeSynopsis: currentEp?.synopsis || "",
+          },
+        }),
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      if (Array.isArray(data.cuts) && data.cuts.length > 0) {
+        updateEp("cuts", data.cuts);
+      }
+    } catch {
+      alert("처리 단계 자동채우기에 실패했어요. 다시 시도해주세요.");
+    } finally {
+      setAutofillingCuts(false);
     }
   };
 
@@ -245,13 +299,14 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
                 <button
                   key={i}
                   onClick={() => setActiveEp(i)}
-                  className={`w-full text-left px-3 py-2 rounded-xl text-xs flex items-center justify-between transition-all duration-200 ${
+                  title={ep.title || undefined}
+                  className={`w-full text-left px-3 py-2 rounded-xl text-xs flex items-center justify-between gap-1 transition-all duration-200 ${
                     activeEp === i
                       ? "bg-[#D4547A]/8 text-[#D4547A] font-semibold border border-[#D4547A]/20"
                       : "text-[#7A7067] hover:bg-[#F4F1EC]"
                   }`}
                 >
-                  <span>기능 {ep.episodeNumber} {ep.title && `· ${ep.title.slice(0, 6)}`}</span>
+                  <span className="truncate min-w-0">기능 {ep.episodeNumber}{ep.title && ` · ${ep.title}`}</span>
                   {ep.isCompleted && <CheckCircle className="w-3.5 h-3.5 text-green-500 flex-shrink-0" />}
                 </button>
               ))}
@@ -272,7 +327,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
                     : "bg-white text-[#7A7067] border-[#EBE7E0]"
                 }`}
               >
-                기능 {ep.episodeNumber}{ep.title ? ` · ${ep.title.slice(0, 6)}` : ""}
+                기능 {ep.episodeNumber}{ep.title ? ` · ${ep.title.slice(0, 10)}` : ""}
                 {ep.isCompleted && <CheckCircle className="w-3 h-3 flex-shrink-0" />}
               </button>
             ))}
@@ -326,12 +381,22 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
                 <Cpu className="w-4 h-4 text-[#D4547A]" />
                 <span className="text-sm font-bold text-[#1A1A1A]">처리 단계 구성</span>
               </div>
-              <button
-                onClick={addCut}
-                className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] hover:border-[#D4547A]/30 transition-all duration-200"
-              >
-                <Plus className="w-3.5 h-3.5" /> 단계 추가
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={autofillCuts}
+                  disabled={autofillingCuts}
+                  className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border border-[#D4547A]/30 text-[#D4547A] hover:bg-[#D4547A]/5 transition-all duration-200 disabled:opacity-50"
+                >
+                  <Wand2 className="w-3.5 h-3.5" />
+                  {autofillingCuts ? "채우는 중..." : "AI 채우기"}
+                </button>
+                <button
+                  onClick={addCut}
+                  className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] hover:border-[#D4547A]/30 transition-all duration-200"
+                >
+                  <Plus className="w-3.5 h-3.5" /> 단계 추가
+                </button>
+              </div>
             </div>
 
             <div className="p-5 space-y-3">
@@ -340,13 +405,23 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
               {(!ep?.cuts || ep.cuts.length === 0) ? (
                 <div className="text-center py-12 bg-[#FBF9F6] rounded-xl border border-dashed border-[#EBE7E0]">
                   <Cpu className="w-8 h-8 text-[#D4CFC9] mx-auto mb-3" />
-                  <p className="text-xs text-[#ADA8A0] mb-3">아직 단계가 없어요. 첫 번째 처리 단계를 추가해봐요!</p>
-                  <button
-                    onClick={addCut}
-                    className="inline-flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-full bg-[#D4547A] text-white hover:bg-[#B8405F] transition-all duration-200"
-                  >
-                    <Plus className="w-3.5 h-3.5" /> 단계 추가
-                  </button>
+                  <p className="text-xs text-[#ADA8A0] mb-3">아직 단계가 없어요. AI 도움을 받거나 직접 추가해봐요!</p>
+                  <div className="flex items-center justify-center gap-2">
+                    <button
+                      onClick={autofillCuts}
+                      disabled={autofillingCuts}
+                      className="inline-flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-full border border-[#D4547A]/30 text-[#D4547A] hover:bg-[#D4547A]/5 transition-all duration-200 disabled:opacity-50"
+                    >
+                      <Wand2 className="w-3.5 h-3.5" />
+                      {autofillingCuts ? "채우는 중..." : "AI로 채우기"}
+                    </button>
+                    <button
+                      onClick={addCut}
+                      className="inline-flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-full bg-[#D4547A] text-white hover:bg-[#B8405F] transition-all duration-200"
+                    >
+                      <Plus className="w-3.5 h-3.5" /> 직접 추가
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -354,7 +429,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
                     <div key={cutIdx} className="border border-[#EBE7E0] rounded-xl overflow-hidden">
                       <div className="flex items-center justify-between px-4 py-2.5 bg-[#FBF9F6] border-b border-[#EBE7E0]">
                         <div className="flex items-center gap-3">
-                          <span className="text-xs font-bold text-[#D4547A] w-10">단계 {cutIdx + 1}</span>
+                          <span className="text-xs font-bold text-[#D4547A] whitespace-nowrap">단계 {cutIdx + 1}</span>
                           <select
                             value={cut.angle}
                             onChange={(e) => updateCut(cutIdx, "angle", e.target.value)}

@@ -14,6 +14,12 @@ import { getProject, updateProject, type Project } from "@/lib/storage";
 import { downloadStory } from "@/lib/download";
 import { saveProjectToDir } from "@/lib/fileStorage";
 
+function mergeText(existing: string, aiContent: string | null | undefined): string {
+  if (!aiContent) return existing;
+  if (!existing.trim()) return aiContent;
+  return existing + "\n\n" + aiContent;
+}
+
 export default function StoryPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
@@ -74,16 +80,19 @@ export default function StoryPage({ params }: { params: Promise<{ id: string }> 
       const res = await fetch("/api/ai/autofill", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ideaChat: project.ideaChat, step: "story" }),
+        body: JSON.stringify({ ideaChat: project.ideaChat, step: "story", existingContent: story }),
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       setStory((s) => ({
-        logline: data.logline ?? s.logline,
-        theme: data.theme ?? s.theme,
-        setting: data.setting ?? s.setting,
-        plotOutline: data.plotOutline ?? s.plotOutline,
-        totalEpisodes: data.totalEpisodes ?? s.totalEpisodes,
+        // logline: 한 문장이므로 비어있을 때만 채움
+        logline: s.logline.trim() ? s.logline : (data.logline ?? s.logline),
+        // 긴 텍스트 필드: 비어있으면 채우고, 있으면 AI 보완 내용을 이어 붙임
+        theme: mergeText(s.theme, data.theme),
+        setting: mergeText(s.setting, data.setting),
+        plotOutline: mergeText(s.plotOutline, data.plotOutline),
+        // totalEpisodes: 기본값(1)이 아닌 경우 사용자 값 유지
+        totalEpisodes: s.totalEpisodes !== "1" ? s.totalEpisodes : (data.totalEpisodes ?? s.totalEpisodes),
       }));
     } catch (e) {
       alert("자동채우기에 실패했어요. 다시 시도해주세요.");

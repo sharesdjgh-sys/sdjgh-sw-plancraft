@@ -96,12 +96,23 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
       const res = await fetch("/api/ai/autofill", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ideaChat: project.ideaChat, step: "character" }),
+        body: JSON.stringify({
+          ideaChat: project.ideaChat,
+          step: "character",
+          existingContent: { characters: characters.map((c) => ({ name: c.name, role: c.role })) },
+        }),
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
-      if (Array.isArray(data.characters)) {
-        setCharacters(data.characters);
+      if (Array.isArray(data.characters) && data.characters.length > 0) {
+        setCharacters((prev) => {
+          // 기존 이해관계자 유지하고 AI가 제안한 새 이해관계자 추가 (최대 4명)
+          const existingNames = new Set(prev.map((c) => c.name.trim().toLowerCase()));
+          const newChars = data.characters.filter(
+            (c: Character) => !existingNames.has(c.name.trim().toLowerCase())
+          );
+          return [...prev, ...newChars].slice(0, 4);
+        });
         setEditIdx(null);
       }
     } catch {

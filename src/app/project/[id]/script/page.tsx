@@ -136,12 +136,19 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
       const res = await fetch("/api/ai/autofill", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ideaChat: project.ideaChat, step: "script" }),
+        body: JSON.stringify({
+          ideaChat: project.ideaChat,
+          step: "script",
+          existingContent: proposalScript.trim() ? { script: proposalScript } : undefined,
+        }),
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       if (data.script) {
-        setProposalScript(data.script);
+        // 기존 내용이 있으면 AI 보완 내용을 뒤에 이어 붙임
+        setProposalScript((prev) =>
+          prev.trim() ? prev + "\n\n" + data.script : data.script
+        );
       }
     } catch {
       alert("자동채우기에 실패했어요. 다시 시도해주세요.");
