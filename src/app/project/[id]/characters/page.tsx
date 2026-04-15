@@ -32,8 +32,9 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
   useEffect(() => {
     const p = getProject(id);
     if (p) {
-      setProject(p);
-      updateProject(id, { currentStep: Math.max(3, p.currentStep) });
+      const updatedStep = Math.max(3, p.currentStep);
+      updateProject(id, { currentStep: updatedStep });
+      setProject({ ...p, currentStep: updatedStep });
       if (p.characters.length > 0) setCharacters(p.characters);
     }
   }, [id]);

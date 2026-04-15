@@ -87,8 +87,9 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
   useEffect(() => {
     const p = getProject(id);
     if (p) {
-      setProject(p);
-      updateProject(id, { currentStep: Math.max(5, p.currentStep) });
+      const updatedStep = Math.max(5, p.currentStep);
+      updateProject(id, { currentStep: updatedStep });
+      setProject({ ...p, currentStep: updatedStep });
       setProposalScript(p.proposalScript ?? "");
     }
   }, [id]);

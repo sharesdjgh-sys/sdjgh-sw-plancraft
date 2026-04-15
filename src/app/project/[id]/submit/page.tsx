@@ -34,10 +34,11 @@ export default function SubmitPage({ params }: { params: Promise<{ id: string }>
   useEffect(() => {
     const p = getProject(id);
     if (p) {
-      setProject(p);
+      const updatedStep = Math.max(6, p.currentStep);
+      updateProject(id, { currentStep: updatedStep });
+      setProject({ ...p, currentStep: updatedStep });
       setAuthorNote(p.authorNote ?? "");
       setCompleted(p.isCompleted ?? false);
-      updateProject(id, { currentStep: Math.max(6, p.currentStep) });
     }
   }, [id]);
 

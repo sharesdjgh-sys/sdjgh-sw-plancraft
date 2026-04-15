@@ -34,8 +34,9 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
   useEffect(() => {
     const p = getProject(id);
     if (p) {
-      setProject(p);
-      updateProject(id, { currentStep: Math.max(4, p.currentStep) });
+      const updatedStep = Math.max(4, p.currentStep);
+      updateProject(id, { currentStep: updatedStep });
+      setProject({ ...p, currentStep: updatedStep });
       const totalEp = Math.max(1, parseInt(p.story.totalEpisodes) || 1);
       const existing = p.episodes.length > 0
         ? p.episodes.map((ep) => ({ ...ep, cuts: ep.cuts ?? [] }))
