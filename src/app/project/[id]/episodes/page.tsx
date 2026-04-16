@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import AiChat, { type AiChatHandle } from "@/components/ai-assistant/AiChat";
 import StepIndicator from "@/components/progress-tracker/StepIndicator";
 import EmptyContentModal from "@/components/EmptyContentModal";
-import { Plus, Trash2, Save, ArrowRight, CheckCircle, Check, Download, Cpu, Wand2 } from "lucide-react";
+import { Plus, Trash2, Save, ArrowRight, CheckCircle, Check, Download, Cpu, Wand2, GripVertical } from "lucide-react";
 import MobileChatSheet, { type MobileChatSheetHandle } from "@/components/mobile/MobileChatSheet";
 import { getProject, updateProject, type Episode, type Cut, type Project } from "@/lib/storage";
 import { downloadEpisode, downloadAllEpisodes } from "@/lib/download";
@@ -30,6 +30,8 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
   const [showEmptyModal, setShowEmptyModal] = useState(false);
   const aiChatRef = useRef<AiChatHandle>(null);
   const mobileChatRef = useRef<MobileChatSheetHandle>(null);
+  const dragIndexRef = useRef<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
   useEffect(() => {
     const p = getProject(id);
@@ -93,6 +95,36 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
   const removeCut = (cutIdx: number) => {
     const updated = (episodes[activeEp]?.cuts ?? []).filter((_, i) => i !== cutIdx);
     updateEp("cuts", updated);
+  };
+
+  const handleDragStart = (idx: number) => {
+    dragIndexRef.current = idx;
+  };
+
+  const handleDragOver = (e: React.DragEvent, idx: number) => {
+    e.preventDefault();
+    setDragOverIndex(idx);
+  };
+
+  const handleDragLeave = () => {
+    setDragOverIndex(null);
+  };
+
+  const handleDrop = (e: React.DragEvent, toIdx: number) => {
+    e.preventDefault();
+    setDragOverIndex(null);
+    const fromIdx = dragIndexRef.current;
+    if (fromIdx === null || fromIdx === toIdx) return;
+    dragIndexRef.current = null;
+    const cuts = [...(episodes[activeEp]?.cuts ?? [])];
+    const [moved] = cuts.splice(fromIdx, 1);
+    cuts.splice(toIdx, 0, moved);
+    updateEp("cuts", cuts);
+  };
+
+  const handleDragEnd = () => {
+    dragIndexRef.current = null;
+    setDragOverIndex(null);
   };
 
   const save = async () => {
@@ -426,9 +458,23 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
               ) : (
                 <div className="space-y-3">
                   {ep.cuts.map((cut, cutIdx) => (
-                    <div key={cutIdx} className="border border-[#EBE7E0] rounded-xl overflow-hidden">
+                    <div
+                      key={cutIdx}
+                      draggable
+                      onDragStart={() => handleDragStart(cutIdx)}
+                      onDragOver={(e) => handleDragOver(e, cutIdx)}
+                      onDragLeave={handleDragLeave}
+                      onDrop={(e) => handleDrop(e, cutIdx)}
+                      onDragEnd={handleDragEnd}
+                      className={`border rounded-xl overflow-hidden transition-all duration-150 ${
+                        dragOverIndex === cutIdx && dragIndexRef.current !== cutIdx
+                          ? "border-[#D4547A] shadow-md scale-[1.01]"
+                          : "border-[#EBE7E0]"
+                      }`}
+                    >
                       <div className="flex items-center justify-between px-4 py-2.5 bg-[#FBF9F6] border-b border-[#EBE7E0]">
                         <div className="flex items-center gap-3">
+                          <GripVertical className="w-4 h-4 text-[#C8C3BC] cursor-grab active:cursor-grabbing shrink-0" />
                           <span className="text-xs font-bold text-[#D4547A] whitespace-nowrap">단계 {cutIdx + 1}</span>
                           <select
                             value={cut.angle}
