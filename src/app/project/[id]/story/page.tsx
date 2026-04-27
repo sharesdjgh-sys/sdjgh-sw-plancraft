@@ -37,6 +37,12 @@ export default function StoryPage({ params }: { params: Promise<{ id: string }> 
     if (p) { setProject(p); setStory(p.story); }
   }, [id]);
 
+  const userType = project?.userType ?? "student";
+  const storyInitialMessage =
+    userType === "general"
+      ? "문제 정의를 도와드릴게요. 해결하려는 현장 문제의 핵심, 발생 배경, 왜 지금 중요한지를 함께 정리해볼까요?"
+      : "문제 정의를 도와드릴게요! 해결하려는 문제의 핵심이 무엇인가요? 어떤 상황에서 불편함을 느꼈는지 편하게 말씀해 주세요.";
+
   const save = async () => {
     setSaving(true);
     updateProject(id, {
@@ -167,20 +173,44 @@ export default function StoryPage({ params }: { params: Promise<{ id: string }> 
 
           <div className="bg-white rounded-2xl border border-[#EBE7E0] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
             <label className="block text-xs font-bold text-[#1A1A1A] mb-1">아이디어 한 줄 소개</label>
-            <p className="text-[10px] text-[#ADA8A0] mb-3">심사위원이 읽었을 때 SW가 궁금해지는 한 문장</p>
-            <Input placeholder="예: 급식 잔반 데이터를 분석해 학교 식단을 개선하는 AI 추천 시스템" value={story.logline} onChange={(e) => setStory((s) => ({ ...s, logline: e.target.value }))} />
+            <p className="text-[10px] text-[#ADA8A0] mb-3">
+              {userType === "general"
+                ? "서비스를 사용할 학생들이 들었을 때 바로 이해할 수 있는 한 문장"
+                : "심사위원이 읽었을 때 SW가 궁금해지는 한 문장"}
+            </p>
+            <Input
+              placeholder={userType === "general"
+                ? "예: 수업 중 학생 이해도를 실시간으로 파악하는 교사용 피드백 앱"
+                : "예: 급식 잔반 데이터를 분석해 학교 식단을 개선하는 AI 추천 시스템"}
+              value={story.logline}
+              onChange={(e) => setStory((s) => ({ ...s, logline: e.target.value }))}
+            />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="bg-white rounded-2xl border border-[#EBE7E0] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
               <label className="block text-xs font-bold text-[#1A1A1A] mb-1">해결하려는 문제</label>
               <p className="text-[10px] text-[#ADA8A0] mb-3">왜 이 문제가 중요한지, 현재 어떤 불편함이 있는지</p>
-              <Textarea placeholder="어떤 사회적 문제 또는 불편함을 해결하려 하나요? 현재 상황과 문제의 심각성을 구체적으로 써봐요." value={story.theme} onChange={(e) => setStory((s) => ({ ...s, theme: e.target.value }))} rows={4} />
+              <Textarea
+                placeholder={userType === "general"
+                  ? "교육 현장에서 어떤 불편함을 겪고 계신가요? 학생 지도·수업·행정 중 개선하고 싶은 상황을 구체적으로 써주세요."
+                  : "어떤 사회적 문제 또는 불편함을 해결하려 하나요? 현재 상황과 문제의 심각성을 구체적으로 써봐요."}
+                value={story.theme}
+                onChange={(e) => setStory((s) => ({ ...s, theme: e.target.value }))}
+                rows={4}
+              />
             </div>
             <div className="bg-white rounded-2xl border border-[#EBE7E0] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
               <label className="block text-xs font-bold text-[#1A1A1A] mb-1">배경 및 필요성</label>
               <p className="text-[10px] text-[#ADA8A0] mb-3">문제가 발생하는 환경, 관련 통계나 사례</p>
-              <Textarea placeholder="문제가 발생하는 배경과 이 SW가 왜 필요한지 설명해주세요." value={story.setting} onChange={(e) => setStory((s) => ({ ...s, setting: e.target.value }))} rows={4} />
+              <Textarea
+                placeholder={userType === "general"
+                  ? "이 문제가 발생하는 교육 환경과, 이 서비스가 왜 필요한지 설명해주세요."
+                  : "문제가 발생하는 배경과 이 SW가 왜 필요한지 설명해주세요."}
+                value={story.setting}
+                onChange={(e) => setStory((s) => ({ ...s, setting: e.target.value }))}
+                rows={4}
+              />
             </div>
           </div>
 
@@ -211,14 +241,15 @@ export default function StoryPage({ params }: { params: Promise<{ id: string }> 
         </main>
 
         <aside className="hidden lg:flex w-72 flex-shrink-0 h-[calc(100vh-5rem)] sticky top-20">
-          <AiChat ref={aiChatRef} step="story" initialMessage="문제 정의를 도와드릴게요! 해결하려는 문제의 핵심이 무엇인가요? 어떤 상황에서 불편함을 느꼈는지 편하게 말씀해 주세요." placeholder="문제 정의에 대해 질문하세요..." />
+          <AiChat ref={aiChatRef} step="story" userType={userType} initialMessage={storyInitialMessage} placeholder="문제 정의에 대해 질문하세요..." />
         </aside>
       </div>
 
       <MobileChatSheet
         ref={mobileChatRef}
         step="story"
-        initialMessage="문제 정의를 도와드릴게요! 해결하려는 문제의 핵심이 무엇인가요? 어떤 상황에서 불편함을 느꼈는지 편하게 말씀해 주세요."
+        userType={userType}
+        initialMessage={storyInitialMessage}
         placeholder="문제 정의에 대해 질문하세요..."
       />
     </div>

@@ -62,6 +62,12 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
     }
   }, [id]);
 
+  const userType = project?.userType ?? "student";
+  const panelInitialMessage =
+    userType === "general"
+      ? "기능 설계를 도와드릴게요. 핵심 기능 우선순위와 입력·처리·출력 흐름을 실제 운영 가능한 형태로 함께 정리해볼까요?"
+      : "기능 설계를 도와드릴게요! 어떤 핵심 기능을 만들고 싶으신가요? 기능의 입력·처리·출력 흐름을 함께 정리해봐요.";
+
   const addEpisode = () => {
     const newEp: Episode = {
       episodeNumber: episodes.length + 1,
@@ -393,7 +399,9 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
             <p className="text-[10px] text-[#ADA8A0] mb-3">이 기능이 무엇을 하는지 간략히 정리해봐요</p>
             <div className="space-y-3">
               <Input
-                placeholder={`기능 ${ep?.episodeNumber} 이름 (예: 식단 추천, 잔반 분석)`}
+                placeholder={userType === "general"
+                  ? `기능 ${ep?.episodeNumber} 이름 (예: 출석 체크, 알림 발송, 학습 현황 조회)`
+                  : `기능 ${ep?.episodeNumber} 이름 (예: 식단 추천, 잔반 분석)`}
                 value={ep?.title ?? ""}
                 onChange={(e) => updateEp("title", e.target.value)}
               />
@@ -508,7 +516,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
                           <Input
                             value={cut.dialogue}
                             onChange={(e) => updateCut(cutIdx, "dialogue", e.target.value)}
-                            placeholder="예: 학생 ID, 메뉴 선택값"
+                            placeholder={userType === "general" ? "예: 교사 ID, 학급 코드" : "예: 학생 ID, 메뉴 선택값"}
                             className="text-xs"
                           />
                         </div>
@@ -517,7 +525,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
                           <Input
                             value={cut.soundEffect}
                             onChange={(e) => updateCut(cutIdx, "soundEffect", e.target.value)}
-                            placeholder="예: 추천 식단 목록, 오류 메시지"
+                            placeholder={userType === "general" ? "예: 출석 현황 목록, 알림 발송 완료" : "예: 추천 식단 목록, 오류 메시지"}
                             className="text-xs"
                           />
                         </div>
@@ -554,7 +562,8 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
           <AiChat
             ref={aiChatRef}
             step="panel"
-            initialMessage="기능 설계를 도와드릴게요! 어떤 핵심 기능을 만들고 싶으신가요? 기능의 입력·처리·출력 흐름을 함께 정리해봐요."
+            userType={userType}
+            initialMessage={panelInitialMessage}
             placeholder="기능 설계에 대해 질문하세요..."
           />
         </aside>
@@ -563,7 +572,8 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
       <MobileChatSheet
         ref={mobileChatRef}
         step="panel"
-        initialMessage="기능 설계를 도와드릴게요! 어떤 핵심 기능을 만들고 싶으신가요? 기능의 입력·처리·출력 흐름을 함께 정리해봐요."
+        userType={userType}
+        initialMessage={panelInitialMessage}
         placeholder="기능 설계에 대해 질문하세요..."
       />
     </div>

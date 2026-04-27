@@ -39,6 +39,12 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
     }
   }, [id]);
 
+  const userType = project?.userType ?? "student";
+  const characterInitialMessage =
+    userType === "general"
+      ? "이해관계자 분석을 도와드릴게요. 실제 사용자, 운영자, 의사결정자 관점에서 누가 어떤 가치를 얻는지 함께 정리해봐요."
+      : "이해관계자 분석을 도와드릴게요! 이 SW를 사용하게 될 주요 대상이 누구인가요? 어떤 사람들이 혜택을 받을지 생각해봐요.";
+
   const addCharacter = () => {
     const newChar: Character = { name: "", role: "주요 사용자", age: "", appearance: "", personality: "", backstory: "" };
     setCharacters((c) => [...c, newChar]);
@@ -257,7 +263,7 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
                           <Input
                             value={ch.name}
                             onChange={(e) => updateChar(idx, "name", e.target.value)}
-                            placeholder="예: 고등학생, 학교 선생님"
+                            placeholder={userType === "general" ? "예: 담임 학급 학생, 학부모" : "예: 고등학생, 학교 선생님"}
                           />
                         </div>
                         <div>
@@ -275,7 +281,7 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
                           <Input
                             value={ch.age}
                             onChange={(e) => updateChar(idx, "age", e.target.value)}
-                            placeholder="예: 15~17세, 고등학생"
+                            placeholder={userType === "general" ? "예: 중학생, 13~15세" : "예: 15~17세, 고등학생"}
                           />
                         </div>
                       </div>
@@ -331,7 +337,8 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
           <AiChat
             ref={aiChatRef}
             step="character"
-            initialMessage="이해관계자 분석을 도와드릴게요! 이 SW를 사용하게 될 주요 대상이 누구인가요? 어떤 사람들이 혜택을 받을지 생각해봐요."
+            userType={userType}
+            initialMessage={characterInitialMessage}
             placeholder="이해관계자 분석에 대해 질문하세요..."
           />
         </aside>
@@ -340,7 +347,8 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
       <MobileChatSheet
         ref={mobileChatRef}
         step="character"
-        initialMessage="이해관계자 분석을 도와드릴게요! 이 SW를 사용하게 될 주요 대상이 누구인가요? 어떤 사람들이 혜택을 받을지 생각해봐요."
+        userType={userType}
+        initialMessage={characterInitialMessage}
         placeholder="이해관계자 분석에 대해 질문하세요..."
       />
     </div>

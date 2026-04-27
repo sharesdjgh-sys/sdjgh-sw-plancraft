@@ -11,7 +11,7 @@ import { getProject, updateProject } from "@/lib/storage";
 import { downloadFullSummary } from "@/lib/download";
 import { saveProjectToDir } from "@/lib/fileStorage";
 
-const CHECKLIST = [
+const STUDENT_CHECKLIST = [
   { id: "idea", label: "아이디어 한 줄 소개가 명확하게 작성되었나요?" },
   { id: "problem", label: "해결하려는 문제의 배경과 필요성을 구체적으로 설명했나요?" },
   { id: "stakeholder", label: "주요 사용자와 이해관계자를 분석했나요?" },
@@ -20,6 +20,17 @@ const CHECKLIST = [
   { id: "format", label: "공모전 제출 규정(파일 형식, 분량 등)을 확인했나요?" },
   { id: "proofread", label: "오탈자와 어색한 표현을 점검했나요?" },
   { id: "motivation", label: "지원 동기를 진심을 담아 작성했나요?" },
+];
+
+const GENERAL_CHECKLIST = [
+  { id: "idea", label: "서비스 한 줄 소개가 학생들이 이해할 수 있게 작성되었나요?" },
+  { id: "problem", label: "교육 현장의 문제 배경과 필요성을 구체적으로 설명했나요?" },
+  { id: "stakeholder", label: "서비스를 사용할 학생·운영자 등 이해관계자를 분석했나요?" },
+  { id: "features", label: "핵심 기능 3~5가지가 바이브코딩으로 구현 가능한 수준인가요?" },
+  { id: "proposal", label: "기획서 전체 내용이 논리적으로 연결되어 있나요?" },
+  { id: "format", label: "공유/제출용 문서 형식(분량, 구성, 전달 대상)을 점검했나요?" },
+  { id: "proofread", label: "오탈자와 어색한 표현을 점검했나요?" },
+  { id: "motivation", label: "이 서비스를 기획한 배경과 목적을 명확히 담았나요?" },
 ];
 
 export default function SubmitPage({ params }: { params: Promise<{ id: string }> }) {
@@ -42,9 +53,16 @@ export default function SubmitPage({ params }: { params: Promise<{ id: string }>
     }
   }, [id]);
 
+  const userType = project?.userType ?? "student";
+  const checklist = userType === "general" ? GENERAL_CHECKLIST : STUDENT_CHECKLIST;
+  const completionInitialMessage =
+    userType === "general"
+      ? "기획 마무리 단계예요. 서비스 완성도와 바이브코딩 구현 가능성을 함께 점검해볼까요? 마지막 검토나 기획 배경 작성이 필요하면 도와드릴게요."
+      : "거의 다 왔어요! 제출 전 최종 점검을 도와드릴게요. 지원 동기 작성이나 기획서 마지막 검토에서 도움이 필요하시면 말씀해 주세요!";
+
   const toggle = (key: string) => setChecks((c) => ({ ...c, [key]: !c[key] }));
   const checkedCount = Object.values(checks).filter(Boolean).length;
-  const isReady = checkedCount === CHECKLIST.length;
+  const isReady = checkedCount === checklist.length;
 
   const markComplete = async () => {
     updateProject(id, { isCompleted: true });
@@ -94,14 +112,14 @@ export default function SubmitPage({ params }: { params: Promise<{ id: string }>
                 )}
               </div>
               <div className="text-right">
-                <p className="text-3xl font-bold">{checkedCount}/{CHECKLIST.length}</p>
+                <p className="text-3xl font-bold">{checkedCount}/{checklist.length}</p>
                 <p className="text-white/70 text-xs">항목 완료</p>
               </div>
             </div>
             <div className="w-full bg-white/20 rounded-full h-2">
               <div
                 className="bg-white h-2 rounded-full transition-all duration-500"
-                style={{ width: `${(checkedCount / CHECKLIST.length) * 100}%` }}
+                style={{ width: `${(checkedCount / checklist.length) * 100}%` }}
               />
             </div>
           </div>
@@ -112,7 +130,7 @@ export default function SubmitPage({ params }: { params: Promise<{ id: string }>
               <p className="text-sm font-bold text-[#1A1A1A]">제출 전 확인 사항</p>
             </div>
             <div className="p-3">
-              {CHECKLIST.map((item) => (
+              {checklist.map((item) => (
                 <button
                   key={item.id}
                   onClick={() => toggle(item.id)}
@@ -133,10 +151,10 @@ export default function SubmitPage({ params }: { params: Promise<{ id: string }>
 
           {/* 지원 동기 */}
           <div className="bg-white rounded-2xl border border-[#EBE7E0] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
-            <label className="block text-xs font-bold text-[#1A1A1A] mb-1">지원 동기 (선택)</label>
-            <p className="text-[10px] text-[#ADA8A0] mb-3">이 아이디어를 공모전에 제출하게 된 계기, 문제 해결에 대한 열정, 심사위원에게 하고 싶은 말을 써봐요.</p>
+            <label className="block text-xs font-bold text-[#1A1A1A] mb-1">{userType === "general" ? "메모 / 전달 메시지 (선택)" : "지원 동기 (선택)"}</label>
+            <p className="text-[10px] text-[#ADA8A0] mb-3">{userType === "general" ? "문서를 공유할 때 전달하고 싶은 핵심 메시지나 실행 계획 메모를 자유롭게 남겨보세요." : "이 아이디어를 공모전에 제출하게 된 계기, 문제 해결에 대한 열정, 심사위원에게 하고 싶은 말을 써봐요."}</p>
             <Textarea
-              placeholder="이 SW 아이디어를 떠올리게 된 계기와 공모전에 참여하는 이유를 자유롭게 써보세요."
+              placeholder={userType === "general" ? "이 기획의 목적, 기대 효과, 공유 시 강조할 포인트를 자유롭게 써보세요." : "이 SW 아이디어를 떠올리게 된 계기와 공모전에 참여하는 이유를 자유롭게 써보세요."}
               value={authorNote}
               onChange={(e) => {
                 setAuthorNote(e.target.value);
@@ -151,7 +169,7 @@ export default function SubmitPage({ params }: { params: Promise<{ id: string }>
             <div className="bg-[#D4547A] rounded-2xl p-6 text-center text-white">
               <div className="text-3xl mb-2">🏆</div>
               <h3 className="text-base font-bold mb-1">축하해요!</h3>
-              <p className="text-xs text-white/80 mb-5">SW 기획서 작성을 완료했어요. 공모전에서 좋은 결과 있기를 응원해요!</p>
+              <p className="text-xs text-white/80 mb-5">{userType === "general" ? "서비스 기획이 완성됐어요! 이제 바이브코딩으로 직접 만들어봐요." : "SW 기획서 작성을 완료했어요. 공모전에서 좋은 결과 있기를 응원해요!"}</p>
               <div className="flex items-center justify-center gap-3">
                 {project && (
                   <button
@@ -173,7 +191,7 @@ export default function SubmitPage({ params }: { params: Promise<{ id: string }>
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <h3 className="text-sm font-bold text-[#1A1A1A]">
-                    {isReady ? "모든 준비가 완료됐어요! 🎉" : `체크리스트 ${checkedCount}/${CHECKLIST.length} 완료`}
+                    {isReady ? "모든 준비가 완료됐어요! 🎉" : `체크리스트 ${checkedCount}/${checklist.length} 완료`}
                   </h3>
                   <p className="text-xs text-[#7A7067] mt-1">
                     {isReady
@@ -217,7 +235,8 @@ export default function SubmitPage({ params }: { params: Promise<{ id: string }>
           <AiChat
             ref={aiChatRef}
             step="completion"
-            initialMessage="거의 다 왔어요! 제출 전 최종 점검을 도와드릴게요. 지원 동기 작성이나 기획서 마지막 검토에서 도움이 필요하시면 말씀해 주세요!"
+            userType={userType}
+            initialMessage={completionInitialMessage}
             placeholder="마지막 점검에 도움을 요청하세요..."
           />
         </aside>
@@ -226,7 +245,8 @@ export default function SubmitPage({ params }: { params: Promise<{ id: string }>
       <MobileChatSheet
         ref={mobileChatRef}
         step="completion"
-        initialMessage="거의 다 왔어요! 제출 전 최종 점검을 도와드릴게요. 지원 동기 작성이나 기획서 마지막 검토에서 도움이 필요하시면 말씀해 주세요!"
+        userType={userType}
+        initialMessage={completionInitialMessage}
         placeholder="마지막 점검에 도움을 요청하세요..."
       />
     </div>

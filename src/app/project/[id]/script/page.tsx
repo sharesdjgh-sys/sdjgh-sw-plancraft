@@ -94,6 +94,12 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
     }
   }, [id]);
 
+  const userType = project?.userType ?? "student";
+  const scriptInitialMessage =
+    userType === "general"
+      ? "기획서 작성을 도와드릴게요. 문제 정의, 해결 방식, 운영 계획, 기대 효과가 설득력 있게 연결되도록 함께 다듬어볼까요?"
+      : "기획서 작성을 도와드릴게요! 배경 및 필요성, 해결 방안, 핵심 기능, 기대 효과 순서로 작성하면 논리적인 기획서가 완성돼요.";
+
   const save = async () => {
     setSaving(true);
     updateProject(id, {
@@ -239,7 +245,9 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
                 지금까지 정리한 내용을 바탕으로 완성된 기획서를 작성해봐요. 왼쪽 기능 목록을 참고하세요.
               </p>
               <Textarea
-                placeholder={`기획서를 작성해주세요.\n\n예시:\n[배경 및 필요성]\n매년 학교 급식에서 발생하는 잔반량은 전국적으로 ...\n\n[해결 방안]\n본 SW는 학생 식단 선호 데이터를 수집하여 ...\n\n[핵심 기능]\n1. 식단 추천 — 학생 선호도 기반 개인화 추천\n2. 잔반 분석 — 섭취량 추적 및 통계 제공\n\n[기대 효과]\n잔반량 30% 감소, 급식 만족도 향상 ...`}
+                placeholder={userType === "general"
+                  ? `기획서를 작성해주세요.\n\n예시:\n[배경 및 필요성]\n수업 중 학생 이해도를 파악하기 어려워 교사들이 개별 피드백을 제공하지 못하는 상황이 빈번하게 발생합니다 ...\n\n[해결 방안]\n본 서비스는 학생이 수업 중 실시간으로 이해도를 입력하면 교사 화면에 즉시 반영되는 피드백 앱입니다 ...\n\n[핵심 기능]\n1. 이해도 체크 — 학생이 O/X 또는 1~5점으로 입력\n2. 실시간 현황판 — 교사 화면에 학급 전체 응답 시각화\n\n[기대 효과]\n교사의 수업 조정 속도 향상, 학생 참여도 증가 ...`
+                  : `기획서를 작성해주세요.\n\n예시:\n[배경 및 필요성]\n매년 학교 급식에서 발생하는 잔반량은 전국적으로 ...\n\n[해결 방안]\n본 SW는 학생 식단 선호 데이터를 수집하여 ...\n\n[핵심 기능]\n1. 식단 추천 — 학생 선호도 기반 개인화 추천\n2. 잔반 분석 — 섭취량 추적 및 통계 제공\n\n[기대 효과]\n잔반량 30% 감소, 급식 만족도 향상 ...`}
                 value={proposalScript}
                 onChange={(e) => setProposalScript(e.target.value)}
                 rows={26}
@@ -279,7 +287,8 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
             <AiChat
               ref={aiChatRef}
               step="script"
-              initialMessage="기획서 작성을 도와드릴게요! 배경 및 필요성, 해결 방안, 핵심 기능, 기대 효과 순서로 작성하면 논리적인 기획서가 완성돼요."
+              userType={userType}
+              initialMessage={scriptInitialMessage}
               placeholder="기획서 작성에 대해 질문하세요..."
             />
           </div>
@@ -289,7 +298,8 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
       <MobileChatSheet
         ref={mobileChatRef}
         step="script"
-        initialMessage="기획서 작성을 도와드릴게요! 배경 및 필요성, 해결 방안, 핵심 기능, 기대 효과 순서로 작성하면 논리적인 기획서가 완성돼요."
+        userType={userType}
+        initialMessage={scriptInitialMessage}
         placeholder="기획서 작성에 대해 질문하세요..."
       />
     </div>

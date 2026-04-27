@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, User, Bot, Mic, MicOff } from "lucide-react";
+import { type UserType } from "@/lib/storage";
 
 type Message = { role: "user" | "assistant"; content: string };
 
@@ -28,6 +29,7 @@ export interface AiChatHandle {
 
 interface AiChatProps {
   step: string;
+  userType?: UserType;
   placeholder?: string;
   initialMessage?: string;
   initialMessages?: Message[];
@@ -35,7 +37,7 @@ interface AiChatProps {
 }
 
 const AiChat = forwardRef<AiChatHandle, AiChatProps>(function AiChat(
-  { step, placeholder, initialMessage, initialMessages, onMessagesChange },
+  { step, userType = "student", placeholder, initialMessage, initialMessages, onMessagesChange },
   ref
 ) {
   const [messages, setMessages] = useState<Message[]>(() => {
@@ -132,7 +134,7 @@ const AiChat = forwardRef<AiChatHandle, AiChatProps>(function AiChat(
       const res = await fetch("/api/ai/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: next, step }),
+        body: JSON.stringify({ messages: next, step, userType }),
       });
       const data = await res.json();
       const newMessages = [...next, { role: "assistant" as const, content: stripMarkdown(data.reply) }];

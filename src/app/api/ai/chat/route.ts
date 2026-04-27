@@ -1,27 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { chat, Message } from "@/lib/claude";
-import {
-  IDEA_ASSISTANT_PROMPT,
-  STORY_ASSISTANT_PROMPT,
-  CHARACTER_ASSISTANT_PROMPT,
-  PANEL_ASSISTANT_PROMPT,
-  SCRIPT_ASSISTANT_PROMPT,
-  COMPLETION_ASSISTANT_PROMPT,
-} from "@/lib/prompts";
-
-const PROMPTS: Record<string, string> = {
-  idea: IDEA_ASSISTANT_PROMPT,
-  story: STORY_ASSISTANT_PROMPT,
-  character: CHARACTER_ASSISTANT_PROMPT,
-  panel: PANEL_ASSISTANT_PROMPT,
-  script: SCRIPT_ASSISTANT_PROMPT,
-  completion: COMPLETION_ASSISTANT_PROMPT,
-};
+import { PROMPTS, type PromptStep } from "@/lib/prompts";
+import { type UserType } from "@/lib/storage";
 
 export async function POST(req: NextRequest) {
-  const { messages, step } = await req.json() as { messages: Message[]; step: string };
+  const { messages, step, userType } = await req.json() as {
+    messages: Message[];
+    step: PromptStep;
+    userType?: UserType;
+  };
 
-  const systemPrompt = PROMPTS[step] ?? IDEA_ASSISTANT_PROMPT;
+  const type: UserType = userType === "general" ? "general" : "student";
+  const systemPrompt = PROMPTS[type][step] ?? PROMPTS.student.idea;
 
   try {
     const reply = await chat(messages, systemPrompt);

@@ -19,6 +19,12 @@ export default function IdeaPage({ params }: { params: Promise<{ id: string }> }
     if (p) setProject(p);
   }, [id]);
 
+  const userType = project?.userType ?? "student";
+  const ideaInitialMessage =
+    userType === "general"
+      ? "안녕하세요! SW 기획 멘토 아이디어봇입니다. 교육 현장이나 업무, 일상에서 해결하고 싶은 문제를 알려주시면 아이디어를 함께 구체화해드릴게요."
+      : "안녕하세요! SW 아이디어 멘토 아이디어봇이에요 😊 어떤 문제를 SW로 해결하고 싶으신가요? 막막해도 괜찮아요. 학교나 일상에서 불편하거나 개선하고 싶은 점이 있으면 편하게 말해봐요!";
+
   const goNext = async () => {
     if (project) {
       updateProject(id, { currentStep: Math.max(2, project.currentStep) });
@@ -62,7 +68,9 @@ export default function IdeaPage({ params }: { params: Promise<{ id: string }> }
             <p className="text-[10px] font-medium text-[#D4547A] uppercase tracking-widest mb-1">Step 01</p>
             <h1 className="text-xl font-bold text-[#1A1A1A] tracking-tight">아이디어 발굴</h1>
             <p className="text-xs text-[#ADA8A0] mt-1">
-              AI 멘토와 자유롭게 대화하며 SW 아이디어를 구체화해봐요. 막막해도 괜찮아요!
+              {userType === "general"
+                ? "수업·행정·학생 지도 현장에서 느끼는 불편함을 SW 서비스 아이디어로 구체화해보세요."
+                : "AI 멘토와 자유롭게 대화하며 SW 아이디어를 구체화해봐요. 막막해도 괜찮아요!"}
             </p>
           </div>
 
@@ -70,7 +78,8 @@ export default function IdeaPage({ params }: { params: Promise<{ id: string }> }
             <AiChat
               key={project?.id ?? "loading"}
               step="idea"
-              initialMessage="안녕하세요! SW 아이디어 멘토 아이디어봇이에요 😊 어떤 문제를 SW로 해결하고 싶으신가요? 막막해도 괜찮아요. 학교나 일상에서 불편하거나 개선하고 싶은 점이 있으면 편하게 말해봐요!"
+              userType={userType}
+              initialMessage={ideaInitialMessage}
               initialMessages={project?.ideaChat}
               onMessagesChange={(msgs) => updateProject(id, { ideaChat: msgs as ChatMessage[] })}
               placeholder="아이디어에 대해 자유롭게 이야기해봐요..."

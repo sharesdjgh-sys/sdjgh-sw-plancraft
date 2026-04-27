@@ -3,6 +3,7 @@
 import { useState, useRef, forwardRef, useImperativeHandle } from "react";
 import { MessageCircle, X } from "lucide-react";
 import AiChat, { type AiChatHandle } from "@/components/ai-assistant/AiChat";
+import { type UserType } from "@/lib/storage";
 
 export interface MobileChatSheetHandle {
   openAndFocus: () => void;
@@ -10,12 +11,13 @@ export interface MobileChatSheetHandle {
 
 interface Props {
   step: string;
+  userType?: UserType;
   initialMessage: string;
   placeholder?: string;
 }
 
 const MobileChatSheet = forwardRef<MobileChatSheetHandle, Props>(function MobileChatSheet(
-  { step, initialMessage, placeholder },
+  { step, userType, initialMessage, placeholder },
   ref
 ) {
   const [open, setOpen] = useState(false);
@@ -65,6 +67,7 @@ const MobileChatSheet = forwardRef<MobileChatSheetHandle, Props>(function Mobile
               <AiChat
                 ref={chatRef}
                 step={step}
+                userType={userType}
                 initialMessage={initialMessage}
                 placeholder={placeholder}
               />

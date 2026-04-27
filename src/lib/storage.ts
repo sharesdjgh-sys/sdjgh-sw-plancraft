@@ -24,6 +24,7 @@ export type Episode = {
 };
 
 export type ChatMessage = { role: "user" | "assistant"; content: string };
+export type UserType = "student" | "general";
 
 export type Project = {
   id: string;
@@ -37,6 +38,7 @@ export type Project = {
   authorNote: string;
   proposalScript: string;
   createdAt: string;
+  userType: UserType;
   ideaChat?: ChatMessage[];
   story: {
     logline: string;
@@ -50,11 +52,18 @@ export type Project = {
 };
 
 const KEY = "plancraft_projects";
+const DEFAULT_USER_TYPE: UserType = "student";
+
+type StoredProject = Omit<Project, "userType"> & { userType?: UserType };
 
 export function getProjects(): Project[] {
   if (typeof window === "undefined") return [];
   try {
-    return JSON.parse(localStorage.getItem(KEY) ?? "[]");
+    const parsed = JSON.parse(localStorage.getItem(KEY) ?? "[]") as StoredProject[];
+    return parsed.map((project) => ({
+      ...project,
+      userType: project.userType === "general" ? "general" : DEFAULT_USER_TYPE,
+    }));
   } catch {
     return [];
   }
@@ -83,6 +92,7 @@ export function createProject(data: {
   genre: string;
   targetCompetition: string;
   deadline: string;
+  userType: UserType;
 }): Project {
   const project: Project = {
     ...data,

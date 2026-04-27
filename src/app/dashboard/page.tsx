@@ -2,11 +2,11 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { STEPS, GENRES } from "@/lib/utils";
 import { Plus, ChevronRight, X, Trophy, Download, Upload, Trash2, User, Pencil, Search } from "lucide-react";
-import { getProjects, createProject, deleteProject, updateProject, type Project } from "@/lib/storage";
+import { getProjects, createProject, deleteProject, updateProject, type Project, type UserType } from "@/lib/storage";
 import { exportAllProjects, importProjects } from "@/lib/download";
 import { isFileSystemAccessSupported, requestDirectory } from "@/lib/fileStorage";
 
@@ -33,11 +33,13 @@ function getDday(deadline: string): { label: string; urgent: boolean; warning: b
   };
 }
 
-type FormState = { title: string; author: string; genre: string; targetCompetition: string; deadline: string };
-const EMPTY_FORM: FormState = { title: "", author: "", genre: "", targetCompetition: "", deadline: "" };
+type FormState = { title: string; author: string; genre: string; targetCompetition: string; deadline: string; userType: UserType };
+const EMPTY_FORM: FormState = { title: "", author: "", genre: "", targetCompetition: "", deadline: "", userType: "student" };
 
 export default function DashboardPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const preferredUserType: UserType = searchParams.get("type") === "general" ? "general" : "student";
   const [projects, setProjects] = useState<Project[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -65,7 +67,7 @@ export default function DashboardPage() {
 
   const openCreate = () => {
     setEditingId(null);
-    setForm(EMPTY_FORM);
+    setForm({ ...EMPTY_FORM, userType: preferredUserType });
     setShowModal(true);
   };
 
@@ -73,7 +75,14 @@ export default function DashboardPage() {
     e.preventDefault();
     e.stopPropagation();
     setEditingId(p.id);
-    setForm({ title: p.title, author: p.author ?? "", genre: p.genre ?? "", targetCompetition: p.targetCompetition ?? "", deadline: p.deadline ?? "" });
+    setForm({
+      title: p.title,
+      author: p.author ?? "",
+      genre: p.genre ?? "",
+      targetCompetition: p.targetCompetition ?? "",
+      deadline: p.deadline ?? "",
+      userType: p.userType ?? "student",
+    });
     setShowModal(true);
   };
 
@@ -90,7 +99,7 @@ export default function DashboardPage() {
       const p = createProject(form);
       setProjects(getProjects());
       setShowModal(false);
-      setForm(EMPTY_FORM);
+      setForm({ ...EMPTY_FORM, userType: preferredUserType });
       setCreating(false);
       if (isFileSystemAccessSupported()) {
         await requestDirectory(p.id);
@@ -141,6 +150,9 @@ export default function DashboardPage() {
             <Link href="/guide" className="text-xs text-[#7A7067] hover:text-[#1A1A1A] transition-colors px-3 py-1.5">
               가이드
             </Link>
+            <span className="text-[10px] px-2.5 py-1 rounded-full bg-[#F4F1EC] border border-[#EBE7E0] text-[#7A7067]">
+              {preferredUserType === "general" ? "선생님·일반인 모드" : "학생 모드"}
+            </span>
           </div>
         </div>
       </header>
@@ -237,7 +249,7 @@ export default function DashboardPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-[#1A1A1A] mb-1.5">마감일</label>
+                    <label className="block text-xs font-semibold text-[#1A1A1A] mb-1.5">{form.userType === "general" ? "목표 출시일" : "마감일"}</label>
                     <Input
                       type="date"
                       value={form.deadline}
@@ -246,9 +258,9 @@ export default function DashboardPage() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-[#1A1A1A] mb-1.5">참가 공모전명</label>
+                  <label className="block text-xs font-semibold text-[#1A1A1A] mb-1.5">{form.userType === "general" ? "관련 프로그램 / 강의명" : "참가 공모전명"}</label>
                   <Input
-                    placeholder="예: SW 아이디어 공모전"
+                    placeholder={form.userType === "general" ? "예: 방과후 AI 수업, 자유학기제 프로젝트" : "예: SW 아이디어 공모전"}
                     value={form.targetCompetition}
                     onChange={(e) => setForm((f) => ({ ...f, targetCompetition: e.target.value }))}
                   />

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import {
   ArrowRight, Lightbulb, Target, Users, Cpu,
-  PenLine, Trophy, Star, Heart
+  PenLine, Trophy, Star, Heart, GraduationCap, BookOpen
 } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
 
@@ -69,23 +69,49 @@ export default function HomePage() {
 
             <p className="hero-enter-3 text-[#7A7067] text-lg leading-relaxed max-w-md mb-10">
               아이디어가 막막해도 괜찮아요.<br />
-              AI 멘토가 아이디어 발굴부터 기획서 제출까지<br />
+              AI 멘토가 아이디어 발굴부터 기획 정리까지<br />
               6단계 전 과정을 함께해요.
             </p>
 
-            <div className="hero-enter-3 flex items-center gap-4 flex-wrap">
-              <Link
-                href="/dashboard"
-                className="flex items-center gap-2 bg-[#D4547A] text-white px-6 py-3.5 rounded-full font-semibold text-sm hover:bg-[#B8405F] transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_24px_rgba(212,84,122,0.35)]"
-              >
-                지금 시작하기 <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link
-                href="/guide"
-                className="text-sm text-[#7A7067] hover:text-[#1A1A1A] transition-colors duration-200 underline underline-offset-4 decoration-[#EBE7E0]"
-              >
-                준비 가이드 보기
-              </Link>
+            <div className="hero-enter-3 flex flex-col gap-3 max-w-sm">
+              <div className="flex gap-2.5">
+                <Link
+                  href="/dashboard?type=student"
+                  className="group flex-1 flex items-center gap-3 bg-[#D4547A] text-white px-4 py-3 rounded-xl hover:bg-[#B8405F] transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_20px_rgba(212,84,122,0.28)]"
+                >
+                  <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0">
+                    <GraduationCap className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-semibold text-sm leading-tight">학생</p>
+                    <p className="text-[11px] opacity-70 leading-tight truncate">SW 공모전 준비</p>
+                  </div>
+                  <ArrowRight className="w-3.5 h-3.5 opacity-50 ml-auto flex-shrink-0 group-hover:translate-x-0.5 transition-transform duration-200" />
+                </Link>
+                <Link
+                  href="/dashboard?type=general"
+                  className="group flex-1 flex items-center gap-3 bg-white text-[#1A1A1A] border border-[#EBE7E0] px-4 py-3 rounded-xl hover:border-[#D4547A]/30 hover:shadow-[0_4px_16px_rgba(212,84,122,0.08)] transition-all duration-300 hover:scale-[1.02]"
+                >
+                  <div className="w-8 h-8 rounded-lg bg-[#F4F1EC] flex items-center justify-center flex-shrink-0">
+                    <BookOpen className="w-4 h-4 text-[#7A7067]" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-semibold text-sm leading-tight">선생님</p>
+                    <p className="text-[11px] text-[#ADA8A0] leading-tight truncate">수업·프로그램 기획</p>
+                  </div>
+                  <ArrowRight className="w-3.5 h-3.5 text-[#C8C3BC] ml-auto flex-shrink-0 group-hover:translate-x-0.5 transition-transform duration-200" />
+                </Link>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="h-px flex-1 bg-[#EBE7E0]" />
+                <Link
+                  href="/guide"
+                  className="flex items-center gap-1 text-xs text-[#ADA8A0] hover:text-[#7A7067] transition-colors duration-200 px-2"
+                >
+                  준비 가이드 보기 <ArrowRight className="w-3 h-3" />
+                </Link>
+                <div className="h-px flex-1 bg-[#EBE7E0]" />
+              </div>
             </div>
           </div>
 
