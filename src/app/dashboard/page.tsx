@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
@@ -36,7 +36,7 @@ function getDday(deadline: string): { label: string; urgent: boolean; warning: b
 type FormState = { title: string; author: string; genre: string; targetCompetition: string; deadline: string; userType: UserType };
 const EMPTY_FORM: FormState = { title: "", author: "", genre: "", targetCompetition: "", deadline: "", userType: "student" };
 
-export default function DashboardPage() {
+function DashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const preferredUserType: UserType = searchParams.get("type") === "general" ? "general" : "student";
@@ -396,5 +396,13 @@ export default function DashboardPage() {
         )}
       </main>
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#FBF9F6]" />}>
+      <DashboardContent />
+    </Suspense>
   );
 }
