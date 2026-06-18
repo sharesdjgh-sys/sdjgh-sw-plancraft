@@ -3,11 +3,32 @@ import { anthropic } from "@/lib/claude";
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
 
+// 대화 내용이 너무 길면 API 요청이 실패할 수 있으므로 글자수 제한
+// 한국어 기준 약 1글자 ≈ 1.5~2토큰, 50,000자 ≈ 75,000~100,000토큰 (모델 한도 200K의 절반 이하)
+const MAX_TRANSCRIPT_CHARS = 50000;
+
 function buildTranscript(messages: ChatMessage[]): string {
-  return messages
-    .filter((m) => m.role !== "assistant" || !m.content.startsWith("안녕하세요"))
-    .map((m) => `[${m.role === "user" ? "사용자" : "AI"}]: ${m.content}`)
-    .join("\n");
+  const filtered = messages
+    .filter((m) => m.role !== "assistant" || !m.content.startsWith("안녕하세요"));
+
+  const lines = filtered.map(
+    (m) => `[${m.role === "user" ? "사용자" : "AI"}]: ${m.content}`
+  );
+
+  let transcript = lines.join("\n");
+
+  // 글자수 초과 시 최근 대화만 남기기 (앞부분을 잘라냄)
+  if (transcript.length > MAX_TRANSCRIPT_CHARS) {
+    // 뒤에서부터 MAX_TRANSCRIPT_CHARS만큼만 유지
+    const trimmed = transcript.slice(-MAX_TRANSCRIPT_CHARS);
+    // 잘린 첫 줄은 불완전할 수 있으므로 첫 번째 줄바꿈 이후부터 사용
+    const firstNewline = trimmed.indexOf("\n");
+    transcript =
+      "[... 이전 대화 생략 ...]\n" +
+      (firstNewline >= 0 ? trimmed.slice(firstNewline + 1) : trimmed);
+  }
+
+  return transcript;
 }
 
 const AUTOFILL_PROMPTS: Record<string, string> = {
@@ -142,7 +163,7 @@ export async function POST(req: NextRequest) {
   try {
     const response = await anthropic.messages.create({
       model: "claude-sonnet-4-6",
-      max_tokens: 2048,
+      max_tokens: 8192,
       system: systemPrompt,
       messages: [
         {
@@ -160,8 +181,44 @@ export async function POST(req: NextRequest) {
 
     const parsed = JSON.parse(jsonMatch[0]);
     return NextResponse.json(parsed);
-  } catch (err) {
-    console.error(err);
-    return NextResponse.json({ error: "AI 자동채우기 실패" }, { status: 500 });
+  } catch (err: unknown) {
+    const error = err as { status?: number; error?: { type?: string; message?: string }; message?: string };
+    const status = error.status ?? 500;
+    const apiErrorType = error.error?.type ?? "";
+    const errorMessage = error.error?.message ?? error.message ?? "알 수 없는 오류";
+
+    console.error("[autofill] AI 자동채우기 실패:", {
+      step,
+      status,
+      apiErrorType,
+      errorMessage,
+      transcriptLength: transcript.length,
+    });
+
+    // 사용자에게 보여줄 구체적인 에러 유형 결정
+    let errorType = "unknown";
+    let userMessage = "AI 자동채우기에 실패했어요.";
+
+    if (status === 429 || apiErrorType === "rate_limit_error") {
+      errorType = "rate_limit";
+      userMessage = "요청이 너무 많아요. 잠시 후 다시 시도해주세요.";
+    } else if (status === 413 || apiErrorType === "request_too_large" || errorMessage.includes("too long") || errorMessage.includes("too many tokens") || errorMessage.includes("token")) {
+      errorType = "token_overflow";
+      userMessage = "대화 내용이 너무 많아 처리할 수 없어요. 아이디어 발굴 대화를 줄이고 다시 시도해주세요.";
+    } else if (apiErrorType === "overloaded_error" || status === 529) {
+      errorType = "overloaded";
+      userMessage = "AI 서버가 바빠요. 잠시 후 다시 시도해주세요.";
+    } else if (apiErrorType === "authentication_error" || status === 401) {
+      errorType = "auth";
+      userMessage = "API 인증 오류가 발생했어요. 관리자에게 문의해주세요.";
+    } else if (errorMessage.includes("JSON not found") || errorMessage.includes("Unexpected response")) {
+      errorType = "parse";
+      userMessage = "AI 응답을 처리하지 못했어요. 다시 시도해주세요.";
+    }
+
+    return NextResponse.json(
+      { error: userMessage, errorType },
+      { status: status >= 400 ? status : 500 }
+    );
   }
 }

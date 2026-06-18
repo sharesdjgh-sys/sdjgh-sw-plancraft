@@ -156,8 +156,9 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
           prev.trim() ? prev + "\n\n" + data.script : data.script
         );
       }
-    } catch {
-      alert("자동채우기에 실패했어요. 다시 시도해주세요.");
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "자동채우기에 실패했어요. 다시 시도해주세요.";
+      alert(msg);
     } finally {
       setAutofilling(false);
     }

@@ -100,8 +100,9 @@ export default function StoryPage({ params }: { params: Promise<{ id: string }> 
         // totalEpisodes: 기본값(1)이 아닌 경우 사용자 값 유지
         totalEpisodes: s.totalEpisodes !== "1" ? s.totalEpisodes : (data.totalEpisodes ?? s.totalEpisodes),
       }));
-    } catch (e) {
-      alert("자동채우기에 실패했어요. 다시 시도해주세요.");
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "자동채우기에 실패했어요. 다시 시도해주세요.";
+      alert(msg);
     } finally {
       setAutofilling(false);
     }
