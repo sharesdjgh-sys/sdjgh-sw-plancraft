@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { anthropic } from "@/lib/claude";
+import { anthropic, extractText } from "@/lib/claude";
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
 
@@ -164,6 +164,7 @@ export async function POST(req: NextRequest) {
     const response = await anthropic.messages.create({
       model: "claude-sonnet-5-5",
       max_tokens: 8192,
+      output_config: { effort: "medium" },
       system: systemPrompt,
       messages: [
         {
@@ -173,10 +174,9 @@ export async function POST(req: NextRequest) {
       ],
     });
 
-    const raw = response.content[0];
-    if (raw.type !== "text") throw new Error("Unexpected response type");
+    const text = extractText(response.content);
 
-    const jsonMatch = raw.text.match(/\{[\s\S]*\}/);
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) throw new Error("JSON not found in response");
 
     const parsed = JSON.parse(jsonMatch[0]);
