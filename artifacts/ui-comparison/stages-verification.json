@@ -1,0 +1,82 @@
+{
+  "steps": [
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "fixture": "ui-comparison-stages",
+  "userType": "general",
+  "viewports": {
+    "desktop": {
+      "width": 1440,
+      "height": 1000
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844
+    },
+    "smallMobile": {
+      "width": 320,
+      "height": 844
+    }
+  },
+  "screenshots": {
+    "step02": {
+      "beforeDesktop": "step02-before-desktop.png",
+      "beforeMobile": "step02-before-mobile.png",
+      "afterDesktop": "step02-after-desktop.png",
+      "afterMobile": "step02-after-mobile.png"
+    },
+    "step03": {
+      "beforeDesktop": "step03-before-desktop.png",
+      "beforeMobile": "step03-before-mobile.png",
+      "afterDesktop": "step03-after-desktop.png",
+      "afterMobile": "step03-after-mobile.png"
+    },
+    "step04": {
+      "beforeDesktop": "step04-before-desktop.png",
+      "beforeMobile": "step04-before-mobile.png",
+      "afterDesktop": "step04-after-desktop.png",
+      "afterMobile": "step04-after-mobile.png"
+    },
+    "step05": {
+      "beforeDesktop": "step05-before-desktop.png",
+      "beforeMobile": "step05-before-mobile.png",
+      "afterDesktop": "step05-after-desktop.png",
+      "afterMobile": "step05-after-mobile.png"
+    },
+    "step06": {
+      "beforeDesktop": "step06-before-desktop.png",
+      "beforeMobile": "step06-before-mobile.png",
+      "afterDesktop": "step06-after-desktop.png",
+      "afterMobile": "step06-after-mobile.png"
+    }
+  },
+  "validation": {
+    "typecheck": "passed",
+    "targetedLint": "passed",
+    "horizontalOverflow": false,
+    "step01Regression": "passed",
+    "storyAutofillPreservesExisting": true,
+    "saveBeforeSidebarNavigation": true,
+    "characterAddDeleteRestore": true,
+    "featureAddRestore": true,
+    "cutAddDragAndAIFill": true,
+    "proposalAppendAndDownload": true,
+    "checklistAndMemoRestore": true,
+    "markComplete": true,
+    "finalSummaryDownload": true,
+    "stageChatsRestored": [
+      "story",
+      "character",
+      "panel",
+      "script",
+      "completion"
+    ],
+    "backupSchemaLegacyAndMentorChats": true,
+    "AIResponses": "mocked for UI validation; no live model call"
+  },
+  "comparison": "index.html"
+}

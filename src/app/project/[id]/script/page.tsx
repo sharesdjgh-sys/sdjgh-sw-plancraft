@@ -1,14 +1,14 @@
 "use client";
 
+import ProjectWorkspace from "@/components/project-workspace/ProjectWorkspace";
+import workspaceStyles from "@/components/project-workspace/workspace.module.css";
+
 import { useState, useEffect, use, useRef } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Textarea } from "@/components/ui/textarea";
-import AiChat, { type AiChatHandle } from "@/components/ai-assistant/AiChat";
-import StepIndicator from "@/components/progress-tracker/StepIndicator";
+import { type AiChatHandle } from "@/components/ai-assistant/AiChat";
 import EmptyContentModal from "@/components/EmptyContentModal";
-import { Save, ArrowRight, ArrowLeft, Check, Download, FileText, CheckCircle, Wand2 } from "lucide-react";
-import MobileChatSheet, { type MobileChatSheetHandle } from "@/components/mobile/MobileChatSheet";
+import { Save, Check, Download, FileText, CheckCircle, Wand2 } from "lucide-react";
 import { getProject, updateProject, type Episode, type Project, type Character } from "@/lib/storage";
 import { downloadProposalScript } from "@/lib/download";
 import { saveProjectToDir } from "@/lib/fileStorage";
@@ -82,7 +82,6 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
   const [autofilling, setAutofilling] = useState(false);
   const [showEmptyModal, setShowEmptyModal] = useState(false);
   const aiChatRef = useRef<AiChatHandle>(null);
-  const mobileChatRef = useRef<MobileChatSheetHandle>(null);
 
   useEffect(() => {
     const p = getProject(id);
@@ -104,7 +103,7 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
     setSaving(true);
     updateProject(id, {
       proposalScript,
-      currentStep: Math.max(5, project?.currentStep ?? 1),
+      currentStep: Math.max(5, getProject(id)?.currentStep ?? 1),
     });
     await saveProjectToDir(id, getProject(id));
     setSaving(false);
@@ -116,7 +115,7 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
     if (!proposalScript.trim()) { setShowEmptyModal(true); return; }
     updateProject(id, {
       proposalScript,
-      currentStep: Math.max(5, project?.currentStep ?? 1),
+      currentStep: Math.max(5, getProject(id)?.currentStep ?? 1),
     });
     await saveProjectToDir(id, getProject(id));
     router.push(`/project/${id}/submit`);
@@ -126,7 +125,7 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
     setShowEmptyModal(false);
     updateProject(id, {
       proposalScript,
-      currentStep: Math.max(5, project?.currentStep ?? 1),
+      currentStep: Math.max(5, getProject(id)?.currentStep ?? 1),
     });
     await saveProjectToDir(id, getProject(id));
     router.push(`/project/${id}/submit`);
@@ -168,74 +167,30 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
   const lineCount = proposalScript ? proposalScript.split("\n").length : 0;
 
   return (
-    <div className="min-h-screen bg-[#FBF9F6]">
+    <>
       {showEmptyModal && (
         <EmptyContentModal
           title="기획서 내용이 비어있어요"
           description="기획서를 작성해야 다음 단계로 넘어갈 수 있어요. AI 자동채우기로 초안을 먼저 생성하거나 AI 멘토에게 도움을 요청해봐요!"
           autofilling={autofilling}
           onAutofill={() => { setShowEmptyModal(false); autofill(); }}
-          onAskMentor={() => { setShowEmptyModal(false); aiChatRef.current?.focusInput(); mobileChatRef.current?.openAndFocus(); }}
+          onAskMentor={() => { setShowEmptyModal(false); aiChatRef.current?.focusInput(); }}
           onGoAnyway={goNextAnyway}
           onClose={() => setShowEmptyModal(false)}
         />
       )}
-      <header className="bg-white border-b border-[#EBE7E0] px-6 py-3.5 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3 min-w-0">
-            <Link
-              href="/dashboard"
-              className="flex items-center gap-1.5 text-xs text-[#ADA8A0] hover:text-[#7A7067] transition-colors flex-shrink-0"
-            >
-              <img src="/plancraft-logo-remove.png" className="w-3.5 h-3.5 rounded object-cover" alt="" /> 대시보드
-            </Link>
-            <span className="text-[#EBE7E0]">/</span>
-            <span className="text-xs font-semibold text-[#1A1A1A] truncate">{project?.title ?? "..."}</span>
-          </div>
-          <div className="flex items-center gap-2 flex-shrink-0">
-            <button
-              onClick={autofill}
-              disabled={autofilling}
-              className="flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-full border border-[#D4547A]/30 text-[#D4547A] hover:bg-[#D4547A]/5 transition-all duration-200 disabled:opacity-50"
-            >
-              <Wand2 className="w-3.5 h-3.5" /> {autofilling ? "채우는 중..." : "AI 자동채우기"}
-            </button>
-            {project && (
-              <button
-                onClick={() => downloadProposalScript({ ...project, proposalScript })}
-                className="hidden sm:flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] transition-all duration-200"
-              >
-                <Download className="w-3.5 h-3.5" /> 기획서 다운로드
-              </button>
-            )}
-            <button
-              onClick={save}
-              disabled={saving}
-              className="flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-full bg-[#D4547A] text-white hover:bg-[#B8405F] transition-all duration-300 disabled:opacity-50"
-            >
-              {saved ? <><Check className="w-3.5 h-3.5" /> 저장됨</> : saving ? "저장 중..." : <><Save className="w-3.5 h-3.5" /> 저장</>}
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <div className="max-w-7xl mx-auto px-4 py-6 flex flex-col md:flex-row gap-4 md:gap-5">
-        {/* Left sidebar */}
-        <aside className="hidden md:flex md:flex-col w-52 flex-shrink-0 space-y-3 sticky top-20 self-start">
-          <div className="bg-white rounded-2xl border border-[#EBE7E0] p-4 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
-            <StepIndicator currentStep={project?.currentStep ?? 1} projectId={id} isCompleted={project?.isCompleted} />
-          </div>
-
-          <FeatureListPanel episodes={project?.episodes ?? []} />
-        </aside>
-
-        <main className="flex-1 min-w-0 space-y-4 pb-20 lg:pb-0">
-          <div>
-            <p className="text-[10px] font-medium text-[#D4547A] uppercase tracking-widest mb-1">Step 05</p>
-            <h1 className="text-xl font-bold text-[#1A1A1A] tracking-tight">기획서 내용 작성</h1>
-          </div>
-
-          {/* 기획서 내용 */}
+      <ProjectWorkspace
+        projectId={id}
+        step={5}
+        mentorStep="script"
+        mentorRef={aiChatRef}
+        mentorMessage={scriptInitialMessage}
+        mentorPlaceholder="기획서 작성에 대해 질문하세요..."
+        onSave={save} busy={saving || autofilling} onNext={goNext} nextLabel="다음: 최종 검토"
+        actions={<><button onClick={autofill} disabled={autofilling}><Wand2 size={14} />{autofilling ? "채우는 중..." : "AI 자동채우기"}</button><button disabled={!project} onClick={() => { if (project) downloadProposalScript({ ...project, proposalScript }); }}><Download size={14} />다운로드</button><button onClick={save} disabled={saving} className={workspaceStyles.saveButton}>{saved ? <><Check size={14} /> 저장됨</> : saving ? "저장 중..." : <><Save size={14} /> 저장</>}</button></>}
+      >
+        <details className={workspaceStyles.references}><summary>지금까지 정리한 내용 확인 · 기능과 이해관계자</summary><div className={workspaceStyles.referenceGrid}><FeatureListPanel episodes={project?.episodes ?? []} /><CharacterPanel characters={project?.characters ?? []} /></div></details>
+{/* 기획서 내용 */}
           <div className="bg-white rounded-2xl border border-[#EBE7E0] shadow-[0_2px_12px_rgba(0,0,0,0.04)] overflow-hidden">
             <div className="flex items-center gap-2 px-5 py-4 border-b border-[#EBE7E0]">
               <FileText className="w-4 h-4 text-[#D4547A]" />
@@ -243,7 +198,7 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
             </div>
             <div className="p-5">
               <p className="text-[10px] text-[#ADA8A0] mb-3">
-                지금까지 정리한 내용을 바탕으로 완성된 기획서를 작성해봐요. 왼쪽 기능 목록을 참고하세요.
+                지금까지 정리한 내용을 바탕으로 완성된 기획서를 작성해봐요. 위의 참고 내용을 펼쳐 기능과 이해관계자를 확인하세요.
               </p>
               <Textarea
                 placeholder={userType === "general"
@@ -251,8 +206,8 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
                   : `기획서를 작성해주세요.\n\n예시:\n[배경 및 필요성]\n매년 학교 급식에서 발생하는 잔반량은 전국적으로 ...\n\n[해결 방안]\n본 SW는 학생 식단 선호 데이터를 수집하여 ...\n\n[핵심 기능]\n1. 식단 추천 — 학생 선호도 기반 개인화 추천\n2. 잔반 분석 — 섭취량 추적 및 통계 제공\n\n[기대 효과]\n잔반량 30% 감소, 급식 만족도 향상 ...`}
                 value={proposalScript}
                 onChange={(e) => setProposalScript(e.target.value)}
-                rows={26}
-                className="font-mono text-xs"
+                rows={18}
+                className="text-sm"
               />
               <div className="flex justify-end mt-2 gap-3 text-[10px] text-[#ADA8A0]">
                 <span>{lineCount}줄</span>
@@ -260,49 +215,7 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
               </div>
             </div>
           </div>
-
-          <div className="flex justify-between gap-3">
-            <Link href={`/project/${id}/episodes`}>
-              <button className="flex items-center gap-2 text-xs font-medium px-4 py-2.5 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] transition-all duration-200">
-                <ArrowLeft className="w-3.5 h-3.5" /> 이전: 기능 설계
-              </button>
-            </Link>
-            <div className="flex gap-3">
-              <button
-                onClick={save}
-                disabled={saving}
-                className="text-xs font-medium px-4 py-2.5 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] transition-all duration-200 disabled:opacity-50"
-              >
-                저장
-              </button>
-              <button onClick={goNext} className="flex items-center gap-2 text-xs font-semibold px-5 py-2.5 rounded-full bg-[#D4547A] text-white hover:bg-[#B8405F] transition-all duration-300">
-                다음: 제출 준비 <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          </div>
-        </main>
-
-        <aside className="hidden lg:flex w-72 flex-shrink-0 sticky top-20 flex-col gap-3" style={{ height: "calc(100vh - 5rem)" }}>
-          <CharacterPanel characters={project?.characters ?? []} />
-          <div className="flex-1 min-h-0">
-            <AiChat
-              ref={aiChatRef}
-              step="script"
-              userType={userType}
-              initialMessage={scriptInitialMessage}
-              placeholder="기획서 작성에 대해 질문하세요..."
-            />
-          </div>
-        </aside>
-      </div>
-
-      <MobileChatSheet
-        ref={mobileChatRef}
-        step="script"
-        userType={userType}
-        initialMessage={scriptInitialMessage}
-        placeholder="기획서 작성에 대해 질문하세요..."
-      />
-    </div>
+      </ProjectWorkspace>
+    </>
   );
 }

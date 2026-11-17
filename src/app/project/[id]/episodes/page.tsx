@@ -1,15 +1,15 @@
 "use client";
 
+import ProjectWorkspace from "@/components/project-workspace/ProjectWorkspace";
+import workspaceStyles from "@/components/project-workspace/workspace.module.css";
+
 import { useState, useEffect, use, useRef } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import AiChat, { type AiChatHandle } from "@/components/ai-assistant/AiChat";
-import StepIndicator from "@/components/progress-tracker/StepIndicator";
+import { type AiChatHandle } from "@/components/ai-assistant/AiChat";
 import EmptyContentModal from "@/components/EmptyContentModal";
-import { Plus, Trash2, Save, ArrowRight, CheckCircle, Check, Download, Cpu, Wand2, GripVertical } from "lucide-react";
-import MobileChatSheet, { type MobileChatSheetHandle } from "@/components/mobile/MobileChatSheet";
+import { Plus, Trash2, Save, CheckCircle, Check, Download, Cpu, Wand2, GripVertical } from "lucide-react";
 import { getProject, updateProject, type Episode, type Cut, type Project } from "@/lib/storage";
 import { downloadEpisode, downloadAllEpisodes } from "@/lib/download";
 import { saveProjectToDir } from "@/lib/fileStorage";
@@ -29,7 +29,6 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
   const [autofilling, setAutofilling] = useState(false);
   const [showEmptyModal, setShowEmptyModal] = useState(false);
   const aiChatRef = useRef<AiChatHandle>(null);
-  const mobileChatRef = useRef<MobileChatSheetHandle>(null);
   const dragIndexRef = useRef<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
@@ -137,7 +136,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
     setSaving(true);
     updateProject(id, {
       episodes,
-      currentStep: Math.max(4, project?.currentStep ?? 1),
+      currentStep: Math.max(4, getProject(id)?.currentStep ?? 1),
     });
     await saveProjectToDir(id, getProject(id));
     setSaving(false);
@@ -149,7 +148,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
     if (episodes.every((ep) => !ep.title.trim())) { setShowEmptyModal(true); return; }
     updateProject(id, {
       episodes,
-      currentStep: Math.max(4, project?.currentStep ?? 1),
+      currentStep: Math.max(4, getProject(id)?.currentStep ?? 1),
     });
     await saveProjectToDir(id, getProject(id));
     router.push(`/project/${id}/script`);
@@ -159,7 +158,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
     setShowEmptyModal(false);
     updateProject(id, {
       episodes,
-      currentStep: Math.max(4, project?.currentStep ?? 1),
+      currentStep: Math.max(4, getProject(id)?.currentStep ?? 1),
     });
     await saveProjectToDir(id, getProject(id));
     router.push(`/project/${id}/script`);
@@ -261,102 +260,30 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
     "flex h-9 w-full rounded-xl border border-[#EBE7E0] bg-white px-3 py-1.5 text-xs text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#D4547A]/20 focus:border-[#D4547A]/40 transition-all duration-200";
 
   return (
-    <div className="min-h-screen bg-[#FBF9F6]">
+    <>
       {showEmptyModal && (
         <EmptyContentModal
           title="기능 이름이 비어있어요"
           description="핵심 기능의 이름을 하나 이상 작성해야 다음 단계로 넘어갈 수 있어요. 어려우면 AI 도움을 받아봐요!"
           autofilling={autofilling}
           onAutofill={() => { setShowEmptyModal(false); autofill(); }}
-          onAskMentor={() => { setShowEmptyModal(false); aiChatRef.current?.focusInput(); mobileChatRef.current?.openAndFocus(); }}
+          onAskMentor={() => { setShowEmptyModal(false); aiChatRef.current?.focusInput(); }}
           onGoAnyway={goNextAnyway}
           onClose={() => setShowEmptyModal(false)}
         />
       )}
-      <header className="bg-white border-b border-[#EBE7E0] px-6 py-3.5 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3 min-w-0">
-            <Link
-              href="/dashboard"
-              className="flex items-center gap-1.5 text-xs text-[#ADA8A0] hover:text-[#7A7067] transition-colors flex-shrink-0"
-            >
-              <img src="/plancraft-logo-remove.png" className="w-3.5 h-3.5 rounded object-cover" alt="" /> 대시보드
-            </Link>
-            <span className="text-[#EBE7E0]">/</span>
-            <span className="text-xs font-semibold text-[#1A1A1A] truncate">{project?.title ?? "..."}</span>
-          </div>
-          <div className="flex items-center gap-2 flex-shrink-0">
-            {project && (
-              <>
-                <button
-                  onClick={autofill}
-                  disabled={autofilling}
-                  className="flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-full border border-[#D4547A]/30 text-[#D4547A] hover:bg-[#D4547A]/5 transition-all duration-200 disabled:opacity-50"
-                >
-                  <Wand2 className="w-3.5 h-3.5" /> {autofilling ? "채우는 중..." : "AI 자동채우기"}
-                </button>
-                <button
-                  onClick={() => downloadEpisode({ ...project, episodes }, activeEp)}
-                  className="hidden sm:flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] transition-all duration-200"
-                >
-                  <Download className="w-3.5 h-3.5" /> 이 기능
-                </button>
-                <button
-                  onClick={() => downloadAllEpisodes({ ...project, episodes })}
-                  className="hidden sm:flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] transition-all duration-200"
-                >
-                  <Download className="w-3.5 h-3.5" /> 전체
-                </button>
-              </>
-            )}
-            <button
-              onClick={save}
-              disabled={saving}
-              className="flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-full bg-[#D4547A] text-white hover:bg-[#B8405F] transition-all duration-300 disabled:opacity-50"
-            >
-              {saved ? <><Check className="w-3.5 h-3.5" /> 저장됨</> : saving ? "저장 중..." : <><Save className="w-3.5 h-3.5" /> 저장</>}
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <div className="max-w-7xl mx-auto px-4 py-6 flex flex-col md:flex-row gap-4 md:gap-5">
-        {/* Left sidebar */}
-        <aside className="hidden md:flex md:flex-col w-52 flex-shrink-0 space-y-3 sticky top-20 self-start">
-          <div className="bg-white rounded-2xl border border-[#EBE7E0] p-4 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
-            <StepIndicator currentStep={project?.currentStep ?? 1} projectId={id} isCompleted={project?.isCompleted} />
-          </div>
-
-          <div className="bg-white rounded-2xl border border-[#EBE7E0] p-4 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold text-[#1A1A1A]">기능 목록</span>
-              <button onClick={addEpisode} className="text-[#D4547A] hover:text-[#B8405F] transition-colors">
-                <Plus className="w-4 h-4" />
-              </button>
-            </div>
-            <div className="space-y-1">
-              {episodes.map((ep, i) => (
-                <button
-                  key={i}
-                  onClick={() => setActiveEp(i)}
-                  title={ep.title || undefined}
-                  className={`w-full text-left px-3 py-2 rounded-xl text-xs flex items-center justify-between gap-1 transition-all duration-200 ${
-                    activeEp === i
-                      ? "bg-[#D4547A]/8 text-[#D4547A] font-semibold border border-[#D4547A]/20"
-                      : "text-[#7A7067] hover:bg-[#F4F1EC]"
-                  }`}
-                >
-                  <span className="truncate min-w-0">기능 {ep.episodeNumber}{ep.title && ` · ${ep.title}`}</span>
-                  {ep.isCompleted && <CheckCircle className="w-3.5 h-3.5 text-green-500 flex-shrink-0" />}
-                </button>
-              ))}
-            </div>
-          </div>
-        </aside>
-
-        <main className="flex-1 min-w-0 space-y-4 pb-20 lg:pb-0">
-          {/* 모바일 기능 탭 */}
-          <div className="md:hidden flex gap-2 overflow-x-auto pb-1">
+      <ProjectWorkspace
+        projectId={id}
+        step={4}
+        mentorStep="panel"
+        mentorRef={aiChatRef}
+        mentorMessage={panelInitialMessage}
+        mentorPlaceholder="기능 설계에 대해 질문하세요..."
+        onSave={save} busy={saving || autofilling || autofillingCuts} onNext={goNext} nextLabel="다음: 기획서 작성"
+        actions={<><button onClick={autofill} disabled={autofilling}><Wand2 size={14} />{autofilling ? "채우는 중..." : "AI 자동채우기"}</button><button disabled={!project} onClick={() => { if (project) downloadEpisode({ ...project, episodes }, activeEp); }}><Download size={14} />이 기능 다운로드</button><button disabled={!project} onClick={() => { if (project) downloadAllEpisodes({ ...project, episodes }); }}><Download size={14} />전체 다운로드</button><button onClick={save} disabled={saving} className={workspaceStyles.saveButton}>{saved ? <><Check size={14} /> 저장됨</> : saving ? "저장 중..." : <><Save size={14} /> 저장</>}</button></>}
+      >
+        {/* 모바일 기능 탭 */}
+          <div className={workspaceStyles.featureTabs}>
             {episodes.map((ep, i) => (
               <button
                 key={i}
@@ -367,7 +294,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
                     : "bg-white text-[#7A7067] border-[#EBE7E0]"
                 }`}
               >
-                기능 {ep.episodeNumber}{ep.title ? ` · ${ep.title.slice(0, 10)}` : ""}
+                기능 {ep.episodeNumber}{ep.title ? ` · ${ep.title}` : ""}
                 {ep.isCompleted && <CheckCircle className="w-3 h-3 flex-shrink-0" />}
               </button>
             ))}
@@ -379,12 +306,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
             </button>
           </div>
 
-          <div className="flex items-center justify-between mb-2">
-            <div>
-              <p className="text-[10px] font-medium text-[#D4547A] uppercase tracking-widest mb-1">Step 04</p>
-              <h1 className="text-xl font-bold text-[#1A1A1A] tracking-tight">기능 {ep?.episodeNumber} 설계</h1>
-            </div>
-            <label className="flex items-center gap-2 text-xs text-[#7A7067] cursor-pointer">
+          <div className={workspaceStyles.featureHeading}><h2>기능 {ep?.episodeNumber} 세부 설계</h2><label className="flex items-center gap-2 text-xs text-[#7A7067] cursor-pointer">
               <input
                 type="checkbox"
                 checked={ep?.isCompleted ?? false}
@@ -392,10 +314,8 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
                 className="rounded accent-[#D4547A]"
               />
               이 기능 완료됨
-            </label>
-          </div>
-
-          {/* 제목 & 줄거리 */}
+            </label></div>
+{/* 제목 & 설명 */}
           <div className="bg-white rounded-2xl border border-[#EBE7E0] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
             <label className="block text-xs font-bold text-[#1A1A1A] mb-1">기능 {ep?.episodeNumber} 이름 & 설명</label>
             <p className="text-[10px] text-[#ADA8A0] mb-3">이 기능이 무엇을 하는지 간략히 정리해봐요</p>
@@ -496,6 +416,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
                         </div>
                         <button
                           onClick={() => removeCut(cutIdx)}
+                          aria-label={"처리 단계 " + (cutIdx + 1) + " 삭제"}
                           className="p-1.5 rounded-lg hover:bg-red-50 border border-transparent hover:border-red-200 transition-all duration-200"
                         >
                           <Trash2 className="w-3.5 h-3.5 text-[#ADA8A0] hover:text-red-400" />
@@ -545,39 +466,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
               )}
             </div>
           </div>
-
-          <div className="flex justify-end gap-3">
-            <button
-              onClick={save}
-              disabled={saving}
-              className="text-xs font-medium px-4 py-2.5 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] transition-all duration-200 disabled:opacity-50"
-            >
-              저장
-            </button>
-            <button onClick={goNext} className="flex items-center gap-2 text-xs font-semibold px-5 py-2.5 rounded-full bg-[#D4547A] text-white hover:bg-[#B8405F] transition-all duration-300">
-              다음: 기획서 작성 <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </main>
-
-        <aside className="hidden lg:flex w-72 flex-shrink-0 h-[calc(100vh-5rem)] sticky top-20">
-          <AiChat
-            ref={aiChatRef}
-            step="panel"
-            userType={userType}
-            initialMessage={panelInitialMessage}
-            placeholder="기능 설계에 대해 질문하세요..."
-          />
-        </aside>
-      </div>
-
-      <MobileChatSheet
-        ref={mobileChatRef}
-        step="panel"
-        userType={userType}
-        initialMessage={panelInitialMessage}
-        placeholder="기능 설계에 대해 질문하세요..."
-      />
-    </div>
+      </ProjectWorkspace>
+    </>
   );
 }

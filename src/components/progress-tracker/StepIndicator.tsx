@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { getProjectProgress } from "@/lib/project-status";
 import { STEPS } from "@/lib/utils";
 import { Check } from "lucide-react";
 
@@ -11,7 +13,8 @@ interface StepIndicatorProps {
 }
 
 export default function StepIndicator({ currentStep, projectId, isCompleted }: StepIndicatorProps) {
-  const progress = isCompleted ? 100 : Math.round((currentStep / STEPS.length) * 100);
+  const pathname = usePathname();
+  const progress = getProjectProgress({ currentStep, isCompleted: !!isCompleted });
 
   return (
     <div className="w-full">
@@ -28,8 +31,8 @@ export default function StepIndicator({ currentStep, projectId, isCompleted }: S
 
       <div className="space-y-1">
         {STEPS.map((step) => {
-          const isDone = step.id < currentStep;
-          const isCurrent = step.id === currentStep;
+          const isDone = !!isCompleted || step.id < currentStep;
+          const isCurrent = pathname.endsWith("/" + step.route);
           const isClickable = (isDone || isCurrent) && !!projectId;
           const href = `/project/${projectId}/${step.route}`;
 
@@ -61,7 +64,7 @@ export default function StepIndicator({ currentStep, projectId, isCompleted }: S
           );
 
           return isClickable ? (
-            <Link key={step.id} href={href}>{inner}</Link>
+            <Link key={step.id} href={href} aria-current={isCurrent ? "step" : undefined}>{inner}</Link>
           ) : (
             <div key={step.id}>{inner}</div>
           );

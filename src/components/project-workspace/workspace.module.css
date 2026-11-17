@@ -1,0 +1,37 @@
+.toolbar{display:flex;justify-content:flex-end;align-items:center;flex-wrap:wrap;gap:8px;padding:18px 0;border-bottom:1px solid #EBE7E0}
+.toolbar button{display:inline-flex!important;align-items:center;justify-content:center;gap:6px;border:1px solid #EBE7E0;border-radius:6px;padding:9px 12px;font-size:12px;color:#7A7067;background:#fff}
+.toolbar button:hover{background:#F4F1EC}.toolbar button:disabled{opacity:.5;cursor:wait}.toolbar .saveButton{background:#D4547A;color:#fff;border-color:#D4547A}.toolbar .saveButton:hover{background:#B8405F}
+.editor{min-width:0}.editor>div{min-width:0}
+.editor :global(.bg-white){background:transparent;box-shadow:none}
+.editor>div:global(.bg-white){border:0;border-radius:0;padding:24px 0;box-shadow:none;border-bottom:1px solid #EBE7E0}
+.editor>div:global(.grid){padding:24px 0;border-bottom:1px solid #EBE7E0;gap:24px}
+.editor>div:global(.grid)>div{background:transparent;border:0;box-shadow:none;padding:0;border-radius:0}
+.editor input:not([type=checkbox]),.editor textarea,.editor select{background:#fff;font-size:14px;line-height:1.85;min-width:0}
+.editor textarea{font-family:inherit}.editor label{font-size:12px}
+.editor p{line-height:1.85}.editor [class*="text-[10px]"]{font-size:11px}.editor [class*="text-[#ADA8A0]"]{color:#7A7067}
+.editor [class*="shadow-"]{box-shadow:none}
+.editor button{min-height:32px}.editor button:disabled{cursor:not-allowed}
+.editor :global(.space-y-3)>div:global(.bg-white){border:0;border-radius:0;border-bottom:1px solid #EBE7E0;padding:12px 0}
+.featureTabs{display:flex;align-items:center;gap:8px;overflow-x:auto;max-width:100%;padding:20px 0 15px;scrollbar-width:thin}
+.featureTabs button{max-width:240px;white-space:nowrap;flex-shrink:0;border-radius:6px}
+.featureHeading{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:4px 0 16px}
+.featureHeading h2{font-size:16px;font-weight:550;letter-spacing:-.3px}
+.featureHeading label{font-size:11px;color:#7A7067;display:flex;align-items:center;gap:7px;white-space:nowrap}
+.references{border-bottom:1px solid #EBE7E0;padding:19px 0;color:#7A7067}
+.references>summary{font-size:12px;cursor:pointer;width:fit-content}.referenceGrid{display:grid;grid-template-columns:1fr 1fr;gap:20px;padding-top:18px}
+.referenceGrid>div{border:0!important;border-radius:0!important;padding:0!important;background:transparent!important}
+.editor .proposal{padding-top:18px}.proposal textarea{min-height:340px}
+.reviewProgress{padding:23px 0;border-bottom:1px solid #EBE7E0;display:flex;gap:20px;align-items:center;justify-content:space-between}
+.reviewProgress>div>span{font-size:11px;color:#D4547A}.reviewProgress strong{font-size:25px;font-weight:550;color:#1A1A1A;display:block;line-height:1.5}
+.reviewProgress p{font-size:12px;color:#7A7067}.reviewProgress progress{appearance:none;width:40%;height:6px;border:0;border-radius:4px;overflow:hidden;background:#F4F1EC}
+.reviewProgress progress::-webkit-progress-bar{background:#F4F1EC;border-radius:4px}.reviewProgress progress::-webkit-progress-value{background:#D4547A;border-radius:4px}.reviewProgress progress::-moz-progress-bar{background:#D4547A;border-radius:4px}
+.mentor{border-top:1px solid #EBE7E0;margin-top:23px;padding-top:20px}.mentorHint{font-size:12px;line-height:1.9;color:#7A7067}
+.previous{display:flex;align-items:center;gap:6px;font-size:11px;color:#7A7067;margin-top:12px}
+.previous:disabled{opacity:.5}
+@media(max-width:760px){.toolbar{justify-content:flex-start;gap:7px;padding:16px 0}.toolbar button{font-size:11px;padding:9px 10px}.editor>div:global(.bg-white){padding:21px 0}.editor>div:global(.grid){gap:21px}.editor input:not([type=checkbox]),.editor textarea,.editor select{font-size:16px}.editor [class*="col-span-2"]{grid-column:auto!important}.referenceGrid{grid-template-columns:1fr;gap:18px}.featureHeading{align-items:flex-start;flex-wrap:wrap;gap:10px}.featureHeading h2{font-size:15px}.reviewProgress{gap:15px}.reviewProgress progress{width:34%}.editor .proposal textarea{min-height:300px}.editor [draggable]>div{flex-wrap:wrap;gap:10px}.editor [draggable] select{max-width:145px}.editor button[class*="flex-shrink-0"]{white-space:normal}}
+
+@media(max-width:760px){.editor input:not([type=checkbox]),.editor select{min-height:42px}}
+
+.sidebar{position:sticky;top:0;align-self:start;height:calc(100dvh - 65px)}
+.editor input:not([type=checkbox]),.editor textarea,.editor select{background:#fff!important}
+@media(max-width:760px){.sidebar{display:none}}

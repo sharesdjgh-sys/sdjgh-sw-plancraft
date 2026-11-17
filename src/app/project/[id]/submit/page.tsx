@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, useEffect, use, useRef } from "react";
+import ProjectWorkspace from "@/components/project-workspace/ProjectWorkspace";
+import workspaceStyles from "@/components/project-workspace/workspace.module.css";
+
+import { useEffect, use, useRef } from "react";
+import { useProject } from "@/lib/use-project";
 import Link from "next/link";
 import { Textarea } from "@/components/ui/textarea";
-import AiChat, { type AiChatHandle } from "@/components/ai-assistant/AiChat";
-import StepIndicator from "@/components/progress-tracker/StepIndicator";
-import MobileChatSheet, { type MobileChatSheetHandle } from "@/components/mobile/MobileChatSheet";
-import { Trophy, CheckCircle, Circle, ArrowLeft, Download } from "lucide-react";
+import { type AiChatHandle } from "@/components/ai-assistant/AiChat";
+import { CheckCircle, Circle, Download } from "lucide-react";
 import { getProject, updateProject } from "@/lib/storage";
 import { downloadFullSummary } from "@/lib/download";
 import { saveProjectToDir } from "@/lib/fileStorage";
@@ -35,22 +37,15 @@ const GENERAL_CHECKLIST = [
 
 export default function SubmitPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const [project, setProject] = useState<ReturnType<typeof getProject>>(null);
-  const [checks, setChecks] = useState<Record<string, boolean>>({});
-  const [authorNote, setAuthorNote] = useState("");
-  const [completed, setCompleted] = useState(false);
+  const project = useProject(id);
+  const checks = project?.reviewChecks ?? {};
+  const authorNote = project?.authorNote ?? "";
+  const completed = project?.isCompleted ?? false;
   const aiChatRef = useRef<AiChatHandle>(null);
-  const mobileChatRef = useRef<MobileChatSheetHandle>(null);
 
   useEffect(() => {
     const p = getProject(id);
-    if (p) {
-      const updatedStep = Math.max(6, p.currentStep);
-      updateProject(id, { currentStep: updatedStep });
-      setProject({ ...p, currentStep: updatedStep });
-      setAuthorNote(p.authorNote ?? "");
-      setCompleted(p.isCompleted ?? false);
-    }
+    if (p && p.currentStep < 6) updateProject(id, { currentStep: 6 });
   }, [id]);
 
   const userType = project?.userType ?? "student";
@@ -60,71 +55,31 @@ export default function SubmitPage({ params }: { params: Promise<{ id: string }>
       ? "기획 마무리 단계예요. 서비스 완성도와 바이브코딩 구현 가능성을 함께 점검해볼까요? 마지막 검토나 기획 배경 작성이 필요하면 도와드릴게요."
       : "거의 다 왔어요! 제출 전 최종 점검을 도와드릴게요. 지원 동기 작성이나 기획서 마지막 검토에서 도움이 필요하시면 말씀해 주세요!";
 
-  const toggle = (key: string) => setChecks((c) => ({ ...c, [key]: !c[key] }));
-  const checkedCount = Object.values(checks).filter(Boolean).length;
+  const toggle = (key: string) => updateProject(id, { reviewChecks: { ...checks, [key]: !checks[key] } });
+  const checkedCount = checklist.filter((item) => checks[item.id]).length;
   const isReady = checkedCount === checklist.length;
 
   const markComplete = async () => {
     updateProject(id, { isCompleted: true });
     await saveProjectToDir(id, getProject(id));
-    setCompleted(true);
+
   };
 
   return (
-    <div className="min-h-screen bg-[#FBF9F6]">
-      <header className="bg-white border-b border-[#EBE7E0] px-6 py-3.5 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3 min-w-0">
-            <Link
-              href="/dashboard"
-              className="flex items-center gap-1.5 text-xs text-[#ADA8A0] hover:text-[#7A7067] transition-colors flex-shrink-0"
-            >
-              <img src="/plancraft-logo-remove.png" className="w-3.5 h-3.5 rounded object-cover" alt="" /> 대시보드
-            </Link>
-            <span className="text-[#EBE7E0]">/</span>
-            <span className="text-xs font-semibold text-[#1A1A1A] truncate">{project?.title ?? "..."}</span>
-          </div>
-        </div>
-      </header>
+    <>
 
-      <div className="max-w-7xl mx-auto px-4 py-6 flex flex-col md:flex-row gap-4 md:gap-5">
-        <aside className="hidden md:block w-52 flex-shrink-0">
-          <div className="bg-white rounded-2xl border border-[#EBE7E0] p-4 sticky top-20 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
-            <StepIndicator currentStep={project?.currentStep ?? 6} projectId={id} isCompleted={project?.isCompleted} />
-          </div>
-        </aside>
+      <ProjectWorkspace
+        projectId={id}
+        step={6}
+        mentorStep="completion"
+        mentorRef={aiChatRef}
+        mentorMessage={completionInitialMessage}
+        mentorPlaceholder="마지막 점검에 도움을 요청하세요..."
 
-        <main className="flex-1 min-w-0 space-y-4 pb-20 lg:pb-0">
-          <div>
-            <p className="text-[10px] font-medium text-[#D4547A] uppercase tracking-widest mb-1">Step 06</p>
-            <h1 className="text-xl font-bold text-[#1A1A1A] tracking-tight flex items-center gap-2">
-              제출 준비 <Trophy className="w-5 h-5 text-[#D4547A]" />
-            </h1>
-          </div>
-
-          {/* 진행률 */}
-          <div className="bg-[#D4547A] rounded-2xl p-6 text-white shadow-[0_4px_24px_rgba(212,84,122,0.25)]">
-            <div className="flex items-center justify-between mb-3">
-              <div>
-                <p className="text-base font-bold">최종 점검 체크리스트</p>
-                {project?.targetCompetition && (
-                  <p className="text-white/70 text-xs mt-1">대상 대회: {project.targetCompetition}</p>
-                )}
-              </div>
-              <div className="text-right">
-                <p className="text-3xl font-bold">{checkedCount}/{checklist.length}</p>
-                <p className="text-white/70 text-xs">항목 완료</p>
-              </div>
-            </div>
-            <div className="w-full bg-white/20 rounded-full h-2">
-              <div
-                className="bg-white h-2 rounded-full transition-all duration-500"
-                style={{ width: `${(checkedCount / checklist.length) * 100}%` }}
-              />
-            </div>
-          </div>
-
-          {/* 체크리스트 */}
+        actions={<><button disabled={!project} onClick={() => { if (project) downloadFullSummary(project); }}><Download size={14} />최종 요약 다운로드</button></>}
+      >
+        <div className={workspaceStyles.reviewProgress}><div><span>최종 점검 체크리스트</span><strong>{checkedCount} / {checklist.length}</strong><p>실제로 확인한 항목을 체크해주세요.</p></div><progress value={checkedCount} max={checklist.length} aria-label="최종 점검 진행률" /></div>
+{/* 체크리스트 */}
           <div className="bg-white rounded-2xl border border-[#EBE7E0] shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
             <div className="px-5 py-4 border-b border-[#EBE7E0]">
               <p className="text-sm font-bold text-[#1A1A1A]">제출 전 확인 사항</p>
@@ -133,6 +88,8 @@ export default function SubmitPage({ params }: { params: Promise<{ id: string }>
               {checklist.map((item) => (
                 <button
                   key={item.id}
+                  role="checkbox"
+                  aria-checked={!!checks[item.id]}
                   onClick={() => toggle(item.id)}
                   className="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-[#F4F1EC] transition-colors text-left"
                 >
@@ -157,7 +114,7 @@ export default function SubmitPage({ params }: { params: Promise<{ id: string }>
               placeholder={userType === "general" ? "이 기획의 목적, 기대 효과, 공유 시 강조할 포인트를 자유롭게 써보세요." : "이 SW 아이디어를 떠올리게 된 계기와 공모전에 참여하는 이유를 자유롭게 써보세요."}
               value={authorNote}
               onChange={(e) => {
-                setAuthorNote(e.target.value);
+
                 updateProject(id, { authorNote: e.target.value });
               }}
               rows={5}
@@ -179,7 +136,7 @@ export default function SubmitPage({ params }: { params: Promise<{ id: string }>
                     <Download className="w-3.5 h-3.5" /> 최종 요약 다운로드
                   </button>
                 )}
-                <Link href="/dashboard">
+                <Link href={userType === "general" ? "/dashboard?type=general" : "/dashboard"}>
                   <button className="flex items-center gap-2 text-xs font-semibold px-5 py-2.5 rounded-full bg-white text-[#D4547A] hover:bg-white/90 transition-all duration-200">
                     대시보드로 돌아가기
                   </button>
@@ -213,42 +170,7 @@ export default function SubmitPage({ params }: { params: Promise<{ id: string }>
               </div>
             </div>
           )}
-
-          <div className="flex items-center justify-between">
-            <Link href={`/project/${id}/script`}>
-              <button className="flex items-center gap-2 text-xs font-medium px-4 py-2.5 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] transition-all duration-200">
-                <ArrowLeft className="w-3.5 h-3.5" /> 이전: 기획서 작성
-              </button>
-            </Link>
-            {!completed && project && (
-              <button
-                onClick={() => downloadFullSummary(project)}
-                className="flex items-center gap-2 text-xs font-semibold px-5 py-2.5 rounded-full border border-[#D4547A]/30 text-[#D4547A] hover:bg-[#D4547A]/5 transition-all duration-200"
-              >
-                <Download className="w-3.5 h-3.5" /> 최종 요약 다운로드
-              </button>
-            )}
-          </div>
-        </main>
-
-        <aside className="hidden lg:flex w-72 flex-shrink-0 h-[calc(100vh-5rem)] sticky top-20">
-          <AiChat
-            ref={aiChatRef}
-            step="completion"
-            userType={userType}
-            initialMessage={completionInitialMessage}
-            placeholder="마지막 점검에 도움을 요청하세요..."
-          />
-        </aside>
-      </div>
-
-      <MobileChatSheet
-        ref={mobileChatRef}
-        step="completion"
-        userType={userType}
-        initialMessage={completionInitialMessage}
-        placeholder="마지막 점검에 도움을 요청하세요..."
-      />
-    </div>
+      </ProjectWorkspace>
+    </>
   );
 }

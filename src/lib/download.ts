@@ -1,4 +1,4 @@
-import { type Project, getProjects, saveProjects } from "./storage";
+import { type Project, getProjects, saveProjects, isProject } from "./storage";
 
 function triggerDownload(filename: string, content: string, mimeType: string) {
   const blob = new Blob([content], { type: mimeType });
@@ -36,6 +36,7 @@ export function importProjects(file: File): Promise<void> {
           throw new Error();
         }
 
+        if (!incoming.every(isProject)) throw new Error();
         const existing = getProjects();
         for (const project of incoming) {
           const idx = existing.findIndex((p) => p.id === project.id);
@@ -51,6 +52,7 @@ export function importProjects(file: File): Promise<void> {
         reject(new Error("올바른 백업 파일이 아니에요."));
       }
     };
+    reader.onerror = () => reject(new Error("파일을 읽지 못했어요. 다시 선택해주세요."));
     reader.readAsText(file);
   });
 }

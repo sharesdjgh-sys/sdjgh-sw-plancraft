@@ -1,0 +1,47 @@
+{
+  "route": "/project/ui-comparison-step01/idea",
+  "fixture": "ui-comparison-step01",
+  "userType": "general",
+  "initialState": "empty conversation, empty story.logline",
+  "desktopViewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "mobileViewport": {
+    "width": 390,
+    "height": 844
+  },
+  "fullPage": true,
+  "scale": "css",
+  "before": {
+    "desktop": "step01-before-desktop.png",
+    "mobile": "step01-before-mobile.png"
+  },
+  "after": {
+    "desktop": "step01-after-desktop.png",
+    "mobile": "step01-after-mobile.png"
+  },
+  "validation": {
+    "typecheck": "passed",
+    "targetedLint": "0 errors, 2 existing img warnings",
+    "fullLint": "existing dashboard set-state-in-effect error remains",
+    "desktop": true,
+    "mobile390": true,
+    "mobile320": true,
+    "horizontalOverflow": false,
+    "help": true,
+    "promptDraft": true,
+    "failedRequestRetry": true,
+    "retryDoesNotDuplicateUserMessage": true,
+    "guideFocusRequest": true,
+    "chatAndGuideRestore": true,
+    "summaryRestore": true,
+    "summaryPassedToProblemDefinition": true,
+    "defaultChatPreserved": true,
+    "AIResponses": "mocked for UI validation; no live provider response tested"
+  },
+  "revisions": {
+    "sidebarContrast": true,
+    "previousDesktop": "step01-after-desktop-v1.png"
+  }
+}

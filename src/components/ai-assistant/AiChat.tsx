@@ -2,7 +2,9 @@
 
 import { useState, useRef, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Textarea } from "@/components/ui/textarea";
-import { Send, User, Bot, Mic, MicOff } from "lucide-react";
+import { Send, User, Bot, Mic, MicOff, ArrowUp, Sparkles } from "lucide-react";
+import Image from "next/image";
+import discovery from "./discovery.module.css";
 import { type UserType } from "@/lib/storage";
 
 type Message = { role: "user" | "assistant"; content: string };
@@ -25,10 +27,14 @@ function stripMarkdown(text: string): string {
 
 export interface AiChatHandle {
   focusInput: () => void;
+  setDraft: (text: string) => void;
 }
 
 interface AiChatProps {
   step: string;
+  variant?: "default" | "discovery";
+  ideaFocus?: "problem" | "context" | "summary";
+  onBusyChange?: (busy: boolean) => void;
   userType?: UserType;
   placeholder?: string;
   initialMessage?: string;
@@ -37,7 +43,7 @@ interface AiChatProps {
 }
 
 const AiChat = forwardRef<AiChatHandle, AiChatProps>(function AiChat(
-  { step, userType = "student", placeholder, initialMessage, initialMessages, onMessagesChange },
+  { step, variant = "default", ideaFocus, onBusyChange, userType = "student", placeholder, initialMessage, initialMessages, onMessagesChange },
   ref
 ) {
   const [messages, setMessages] = useState<Message[]>(() => {
@@ -46,7 +52,11 @@ const AiChat = forwardRef<AiChatHandle, AiChatProps>(function AiChat(
     return [];
   });
   const [input, setInput] = useState("");
+  const [expanded, setExpanded] = useState(false);
+  const threadRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const requestRef = useRef<AbortController | null>(null);
   const [isListening, setIsListening] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -55,15 +65,25 @@ const AiChat = forwardRef<AiChatHandle, AiChatProps>(function AiChat(
   const manualStopRef = useRef(false);
 
   useImperativeHandle(ref, () => ({
+    setDraft: (text: string) => { setInput(text); inputRef.current?.focus(); },
     focusInput: () => {
       inputRef.current?.focus();
-      inputRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      if (variant === "default") inputRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
     },
   }));
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    if (variant === "discovery") {
+      const thread = threadRef.current;
+      if (thread) thread.scrollTop = thread.scrollHeight;
+    } else bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, loading, variant]);
+
+  useEffect(() => () => {
+    manualStopRef.current = true;
+    recognitionRef.current?.abort();
+    requestRef.current?.abort();
+  }, []);
 
   const startRecognition = () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -94,21 +114,23 @@ const AiChat = forwardRef<AiChatHandle, AiChatProps>(function AiChat(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     recognition.onerror = (e: any) => {
       if (e.error === "no-speech") return; // 묵음은 무시하고 계속 청취
-      if (!manualStopRef.current) {
-        startRecognition();
-      } else {
-        setIsListening(false);
-      }
+      manualStopRef.current = true;
+      setIsListening(false);
+      setError(e.error === "not-allowed" ? "마이크 사용이 허용되지 않았어요. 브라우저의 마이크 권한을 확인해주세요." : "음성 입력이 중단되었어요. 다시 시작해주세요.");
     };
 
     recognitionRef.current = recognition;
-    recognition.start();
+    try { recognition.start(); } catch {
+      manualStopRef.current = true;
+      setIsListening(false);
+      setError("음성 입력을 시작하지 못했어요. 잠시 후 다시 시도해주세요.");
+    }
   };
 
   const toggleListening = () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const w = window as any;
-    if (!w.SpeechRecognition && !w.webkitSpeechRecognition) return;
+    if (!w.SpeechRecognition && !w.webkitSpeechRecognition) { setError("이 브라우저에서는 음성 입력을 지원하지 않아요. 키보드로 입력해주세요."); return; }
 
     if (isListening) {
       manualStopRef.current = true;
@@ -121,37 +143,79 @@ const AiChat = forwardRef<AiChatHandle, AiChatProps>(function AiChat(
     startRecognition();
   };
 
-  const send = async () => {
-    if (!input.trim() || loading) return;
-    const userMsg: Message = { role: "user", content: input.trim() };
-    const next = [...messages, userMsg];
+  const send = async (retry = false) => {
+    if ((!retry && !input.trim()) || loading) return;
+    const next: Message[] = retry ? messages : [...messages, { role: "user", content: input.trim() }];
     setMessages(next);
     onMessagesChange?.(next);
-    setInput("");
+    if (!retry) setInput("");
+    setError("");
     setLoading(true);
+    onBusyChange?.(true);
+    const controller = new AbortController();
+    requestRef.current = controller;
 
     try {
       const res = await fetch("/api/ai/chat", {
         method: "POST",
+        signal: controller.signal,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: next, step, userType }),
+        body: JSON.stringify({ messages: next, step, userType, ...(ideaFocus ? { ideaFocus } : {}) }),
       });
       const data = await res.json();
+      if (!res.ok || typeof data.reply !== "string") throw new Error(data.error || "AI 응답을 받지 못했어요. 잠시 후 다시 시도해주세요.");
       const newMessages = [...next, { role: "assistant" as const, content: stripMarkdown(data.reply) }];
       setMessages(newMessages);
       onMessagesChange?.(newMessages);
-    } catch {
-      const errMessages = [...next, { role: "assistant" as const, content: "오류가 발생했어요. 다시 시도해주세요." }];
-      setMessages(errMessages);
-      onMessagesChange?.(errMessages);
+    } catch (err) {
+      if (controller.signal.aborted) return;
+      setError(err instanceof Error ? err.message : "연결하지 못했어요. 잠시 후 다시 시도해주세요.");
     } finally {
       setLoading(false);
+      onBusyChange?.(false);
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.nativeEvent.isComposing || e.keyCode === 229) return;
     if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); }
   };
+
+
+  if (variant === "discovery") {
+    return (
+      <section className={discovery.discovery} aria-label="아이디어봇과 대화">
+        <div className={discovery.header}>
+          <div className={discovery.agent}>
+            <Image src="/ideabot-remove.png" width={27} height={27} alt="" unoptimized />
+            <strong>아이디어봇과 함께</strong><span>AI 멘토</span>
+          </div>
+          {messages.length > 1 && <button className={discovery.expand} aria-expanded={expanded} aria-controls="discovery-thread" onClick={() => setExpanded(!expanded)}>{expanded ? "대화 영역 줄이기" : "대화 영역 넓히기"}</button>}
+        </div>
+        <div id="discovery-thread" ref={threadRef} className={discovery.thread + (expanded ? " " + discovery.expanded : "")} role="log" aria-label="AI 멘토와의 대화" aria-live="polite" aria-busy={loading} tabIndex={0}>
+          <div className={discovery.messages}>
+            {messages.map((message, index) => message.role === "user"
+              ? <div key={index} className={discovery.user}>{message.content}</div>
+              : <div key={index}><div className={discovery.role}><span><Sparkles size={12} /></span>아이디어봇</div><div className={discovery.assistantText}>{message.content}</div></div>
+            )}
+            {loading && <div className={discovery.loading} role="status"><span /> 생각을 정리하고 있어요…</div>}
+          </div>
+        </div>
+        {error && <div className={discovery.error} role="alert"><span>{error}</span>{messages.at(-1)?.role === "user" && <button disabled={loading} onClick={() => send(true)}>다시 시도</button>}</div>}
+        <div className={discovery.composer}>
+          <label className="sr-only" htmlFor="discovery-input">AI 멘토에게 보낼 메시지</label>
+          <textarea id="discovery-input" ref={inputRef} value={input} onChange={(event) => setInput(event.target.value)} onKeyDown={handleKeyDown} placeholder={placeholder} className={discovery.input} rows={2} maxLength={20000} />
+          <div className={discovery.composerBottom}>
+            <span>Enter 전송 · Shift + Enter 줄바꿈</span>
+            <div className={discovery.actions}>
+              <button type="button" onClick={toggleListening} className={discovery.mic} aria-label={isListening ? "녹음 중지" : "음성 입력"} aria-pressed={isListening}>{isListening ? <MicOff size={16} /> : <Mic size={16} />}</button>
+              <button onClick={() => send()} disabled={loading || !input.trim()} className={discovery.send} aria-label="메시지 보내기"><ArrowUp size={17} /></button>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full bg-white rounded-2xl border border-[#EBE7E0] overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
@@ -164,13 +228,13 @@ const AiChat = forwardRef<AiChatHandle, AiChatProps>(function AiChat(
           <p className="text-xs font-bold text-[#1A1A1A]">AI 멘토 아이디어봇</p>
           <div className="flex items-center gap-1">
             <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
-            <p className="text-[10px] text-[#ADA8A0]">항상 준비됐어요</p>
+            <p className="text-[10px] text-[#ADA8A0]">기획을 함께 정리해요</p>
           </div>
         </div>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0 bg-[#FBF9F6]">
+      <div role="log" aria-label="AI 멘토와의 대화" aria-live="polite" className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0 bg-[#FBF9F6]">
         {messages.length === 0 && (
           <div className="text-center mt-8">
             <div className="w-12 h-12 rounded-2xl overflow-hidden mx-auto mb-3">
@@ -187,7 +251,7 @@ const AiChat = forwardRef<AiChatHandle, AiChatProps>(function AiChat(
                 : <Bot className="w-3 h-3 text-white" />
               }
             </div>
-            <div className={`max-w-[82%] rounded-2xl px-3.5 py-2.5 text-xs leading-relaxed ${
+            <div className={`max-w-[82%] whitespace-pre-wrap break-words rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed ${
               msg.role === "user"
                 ? "bg-[#D4547A] text-white rounded-tr-sm"
                 : "bg-white text-[#1A1A1A] rounded-tl-sm border border-[#EBE7E0] shadow-[0_1px_4px_rgba(0,0,0,0.04)]"
@@ -213,11 +277,14 @@ const AiChat = forwardRef<AiChatHandle, AiChatProps>(function AiChat(
         <div ref={bottomRef} />
       </div>
 
+      {error && <div role="alert" className="flex flex-wrap items-center justify-between gap-2 border-t border-rose-100 bg-rose-50 px-4 py-3 text-xs text-rose-800"><span>{error}</span>{messages.at(-1)?.role === "user" && <button type="button" disabled={loading} onClick={() => send(true)} className="font-semibold underline underline-offset-4 disabled:opacity-40">다시 시도</button>}</div>}
+
       {/* Input */}
       <div className="p-3 border-t border-[#EBE7E0] bg-white">
         <div className="flex gap-2 items-end">
           <Textarea
             ref={inputRef}
+            aria-label="AI 멘토에게 보낼 메시지"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -234,6 +301,8 @@ const AiChat = forwardRef<AiChatHandle, AiChatProps>(function AiChat(
                 : "bg-[#EBE7E0] hover:bg-[#D4547A] group"
             }`}
             title={isListening ? "녹음 중지" : "음성 입력"}
+            aria-label={isListening ? "녹음 중지" : "음성 입력"}
+            aria-pressed={isListening}
           >
             {isListening
               ? <MicOff className="w-3.5 h-3.5 text-white" />
@@ -241,7 +310,8 @@ const AiChat = forwardRef<AiChatHandle, AiChatProps>(function AiChat(
             }
           </button>
           <button
-            onClick={send}
+            onClick={() => send()}
+            aria-label="메시지 보내기"
             disabled={loading || !input.trim()}
             className="w-9 h-9 flex-shrink-0 rounded-xl bg-[#D4547A] flex items-center justify-center hover:bg-[#B8405F] transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
           >

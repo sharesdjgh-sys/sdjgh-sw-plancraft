@@ -1,15 +1,15 @@
 "use client";
 
+import ProjectWorkspace from "@/components/project-workspace/ProjectWorkspace";
+import workspaceStyles from "@/components/project-workspace/workspace.module.css";
+
 import { useState, useEffect, use, useRef } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import AiChat, { type AiChatHandle } from "@/components/ai-assistant/AiChat";
-import StepIndicator from "@/components/progress-tracker/StepIndicator";
+import { type AiChatHandle } from "@/components/ai-assistant/AiChat";
 import EmptyContentModal from "@/components/EmptyContentModal";
-import { Plus, Trash2, ArrowRight, Check, Save, User, Download, Wand2 } from "lucide-react";
-import MobileChatSheet, { type MobileChatSheetHandle } from "@/components/mobile/MobileChatSheet";
+import { Plus, Trash2, Check, Save, User, Download, Wand2 } from "lucide-react";
 import { getProject, updateProject, type Character, type Project } from "@/lib/storage";
 import { downloadCharacters } from "@/lib/download";
 import { saveProjectToDir } from "@/lib/fileStorage";
@@ -27,7 +27,6 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
   const [autofilling, setAutofilling] = useState(false);
   const [showEmptyModal, setShowEmptyModal] = useState(false);
   const aiChatRef = useRef<AiChatHandle>(null);
-  const mobileChatRef = useRef<MobileChatSheetHandle>(null);
 
   useEffect(() => {
     const p = getProject(id);
@@ -58,13 +57,14 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
   const removeChar = (idx: number) => {
     setCharacters((c) => c.filter((_, i) => i !== idx));
     if (editIdx === idx) setEditIdx(null);
+    else if (editIdx !== null && idx < editIdx) setEditIdx(editIdx - 1);
   };
 
   const save = async () => {
     setSaving(true);
     updateProject(id, {
       characters,
-      currentStep: Math.max(3, project?.currentStep ?? 1),
+      currentStep: Math.max(3, getProject(id)?.currentStep ?? 1),
     });
     await saveProjectToDir(id, getProject(id));
     setSaving(false);
@@ -76,7 +76,7 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
     if (characters.length === 0) { setShowEmptyModal(true); return; }
     updateProject(id, {
       characters,
-      currentStep: Math.max(3, project?.currentStep ?? 1),
+      currentStep: Math.max(3, getProject(id)?.currentStep ?? 1),
     });
     await saveProjectToDir(id, getProject(id));
     router.push(`/project/${id}/episodes`);
@@ -86,7 +86,7 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
     setShowEmptyModal(false);
     updateProject(id, {
       characters,
-      currentStep: Math.max(3, project?.currentStep ?? 1),
+      currentStep: Math.max(3, getProject(id)?.currentStep ?? 1),
     });
     await saveProjectToDir(id, getProject(id));
     router.push(`/project/${id}/episodes`);
@@ -133,81 +133,30 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
     "flex h-10 w-full rounded-xl border border-[#EBE7E0] bg-white px-3 py-2 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#D4547A]/20 focus:border-[#D4547A]/40 transition-all duration-200";
 
   return (
-    <div className="min-h-screen bg-[#FBF9F6]">
+    <>
       {showEmptyModal && (
         <EmptyContentModal
           title="이해관계자를 추가해주세요"
           description="SW를 사용할 주요 이해관계자를 한 명 이상 추가해야 다음 단계로 넘어갈 수 있어요. 어려우면 AI 도움을 받아봐요!"
           autofilling={autofilling}
           onAutofill={() => { setShowEmptyModal(false); autofill(); }}
-          onAskMentor={() => { setShowEmptyModal(false); aiChatRef.current?.focusInput(); mobileChatRef.current?.openAndFocus(); }}
+          onAskMentor={() => { setShowEmptyModal(false); aiChatRef.current?.focusInput(); }}
           onGoAnyway={goNextAnyway}
           onClose={() => setShowEmptyModal(false)}
         />
       )}
-      <header className="bg-white border-b border-[#EBE7E0] px-6 py-3.5 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3 min-w-0">
-            <Link
-              href="/dashboard"
-              className="flex items-center gap-1.5 text-xs text-[#ADA8A0] hover:text-[#7A7067] transition-colors flex-shrink-0"
-            >
-              <img src="/plancraft-logo-remove.png" className="w-3.5 h-3.5 rounded object-cover" alt="" /> 대시보드
-            </Link>
-            <span className="text-[#EBE7E0]">/</span>
-            <span className="text-xs font-semibold text-[#1A1A1A] truncate">{project?.title ?? "..."}</span>
-          </div>
-          <div className="flex items-center gap-2 flex-shrink-0">
-            {project && (
-              <>
-                <button
-                  onClick={autofill}
-                  disabled={autofilling}
-                  className="flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-full border border-[#D4547A]/30 text-[#D4547A] hover:bg-[#D4547A]/5 transition-all duration-200 disabled:opacity-50"
-                >
-                  <Wand2 className="w-3.5 h-3.5" /> {autofilling ? "채우는 중..." : "AI 자동채우기"}
-                </button>
-                <button
-                  onClick={() => downloadCharacters({ ...project, characters })}
-                  className="hidden sm:flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] transition-all duration-200"
-                >
-                  <Download className="w-3.5 h-3.5" /> 다운로드
-                </button>
-              </>
-            )}
-            <button
-              onClick={save}
-              disabled={saving}
-              className="flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-full bg-[#D4547A] text-white hover:bg-[#B8405F] transition-all duration-300 disabled:opacity-50"
-            >
-              {saved ? <><Check className="w-3.5 h-3.5" /> 저장됨</> : saving ? "저장 중..." : <><Save className="w-3.5 h-3.5" /> 저장</>}
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <div className="max-w-7xl mx-auto px-4 py-6 flex flex-col md:flex-row gap-4 md:gap-5">
-        <aside className="hidden md:block w-52 flex-shrink-0">
-          <div className="bg-white rounded-2xl border border-[#EBE7E0] p-4 sticky top-20 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
-            <StepIndicator currentStep={project?.currentStep ?? 1} projectId={id} isCompleted={project?.isCompleted} />
-          </div>
-        </aside>
-
-        <main className="flex-1 min-w-0 space-y-4 pb-20 lg:pb-0">
-          <div className="flex items-center justify-between mb-2">
-            <div>
-              <p className="text-[10px] font-medium text-[#D4547A] uppercase tracking-widest mb-1">Step 03</p>
-              <h1 className="text-xl font-bold text-[#1A1A1A] tracking-tight">이해관계자 분석</h1>
-            </div>
-            <button
-              onClick={addCharacter}
-              className="flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] hover:border-[#D4547A]/30 transition-all duration-200"
-            >
-              <Plus className="w-3.5 h-3.5" /> 이해관계자 추가
-            </button>
-          </div>
-
-          {characters.length === 0 ? (
+      <ProjectWorkspace
+        projectId={id}
+        step={3}
+        mentorStep="character"
+        mentorRef={aiChatRef}
+        mentorMessage={characterInitialMessage}
+        mentorPlaceholder="이해관계자 분석에 대해 질문하세요..."
+        onSave={save} busy={saving || autofilling} onNext={goNext} nextLabel="다음: 기능 설계"
+        actions={<><button onClick={autofill} disabled={autofilling}><Wand2 size={14} />{autofilling ? "채우는 중..." : "AI 자동채우기"}</button><button disabled={!project} onClick={() => { if (project) downloadCharacters({ ...project, characters }); }}><Download size={14} />다운로드</button><button onClick={save} disabled={saving} className={workspaceStyles.saveButton}>{saved ? <><Check size={14} /> 저장됨</> : saving ? "저장 중..." : <><Save size={14} /> 저장</>}</button></>}
+      >
+        <div className={workspaceStyles.featureHeading}><h2>등록한 이해관계자 <span>{characters.length}명</span></h2><button onClick={addCharacter} className="flex items-center gap-2 text-xs border border-[#EBE7E0] rounded-lg px-3 py-2 text-[#7A7067]"><Plus size={14} /> 이해관계자 추가</button></div>
+{characters.length === 0 ? (
             <div className="text-center py-20 bg-white rounded-2xl border border-[#EBE7E0]">
               <div className="w-12 h-12 rounded-2xl bg-[#F4F1EC] flex items-center justify-center mx-auto mb-4">
                 <User className="w-5 h-5 text-[#ADA8A0]" />
@@ -249,6 +198,7 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
                       </button>
                       <button
                         onClick={() => removeChar(idx)}
+                          aria-label={(ch.name || "이름 없는") + " 이해관계자 삭제"}
                         className="p-1.5 rounded-lg border border-[#EBE7E0] hover:bg-red-50 hover:border-red-200 transition-all duration-200"
                       >
                         <Trash2 className="w-3.5 h-3.5 text-[#ADA8A0] hover:text-red-400" />
@@ -319,39 +269,7 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
               ))}
             </div>
           )}
-
-          <div className="flex justify-end gap-3">
-            <button
-              onClick={save}
-              disabled={saving}
-              className="text-xs font-medium px-4 py-2.5 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] transition-all duration-200 disabled:opacity-50"
-            >
-              저장
-            </button>
-            <button onClick={goNext} className="flex items-center gap-2 text-xs font-semibold px-5 py-2.5 rounded-full bg-[#D4547A] text-white hover:bg-[#B8405F] transition-all duration-300">
-              다음: 기능 설계 <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </main>
-
-        <aside className="hidden lg:flex w-72 flex-shrink-0 h-[calc(100vh-5rem)] sticky top-20">
-          <AiChat
-            ref={aiChatRef}
-            step="character"
-            userType={userType}
-            initialMessage={characterInitialMessage}
-            placeholder="이해관계자 분석에 대해 질문하세요..."
-          />
-        </aside>
-      </div>
-
-      <MobileChatSheet
-        ref={mobileChatRef}
-        step="character"
-        userType={userType}
-        initialMessage={characterInitialMessage}
-        placeholder="이해관계자 분석에 대해 질문하세요..."
-      />
-    </div>
+      </ProjectWorkspace>
+    </>
   );
 }

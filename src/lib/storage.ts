@@ -7,13 +7,7 @@ export type Character = {
   backstory: string;
 };
 
-export type Cut = {
-  angle: string;
-  description: string;
-  dialogue: string;
-  soundEffect: string;
-};
-
+export type Cut = { angle: string; description: string; dialogue: string; soundEffect: string };
 export type Episode = {
   episodeNumber: number;
   title: string;
@@ -22,10 +16,8 @@ export type Episode = {
   script: string;
   isCompleted: boolean;
 };
-
 export type ChatMessage = { role: "user" | "assistant"; content: string };
 export type UserType = "student" | "general";
-
 export type Project = {
   id: string;
   title: string;
@@ -38,39 +30,40 @@ export type Project = {
   authorNote: string;
   proposalScript: string;
   createdAt: string;
+  updatedAt?: string;
   userType: UserType;
   ideaChat?: ChatMessage[];
-  story: {
-    logline: string;
-    theme: string;
-    setting: string;
-    plotOutline: string;
-    totalEpisodes: string;
-  };
+  ideaStage?: 0 | 1 | 2;
+  mentorChats?: Partial<Record<"story" | "character" | "panel" | "script" | "completion", ChatMessage[]>>;
+  reviewChecks?: Record<string, boolean>;
+  story: { logline: string; theme: string; setting: string; plotOutline: string; totalEpisodes: string };
   characters: Character[];
   episodes: Episode[];
 };
 
 const KEY = "plancraft_projects";
-const DEFAULT_USER_TYPE: UserType = "student";
-
+export const PROJECTS_CHANGED_EVENT = "plancraft:projects-changed";
 type StoredProject = Omit<Project, "userType"> & { userType?: UserType };
 
 export function getProjects(): Project[] {
   if (typeof window === "undefined") return [];
   try {
     const parsed = JSON.parse(localStorage.getItem(KEY) ?? "[]") as StoredProject[];
+    if (!Array.isArray(parsed)) return [];
     return parsed.map((project) => ({
       ...project,
-      userType: project.userType === "general" ? "general" : DEFAULT_USER_TYPE,
+      currentStep: Math.min(6, Math.max(1, Math.trunc(project.currentStep || 1))),
+      updatedAt: project.updatedAt ?? project.createdAt,
+      authorNote: project.authorNote ?? "",
+      proposalScript: project.proposalScript ?? "",
+      userType: project.userType === "general" ? "general" : "student",
     }));
-  } catch {
-    return [];
-  }
+  } catch { return []; }
 }
 
 export function saveProjects(projects: Project[]): void {
   localStorage.setItem(KEY, JSON.stringify(projects));
+  window.dispatchEvent(new Event(PROJECTS_CHANGED_EVENT));
 }
 
 export function getProject(id: string): Project | null {
@@ -81,23 +74,20 @@ export function updateProject(id: string, updates: Partial<Project>): void {
   const projects = getProjects();
   const idx = projects.findIndex((p) => p.id === id);
   if (idx !== -1) {
-    projects[idx] = { ...projects[idx], ...updates };
+    projects[idx] = { ...projects[idx], ...updates, updatedAt: new Date().toISOString() };
     saveProjects(projects);
   }
 }
 
 export function createProject(data: {
-  title: string;
-  author: string;
-  genre: string;
-  targetCompetition: string;
-  deadline: string;
-  userType: UserType;
+  title: string; author: string; genre: string; targetCompetition: string; deadline: string; userType: UserType;
 }): Project {
+  const now = new Date().toISOString();
   const project: Project = {
     ...data,
     id: crypto.randomUUID(),
-    createdAt: new Date().toISOString(),
+    createdAt: now,
+    updatedAt: now,
     currentStep: 1,
     isCompleted: false,
     authorNote: "",
@@ -106,11 +96,44 @@ export function createProject(data: {
     characters: [],
     episodes: [{ episodeNumber: 1, title: "", synopsis: "", cuts: [], script: "", isCompleted: false }],
   };
-  const projects = getProjects();
-  saveProjects([project, ...projects]);
+  saveProjects([project, ...getProjects()]);
   return project;
 }
 
 export function deleteProject(id: string): void {
   saveProjects(getProjects().filter((p) => p.id !== id));
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+function hasStrings(value: unknown, keys: string[]): boolean {
+  return isRecord(value) && keys.every((key) => typeof value[key] === "string");
+}
+
+/** Validate every entry before importing so a malformed backup cannot replace existing work. */
+export function isProject(value: unknown): value is Project {
+  if (!isRecord(value)) return false;
+  if (!hasStrings(value, ["id", "title", "author", "genre", "targetCompetition", "deadline", "createdAt"])) return false;
+  if (!value.id || !Number.isFinite(Date.parse(value.createdAt as string))) return false;
+  if (typeof value.currentStep !== "number" || !Number.isFinite(value.currentStep) || typeof value.isCompleted !== "boolean") return false;
+  // Older backups may predate these fields.
+  if (["authorNote", "proposalScript"].some((key) => value[key] !== undefined && typeof value[key] !== "string")) return false;
+  if (value.updatedAt !== undefined && (typeof value.updatedAt !== "string" || !Number.isFinite(Date.parse(value.updatedAt)))) return false;
+  if (value.userType !== undefined && value.userType !== "student" && value.userType !== "general") return false;
+  if (!hasStrings(value.story, ["logline", "theme", "setting", "plotOutline", "totalEpisodes"])) return false;
+  if (!Array.isArray(value.characters) || !value.characters.every((ch) => hasStrings(ch, ["name", "role", "age", "appearance", "personality", "backstory"]))) return false;
+  if (!Array.isArray(value.episodes) || !value.episodes.every((ep) =>
+    isRecord(ep) && typeof ep.episodeNumber === "number" && Number.isFinite(ep.episodeNumber)
+    && hasStrings(ep, ["title", "synopsis", "script"]) && typeof ep.isCompleted === "boolean"
+    && Array.isArray(ep.cuts) && ep.cuts.every((cut) => hasStrings(cut, ["angle", "description", "dialogue", "soundEffect"]))
+  )) return false;
+  if (value.ideaStage !== undefined && value.ideaStage !== 0 && value.ideaStage !== 1 && value.ideaStage !== 2) return false;
+  if (value.mentorChats !== undefined && (!isRecord(value.mentorChats) || !Object.entries(value.mentorChats).every(([step, messages]) =>
+    ["story", "character", "panel", "script", "completion"].includes(step) && Array.isArray(messages) && messages.every((m) => isRecord(m) && (m.role === "user" || m.role === "assistant") && typeof m.content === "string")
+  ))) return false;
+  if (value.reviewChecks !== undefined && (!isRecord(value.reviewChecks) || !Object.values(value.reviewChecks).every((check) => typeof check === "boolean"))) return false;
+  return value.ideaChat === undefined || (Array.isArray(value.ideaChat) && value.ideaChat.every((m) =>
+    isRecord(m) && (m.role === "user" || m.role === "assistant") && typeof m.content === "string"
+  ));
 }
