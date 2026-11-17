@@ -6,9 +6,10 @@ import BrandMark from "@/components/brand/BrandMark";
 import { useRouter } from "next/navigation";
 import * as Dialog from "@radix-ui/react-dialog";
 import { ArrowLeft, ArrowRight, BookOpen, ChevronRight, X } from "lucide-react";
-import AiChat, { type AiChatHandle } from "@/components/ai-assistant/AiChat";
+import { type AiChatHandle } from "@/components/ai-assistant/AiChat";
+import FloatingAiMentor from "@/components/ai-assistant/FloatingAiMentor";
 import { useProject } from "@/lib/use-project";
-import { getProject, updateProject } from "@/lib/storage";
+import { getProject, updateProject, type Project } from "@/lib/storage";
 import { STEPS } from "@/lib/utils";
 import type { PromptStep } from "@/lib/prompts";
 import base from "@/app/project/[id]/idea/idea.module.css";
@@ -75,9 +76,10 @@ type Props = {
   mentorMessage: string;
   mentorPlaceholder: string;
   mentorRef: RefObject<AiChatHandle | null>;
+  mentorContext?: Partial<Pick<Project, "story" | "characters" | "episodes" | "proposalScript" | "authorNote">>;
 };
 
-export default function ProjectWorkspace({ projectId, step, children, actions, onSave, busy = false, onNext, nextLabel, mentorStep, mentorMessage, mentorPlaceholder, mentorRef }: Props) {
+export default function ProjectWorkspace({ projectId, step, children, actions, onSave, busy = false, onNext, nextLabel, mentorStep, mentorMessage, mentorPlaceholder, mentorRef, mentorContext }: Props) {
   const project = useProject(projectId);
   const router = useRouter();
   const [guideIndex, setGuideIndex] = useState(0);
@@ -106,6 +108,16 @@ export default function ProjectWorkspace({ projectId, step, children, actions, o
   const dashboardHref = project.userType === "general" ? "/dashboard?type=general" : "/dashboard?type=student";
   const previous = STEPS[step - 2];
   const href = (route: string) => "/project/" + encodeURIComponent(projectId) + "/" + route;
+  const context = JSON.stringify({
+    프로젝트: project.title,
+    현재단계: STEPS[step - 1].label,
+    현재작성내용: mentorContext ?? { authorNote: project.authorNote, reviewChecks: project.reviewChecks },
+    문제정의: project.story,
+    이해관계자: project.characters,
+    기능설계: project.episodes,
+    기획서: project.proposalScript,
+    아이디어대화: project.ideaChat?.slice(-8),
+  }).slice(0, 28000);
 
   return (
     <div className={base.page}>
@@ -128,7 +140,7 @@ export default function ProjectWorkspace({ projectId, step, children, actions, o
           </nav>
           <div className={base.sidebarBottom}><button onClick={() => setHelpOpen(true)}><BookOpen size={14} /> 막막할 때, 사용 가이드</button><p>한 단계씩 구체화하며,<br />실제로 만들 수 있는 기획으로.</p></div>
         </aside>
-        <main className={base.main}>
+        <main className={base.main + " " + styles.withFloatingHelp}>
           <div className={base.heading}>
             <div><p className={base.eyebrow}>STEP {String(step).padStart(2, "0")} · 생각을 구체적으로</p><h1>{STEPS[step - 1].label}</h1><p className={base.description}>{config.description}</p></div>
             <button className={base.helpButton} onClick={() => setHelpOpen(true)}><BookOpen size={14} /> 사용 방법</button>
@@ -143,19 +155,16 @@ export default function ProjectWorkspace({ projectId, step, children, actions, o
           {actions && <div className={styles.toolbar} role="group" aria-label="작성 도구">{actions}</div>}
           {notice && <p className={base.error} role="status">{notice}</p>}
           <div ref={editorRef} className={styles.editor}>{children}</div>
-          <section className={styles.mentor} aria-label="단계별 AI 도움">
-            <p className={styles.mentorHint}>작성하다 막히면, 아이디어봇과 함께 구체화해보세요.</p>
-            <AiChat key={projectId + mentorStep} ref={mentorRef} variant="discovery" step={mentorStep} userType={project.userType} initialMessage={mentorMessage} placeholder={mentorPlaceholder} initialMessages={project.mentorChats?.[mentorStep]} onBusyChange={setChatBusy} onMessagesChange={(messages) => {
-              try { const latest = getProject(projectId); if (latest) updateProject(projectId, { mentorChats: { ...latest.mentorChats, [mentorStep]: messages } }); }
-              catch { setNotice("AI 대화를 저장하지 못했어요. 브라우저 저장 공간을 확인해주세요."); }
-            }} />
-          </section>
           <footer className={base.footer}>
             <div><span>이번 단계의 목표</span><p>{config.goal}</p><button className={styles.previous} disabled={busy || chatBusy || navigating} onClick={() => void navigate(href(previous.route))}><ArrowLeft size={13} /> 이전: {previous.label}</button></div>
             {onNext ? <button className={base.primary} disabled={busy || chatBusy || navigating} onClick={() => void onNext()}>{nextLabel ?? "다음 단계"}<ArrowRight size={15} /></button> : <button className={base.primary} disabled={busy || chatBusy || navigating} onClick={() => void navigate(dashboardHref)}>프로젝트 목록<ArrowRight size={15} /></button>}
           </footer>
         </main>
       </div>
+      <FloatingAiMentor key={projectId + mentorStep} ref={mentorRef} project={project} step={step} mentorStep={mentorStep} initialMessage={mentorMessage} placeholder={mentorPlaceholder} context={context} onBusyChange={setChatBusy} onMessagesChange={(messages) => {
+        try { const latest = getProject(projectId); if (latest) updateProject(projectId, { mentorChats: { ...latest.mentorChats, [mentorStep]: messages } }); }
+        catch { setNotice("AI 대화를 저장하지 못했어요. 브라우저 저장 공간을 확인해주세요."); }
+      }} />
       <Dialog.Root open={helpOpen} onOpenChange={setHelpOpen}><Dialog.Portal><Dialog.Overlay className={base.overlay} /><Dialog.Content className={base.dialog}><p className={base.eyebrow}>STEP {String(step).padStart(2, "0")} 사용 가이드</p><Dialog.Title>{STEPS[step - 1].label}, 이렇게 진행해요.</Dialog.Title><Dialog.Description>{config.goal}</Dialog.Description><ol className={base.helpSteps}>{config.steps.map((item) => <li key={item[0]}><strong>{item[0]}</strong><p>{item[2]}</p></li>)}</ol><Dialog.Close className={base.close} aria-label="사용 가이드 닫기"><X size={19} /></Dialog.Close><div className={base.dialogActions}><Dialog.Close className={base.primary}>이해했어요</Dialog.Close></div></Dialog.Content></Dialog.Portal></Dialog.Root>
     </div>
   );

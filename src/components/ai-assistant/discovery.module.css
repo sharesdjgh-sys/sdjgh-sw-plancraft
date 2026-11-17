@@ -19,4 +19,9 @@
 .send{background:#D4547A;color:#fff}.send:hover{background:#B8405F}.send:disabled{opacity:.4;cursor:not-allowed}
 .error{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;border:1px solid #edcad4;background:#FCEEF3;border-radius:7px;padding:11px 13px;font-size:12px;line-height:1.8;color:#a73453;margin-top:12px}
 .error button{font-weight:600;text-decoration:underline;text-underline-offset:3px}.error button:disabled{opacity:.5}
+.floating{display:flex;flex:1;flex-direction:column;min-height:0;padding:0 18px 16px}
+.floating .thread{flex:1;min-height:0;max-height:none;padding:4px 4px 10px 0}.floating .messages{gap:16px}.floating .assistantText{color:#5e544c;font-size:14px;line-height:1.85}
+.floating .composer{flex-shrink:0;margin-top:8px;padding:12px}.floating .input{resize:none;min-height:46px;max-height:90px}.floating .error{flex-shrink:0;max-height:100px;overflow:auto}
+.floating .send,.floating .mic{width:36px;height:36px}
 @media(max-width:760px){.discovery{padding-top:18px}.agent strong{font-size:11px}.agent>span{font-size:10px}.expand{font-size:10px}.thread{max-height:220px;min-height:110px}.expanded{max-height:350px}.assistantText{font-size:14px}.user{font-size:13px;max-width:95%}.composer{padding:13px 14px}.input{font-size:16px;min-height:44px}.composerBottom>span{font-size:9px}.role{font-size:10px}}
+@media(max-width:760px){.floating{padding:0 14px 12px}.floating .thread{min-height:0;max-height:none}.floating .send,.floating .mic{width:40px;height:40px}}

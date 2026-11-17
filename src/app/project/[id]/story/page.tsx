@@ -125,6 +125,7 @@ export default function StoryPage({ params }: { params: Promise<{ id: string }> 
         step={2}
         mentorStep="story"
         mentorRef={aiChatRef}
+        mentorContext={{ story }}
         mentorMessage={storyInitialMessage}
         mentorPlaceholder="문제 정의에 대해 질문하세요..."
         onSave={save} busy={saving || autofilling} onNext={goNext} nextLabel="다음: 이해관계자 분석"

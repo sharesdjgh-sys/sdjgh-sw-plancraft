@@ -62,7 +62,7 @@ export default function EmptyContentModal({
             <Sparkles className="w-4 h-4 text-[#D4547A] flex-shrink-0" />
             <div>
               <p className="text-xs font-semibold text-[#1A1A1A]">AI 멘토 아이디어봇에게 질문</p>
-              <p className="text-[10px] text-[#ADA8A0]">아래 대화 영역에서 도움을 받아보세요</p>
+              <p className="text-[10px] text-[#ADA8A0]">AI 도움 창을 열어 함께 정리해보세요</p>
             </div>
           </button>
         </div>

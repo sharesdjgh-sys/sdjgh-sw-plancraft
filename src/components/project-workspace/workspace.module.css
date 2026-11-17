@@ -25,7 +25,7 @@
 .reviewProgress>div>span{font-size:11px;color:#D4547A}.reviewProgress strong{font-size:25px;font-weight:550;color:#1A1A1A;display:block;line-height:1.5}
 .reviewProgress p{font-size:12px;color:#7A7067}.reviewProgress progress{appearance:none;width:40%;height:6px;border:0;border-radius:4px;overflow:hidden;background:#F4F1EC}
 .reviewProgress progress::-webkit-progress-bar{background:#F4F1EC;border-radius:4px}.reviewProgress progress::-webkit-progress-value{background:#D4547A;border-radius:4px}.reviewProgress progress::-moz-progress-bar{background:#D4547A;border-radius:4px}
-.mentor{border-top:1px solid #EBE7E0;margin-top:23px;padding-top:20px}.mentorHint{font-size:12px;line-height:1.9;color:#7A7067}
+.withFloatingHelp.withFloatingHelp{padding-bottom:112px}
 .previous{display:flex;align-items:center;gap:6px;font-size:11px;color:#7A7067;margin-top:12px}
 .previous:disabled{opacity:.5}
 @media(max-width:760px){.toolbar{justify-content:flex-start;gap:7px;padding:16px 0}.toolbar button{font-size:11px;padding:9px 10px}.editor>div:global(.bg-white){padding:21px 0}.editor>div:global(.grid){gap:21px}.editor input:not([type=checkbox]),.editor textarea,.editor select{font-size:16px}.editor [class*="col-span-2"]{grid-column:auto!important}.referenceGrid{grid-template-columns:1fr;gap:18px}.featureHeading{align-items:flex-start;flex-wrap:wrap;gap:10px}.featureHeading h2{font-size:15px}.reviewProgress{gap:15px}.reviewProgress progress{width:34%}.editor .proposal textarea{min-height:300px}.editor [draggable]>div{flex-wrap:wrap;gap:10px}.editor [draggable] select{max-width:145px}.editor button[class*="flex-shrink-0"]{white-space:normal}}

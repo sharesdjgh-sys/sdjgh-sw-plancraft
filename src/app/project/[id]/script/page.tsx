@@ -184,6 +184,7 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
         step={5}
         mentorStep="script"
         mentorRef={aiChatRef}
+        mentorContext={{ proposalScript }}
         mentorMessage={scriptInitialMessage}
         mentorPlaceholder="기획서 작성에 대해 질문하세요..."
         onSave={save} busy={saving || autofilling} onNext={goNext} nextLabel="다음: 최종 검토"

@@ -277,6 +277,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
         step={4}
         mentorStep="panel"
         mentorRef={aiChatRef}
+        mentorContext={{ episodes }}
         mentorMessage={panelInitialMessage}
         mentorPlaceholder="기능 설계에 대해 질문하세요..."
         onSave={save} busy={saving || autofilling || autofillingCuts} onNext={goNext} nextLabel="다음: 기획서 작성"

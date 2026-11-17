@@ -41,7 +41,7 @@ export default function GuidePage() {
 
   const goTo = useCallback((index: number) => {
     const rail = railRef.current;
-    if (!rail) return;
+    if (!rail || rail.clientWidth === 0 || !Number.isFinite(index)) return;
     const next = Math.max(0, Math.min(GUIDE_STEPS.length - 1, index));
     rail.scrollTo({
       left: next * rail.clientWidth,
@@ -67,7 +67,7 @@ export default function GuidePage() {
     rail.addEventListener("wheel", onWheel, { passive: false });
     let previousWidth = rail.clientWidth;
     const observer = new ResizeObserver(() => {
-      if (rail.clientWidth === previousWidth) return;
+      if (rail.clientWidth === 0 || rail.clientWidth === previousWidth) return;
       previousWidth = rail.clientWidth;
       rail.scrollTo({ left: activeRef.current * previousWidth, behavior: "instant" });
     });
@@ -128,7 +128,7 @@ export default function GuidePage() {
           <div className={styles.rail} ref={railRef} role="region" aria-roledescription="슬라이드" aria-label="단계별 상세 가이드" aria-describedby="guide-keyboard" tabIndex={0}
             onScroll={() => {
               const rail = railRef.current;
-              if (!rail) return;
+              if (!rail || rail.clientWidth === 0) return;
               const index = Math.max(0, Math.min(GUIDE_STEPS.length - 1, Math.round(rail.scrollLeft / rail.clientWidth)));
               activeRef.current = index;
               setActive(index);

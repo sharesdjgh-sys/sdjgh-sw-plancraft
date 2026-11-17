@@ -150,6 +150,7 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
         step={3}
         mentorStep="character"
         mentorRef={aiChatRef}
+        mentorContext={{ characters }}
         mentorMessage={characterInitialMessage}
         mentorPlaceholder="이해관계자 분석에 대해 질문하세요..."
         onSave={save} busy={saving || autofilling} onNext={goNext} nextLabel="다음: 기능 설계"

@@ -32,7 +32,9 @@ export interface AiChatHandle {
 
 interface AiChatProps {
   step: string;
-  variant?: "default" | "discovery";
+  variant?: "default" | "discovery" | "floating";
+  active?: boolean;
+  projectContext?: string;
   ideaFocus?: "problem" | "context" | "summary";
   onBusyChange?: (busy: boolean) => void;
   userType?: UserType;
@@ -43,7 +45,7 @@ interface AiChatProps {
 }
 
 const AiChat = forwardRef<AiChatHandle, AiChatProps>(function AiChat(
-  { step, variant = "default", ideaFocus, onBusyChange, userType = "student", placeholder, initialMessage, initialMessages, onMessagesChange },
+  { step, variant = "default", active = true, projectContext, ideaFocus, onBusyChange, userType = "student", placeholder, initialMessage, initialMessages, onMessagesChange },
   ref
 ) {
   const [messages, setMessages] = useState<Message[]>(() => {
@@ -73,11 +75,19 @@ const AiChat = forwardRef<AiChatHandle, AiChatProps>(function AiChat(
   }));
 
   useEffect(() => {
-    if (variant === "discovery") {
+    if (!active) return;
+    if (variant !== "default") {
       const thread = threadRef.current;
       if (thread) thread.scrollTop = thread.scrollHeight;
     } else bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, loading, variant]);
+  }, [messages, loading, variant, active]);
+
+  useEffect(() => {
+    if (!active) {
+      manualStopRef.current = true;
+      recognitionRef.current?.stop();
+    }
+  }, [active]);
 
   useEffect(() => () => {
     manualStopRef.current = true;
@@ -160,7 +170,7 @@ const AiChat = forwardRef<AiChatHandle, AiChatProps>(function AiChat(
         method: "POST",
         signal: controller.signal,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: next, step, userType, ...(ideaFocus ? { ideaFocus } : {}) }),
+        body: JSON.stringify({ messages: next, step, userType, ...(ideaFocus ? { ideaFocus } : {}), ...(projectContext ? { projectContext } : {}) }),
       });
       const data = await res.json();
       if (!res.ok || typeof data.reply !== "string") throw new Error(data.error || "AI 응답을 받지 못했어요. 잠시 후 다시 시도해주세요.");
@@ -182,16 +192,16 @@ const AiChat = forwardRef<AiChatHandle, AiChatProps>(function AiChat(
   };
 
 
-  if (variant === "discovery") {
+  if (variant !== "default") {
     return (
-      <section className={discovery.discovery} aria-label="아이디어봇과 대화">
-        <div className={discovery.header}>
+      <section className={discovery.discovery + (variant === "floating" ? " " + discovery.floating : "")} aria-label="아이디어봇과 대화">
+        {variant !== "floating" && <div className={discovery.header}>
           <div className={discovery.agent}>
             <Image src="/ideabot-remove.png" width={27} height={27} alt="" unoptimized />
             <strong>아이디어봇과 함께</strong><span>AI 멘토</span>
           </div>
           {messages.length > 1 && <button className={discovery.expand} aria-expanded={expanded} aria-controls="discovery-thread" onClick={() => setExpanded(!expanded)}>{expanded ? "대화 영역 줄이기" : "대화 영역 넓히기"}</button>}
-        </div>
+        </div>}
         <div id="discovery-thread" ref={threadRef} className={discovery.thread + (expanded ? " " + discovery.expanded : "")} role="log" aria-label="AI 멘토와의 대화" aria-live="polite" aria-busy={loading} tabIndex={0}>
           <div className={discovery.messages}>
             {messages.map((message, index) => message.role === "user"
