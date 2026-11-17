@@ -1,0 +1,27 @@
+{
+  "selected": "M1 · 소프트 블록",
+  "previousSelection": "C1 · 라운드 스튜디오",
+  "method": "Built-in image_gen.imagegen",
+  "source": "public/previews/wordmarks-voxel/wordmark-m1.png",
+  "productionAsset": "public/brand/plancraft-wordmark-m1.png",
+  "sha256": "E1113CE2BAF8A40294E7B57CBBCB79AB9CDD627CA9F39F0692AAD766AC78A6F4",
+  "exactCopyOfApprovedImage": true,
+  "component": "src/components/brand/BrandMark.tsx",
+  "iconSizePx": { "desktop": 40, "mobile": 36, "compactFooter": 30 },
+  "applied": ["Home header and footer", "Dashboard", "Guide", "Idea", "Story", "Characters", "Episodes", "Script", "Submit"],
+  "verified": [
+    "Original icon preserved",
+    "Transparent M1 PNG matches chosen preview byte-for-byte",
+    "Next.js image optimization with responsive sizes",
+    "Desktop and mobile header screenshots",
+    "No header/page horizontal overflow at 1440 and 320px on all nine routes, plus 390px on Home/Dashboard/Guide",
+    "Long project title fits header",
+    "Brand link preserves general user mode and save navigation",
+    "Compact footer asset loads and fits at 320px",
+    "TypeScript noEmit passed",
+    "Full ESLint passed with 0 errors and 4 pre-existing native-image warnings",
+    "git diff --check passed",
+    "Temporary brand QA project removed"
+  ],
+  "versionControl": "Local commit only; no push"
+}

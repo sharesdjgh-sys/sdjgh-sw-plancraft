@@ -2,7 +2,7 @@
 
 import { use, useRef, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import BrandMark from "@/components/brand/BrandMark";
 import { useRouter } from "next/navigation";
 import * as Dialog from "@radix-ui/react-dialog";
 import { ArrowRight, BookOpen, Check, ChevronRight, Loader2, X } from "lucide-react";
@@ -129,8 +129,7 @@ export default function IdeaPage({ params }: { params: Promise<{ id: string }> }
     <div className={styles.page}>
       <header className={styles.header}>
         <Link href={dashboardHref} className={styles.brand} aria-label="PlanCraft 프로젝트 목록">
-          <Image src="/plancraft-logo-remove.png" width={29} height={29} alt="" unoptimized />
-          <span>PlanCraft</span>
+          <BrandMark />
         </Link>
         <div className={styles.breadcrumb}>
           <Link href={dashboardHref}>내 작업 공간</Link>

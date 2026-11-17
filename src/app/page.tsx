@@ -4,6 +4,7 @@ import {
   PenLine, Trophy, Star, Heart, GraduationCap, BookOpen
 } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
+import BrandMark from "@/components/brand/BrandMark";
 
 const STEP_COLORS = [
   "#D4547A", // 01 Rose
@@ -28,18 +29,15 @@ export default function HomePage() {
     <div className="min-h-screen bg-[#FBF9F6] text-[#1A1A1A] overflow-x-hidden">
 
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-4 bg-[#FBF9F6]/85 backdrop-blur-xl border-b border-[#EBE7E0]">
-        <div className="flex items-center gap-2">
-          <img src="/plancraft-logo-remove.png" className="w-7 h-7 rounded-lg object-cover" alt="PlanCraft" />
-          <span className="text-sm font-semibold tracking-tight text-[#1A1A1A]">PlanCraft</span>
-        </div>
-        <div className="flex items-center gap-5">
-          <Link href="/guide" className="text-sm text-[#7A7067] hover:text-[#1A1A1A] transition-colors duration-200">
+      <nav className="fixed top-0 left-0 right-0 z-50 h-[65px] flex items-center justify-between px-4 sm:px-8 bg-[#FBF9F6]/85 backdrop-blur-xl border-b border-[#EBE7E0]">
+        <Link href="/" aria-label="PlanCraft 홈"><BrandMark /></Link>
+        <div className="flex items-center gap-2 sm:gap-5">
+          <Link href="/guide" className="text-xs sm:text-sm text-[#7A7067] hover:text-[#1A1A1A] transition-colors duration-200">
             가이드
           </Link>
           <Link
             href="/dashboard"
-            className="flex items-center gap-1.5 bg-[#1A1A1A] text-white text-sm font-medium px-4 py-2 rounded-full hover:bg-[#2D2D2D] transition-all duration-300 hover:scale-[1.02]"
+            className="flex items-center gap-1.5 bg-[#1A1A1A] text-white text-xs sm:text-sm font-medium px-3 sm:px-4 py-2 rounded-full hover:bg-[#2D2D2D] transition-all duration-300 hover:scale-[1.02]"
           >
             시작하기 <ArrowRight className="w-3.5 h-3.5" />
           </Link>
@@ -296,10 +294,7 @@ export default function HomePage() {
       {/* Footer */}
       <footer className="border-t border-[#EBE7E0] px-8 py-8 bg-white">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <img src="/plancraft-logo-remove.png" className="w-5 h-5 rounded object-cover" alt="PlanCraft" />
-            <span className="text-xs text-[#ADA8A0] font-medium">PlanCraft</span>
-          </div>
+          <BrandMark compact />
           <p className="text-xs text-[#ADA8A0]">© 2026 PlanCraft</p>
         </div>
       </footer>

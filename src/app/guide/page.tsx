@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import BrandMark from "@/components/brand/BrandMark";
 import { ArrowLeft, ArrowRight, Check, ChevronRight, Clock3, Lightbulb, Target, Users, Cpu, PenLine, Trophy, MoveHorizontal } from "lucide-react";
 import base from "@/app/project/[id]/idea/idea.module.css";
 import styles from "./guide.module.css";
@@ -87,8 +88,7 @@ export default function GuidePage() {
     <div className={base.page}>
       <header className={base.header + " " + styles.header}>
         <Link href="/" className={base.brand}>
-          <Image src="/plancraft-logo-remove.png" width={29} height={29} alt="" unoptimized />
-          <span>PlanCraft</span>
+          <BrandMark />
         </Link>
         <div className={base.breadcrumb}><Link href="/dashboard">내 작업 공간</Link><ChevronRight size={13} /><span>사용 가이드</span></div>
         <Link href="/dashboard" className={styles.backLink}>내 프로젝트 <ArrowRight size={15} /></Link>

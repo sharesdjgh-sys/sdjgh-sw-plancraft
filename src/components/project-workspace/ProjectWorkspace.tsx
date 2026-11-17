@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import BrandMark from "@/components/brand/BrandMark";
 import { useRouter } from "next/navigation";
 import * as Dialog from "@radix-ui/react-dialog";
 import { ArrowLeft, ArrowRight, BookOpen, ChevronRight, X } from "lucide-react";
@@ -110,7 +110,7 @@ export default function ProjectWorkspace({ projectId, step, children, actions, o
   return (
     <div className={base.page}>
       <header className={base.header}>
-        <Link href={dashboardHref} className={base.brand} onClick={(event) => { event.preventDefault(); void navigate(dashboardHref); }}><Image src="/plancraft-logo-remove.png" width={29} height={29} alt="" unoptimized /><span>PlanCraft</span></Link>
+        <Link href={dashboardHref} className={base.brand} onClick={(event) => { event.preventDefault(); void navigate(dashboardHref); }}><BrandMark /></Link>
         <div className={base.breadcrumb}><Link href={dashboardHref} onClick={(event) => { event.preventDefault(); void navigate(dashboardHref); }}>내 작업 공간</Link><ChevronRight size={13} /><span>{project.title}</span></div>
         <span className={base.storageNote}><span /> {onSave ? "저장 버튼으로 기획 보관" : "이 브라우저에 저장"}</span>
         <span className={base.mobileStage}>{STEPS[step - 1].label} · {step} / 6</span>

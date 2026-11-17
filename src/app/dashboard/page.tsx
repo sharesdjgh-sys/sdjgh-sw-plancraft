@@ -3,6 +3,7 @@
 import { Suspense, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import BrandMark from "@/components/brand/BrandMark";
 import { useRouter, useSearchParams } from "next/navigation";
 import * as Dialog from "@radix-ui/react-dialog";
 import { ArrowRight, BookOpen, Check, ChevronRight, Download, LayoutGrid, Loader2, Pencil, Plus, Search, Trash2, Upload, X } from "lucide-react";
@@ -142,7 +143,7 @@ function DashboardContent() {
     <div className={base.page}>
       <input ref={importRef} type="file" accept=".json,application/json" aria-label="프로젝트 백업 파일 선택" hidden onChange={handleImport} />
       <header className={base.header + " " + styles.header}>
-        <Link href="/" className={base.brand}><Image src="/plancraft-logo-remove.png" width={29} height={29} alt="" unoptimized /><span>PlanCraft</span></Link>
+        <Link href="/" className={base.brand}><BrandMark /></Link>
         <div className={base.breadcrumb}><span>내 작업 공간</span><ChevronRight size={13} /><span>프로젝트</span></div>
         <span className={styles.mode}>{preferredUserType === "general" ? "선생님·일반인 모드" : "학생 모드"}</span>
       </header>
