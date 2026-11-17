@@ -14,8 +14,7 @@
 }
 
 @theme inline {
-  --font-sans:  'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  --font-serif: 'Instrument Serif', Georgia, serif;
+  --font-sans: var(--font-ui), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 }
 
 * {
@@ -24,10 +23,17 @@
 }
 
 body {
-  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  font-family: var(--font-ui), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   background: var(--cream);
   color: var(--text);
   word-break: keep-all;
+}
+
+/* All heading levels use typography D; body copy and controls keep LINE Seed KR. */
+h1, h2, h3 {
+  font-family: var(--font-display), var(--font-ui), sans-serif;
+  font-weight: 400;
+  font-synthesis: none;
 }
 
 /* Scroll reveal */

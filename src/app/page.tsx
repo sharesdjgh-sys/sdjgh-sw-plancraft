@@ -59,9 +59,9 @@ export default function HomePage() {
             </div>
 
             {/* Headline */}
-            <h1 className="hero-enter-2 text-[clamp(2.6rem,6vw,4.5rem)] font-bold tracking-tight leading-[1.08] mb-6">
+            <h1 className="hero-enter-2 text-[clamp(2.6rem,6vw,4.5rem)] font-normal tracking-tight leading-[1.08] mb-6">
               내 아이디어를<br />
-              <span className="font-serif italic text-[#D4547A]">기획서</span>로<br />
+              <span className="text-[#D4547A]">기획서</span>로<br />
               완성해봐요
             </h1>
 
@@ -173,7 +173,7 @@ export default function HomePage() {
             <p className="text-xs font-medium text-[#D4547A] uppercase tracking-widest mb-3">Process</p>
             <h2 className="text-3xl font-bold tracking-tight">
               아이디어에서 기획서까지,<br />
-              <span className="font-serif italic">딱 6단계</span>
+              <span>딱 6단계</span>
             </h2>
           </div>
         </ScrollReveal>
@@ -211,7 +211,7 @@ export default function HomePage() {
             <p className="text-xs font-medium text-[#D4547A] uppercase tracking-widest mb-3">Why us</p>
             <h2 className="text-3xl font-bold tracking-tight">
               끝까지 완성할 수 있는<br />
-              <span className="font-serif italic">이유가 있어요</span>
+              <span>이유가 있어요</span>
             </h2>
           </div>
         </ScrollReveal>

@@ -198,27 +198,33 @@ function DashboardContent() {
           ) : filtered.length === 0 ? (
             <section className={styles.noResults}><Search size={28} /><h2>조건에 맞는 프로젝트가 없어요</h2><p>다른 검색어를 입력하거나 상태 필터를 바꿔보세요.</p><button className={base.secondary} onClick={() => { setFilter("all"); setSearch(""); }}>검색·필터 초기화 <ArrowRight size={14} /></button></section>
           ) : (
-            <section aria-label="내 프로젝트 목록">
+            <section className={styles.projectPanel} aria-label="내 프로젝트 목록">
               <div className={styles.columnHead} aria-hidden="true"><span>프로젝트</span><span>진행 상황</span><span className={styles.scheduleHead}>일정</span><span>관리</span></div>
               <ul className={styles.projectList}>
                 {filtered.map((project) => {
                   const progress = getProjectProgress(project);
                   const days = getDaysUntil(project.deadline);
+                  const summary = project.story.logline.trim();
                   return <li key={project.id} className={styles.projectRow}>
                     <Link className={styles.projectInfo} href={getProjectHref(project)} aria-label={project.title + (project.isCompleted ? " · 최종본 보기" : " · 이어서 작성")}>
-                      <div className={styles.titleLine}><h2>{project.title}</h2><span className={project.isCompleted ? styles.completed : styles.active}>{project.isCompleted ? <Check size={11} /> : <span />}{project.isCompleted ? "기획 완료" : "작성 중"}</span></div>
-                      <p className={styles.projectDescription}>{project.story.logline || (project.isCompleted ? "작성한 기획서를 확인해보세요." : "한 줄 소개를 적으며 아이디어를 구체화해보세요.")}</p>
-                      <div className={styles.projectMeta}><span>{project.genre || "분야 미지정"}</span>{project.author && <span>{project.author}</span>}{project.targetCompetition && <span>{project.targetCompetition}</span>}</div>
+                      <span className={styles.projectMark} aria-hidden="true">{Array.from(project.title.trim())[0] || "P"}</span>
+                      <div className={styles.projectCopy}>
+                        <div className={styles.titleLine}><h2>{project.title}</h2><span className={project.isCompleted ? styles.completed : styles.active}>{project.isCompleted ? <Check size={12} /> : <span />}{project.isCompleted ? "기획 완료" : "작성 중"}</span></div>
+                        <p className={styles.projectDescription + (!summary ? " " + styles.noSummary : "")}>{summary || (project.isCompleted ? "작성한 기획서를 확인해보세요." : "아직 한 줄 소개가 없어요.")}</p>
+                        <div className={styles.projectMeta}><span className={styles.projectCategory}>{project.genre || "분야 미지정"}</span>{project.author && <span>{project.author}</span>}{project.targetCompetition && <span>{project.targetCompetition}</span>}</div>
+                      </div>
                     </Link>
-                    <div className={styles.progress}><div><span>{project.isCompleted ? "최종 검토 완료" : STEPS[project.currentStep - 1]?.label}</span><strong>{progress}%</strong></div><div className={styles.progressTrack} role="progressbar" aria-label={project.title + " 단계 진행률"} aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100}><span style={{ width: progress + "%" }} /></div></div>
+                    <div className={styles.progress}><div><span>{project.isCompleted ? "최종 검토 완료" : String(project.currentStep).padStart(2, "0") + " · " + STEPS[project.currentStep - 1]?.label}</span><strong>{progress}%</strong></div><div className={styles.progressTrack} role="progressbar" aria-label={project.title + " 단계 진행률"} aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100}><span style={{ width: progress + "%" }} /></div></div>
                     <div className={styles.schedule}>
                       {project.isCompleted ? <span>기획 완료</span> : days !== null ? <><span className={days <= 7 ? styles.urgent : styles.due}>{days < 0 ? (project.userType === "general" ? "목표일 지남" : "마감 지남") : days === 0 ? "오늘까지" : "D-" + days}</span><span>{formatDate(project.deadline, true)}</span></> : <span>일정 미정</span>}
                       <small>수정 {formatDate(project.updatedAt ?? project.createdAt)}</small>
                     </div>
                     <div className={styles.rowActions} role="group" aria-label={project.title + " 관리"}>
-                      <button onClick={() => openEdit(project)} aria-label={project.title + " 정보 수정"} title="프로젝트 정보 수정"><Pencil size={15} /></button>
-                      <button onClick={() => { setDeleteTarget(project); setDeleteError(""); }} aria-label={project.title + " 삭제"} title="프로젝트 삭제"><Trash2 size={15} /></button>
-                      <Link className={styles.openProject} href={getProjectHref(project)} aria-label={project.title + " 열기"} title="프로젝트 열기"><ArrowRight size={17} /></Link>
+                      <Link className={styles.openProject} href={getProjectHref(project)} aria-label={project.title + " 열기"}>{project.isCompleted ? "최종본 보기" : "이어서 작성"}<ArrowRight size={15} /></Link>
+                      <div className={styles.management}>
+                        <button onClick={() => openEdit(project)} aria-label={project.title + " 정보 수정"} title="프로젝트 정보 수정"><Pencil size={15} /></button>
+                        <button onClick={() => { setDeleteTarget(project); setDeleteError(""); }} aria-label={project.title + " 삭제"} title="프로젝트 삭제"><Trash2 size={15} /></button>
+                      </div>
                     </div>
                   </li>;
                 })}

@@ -1,13 +1,21 @@
 import type { Metadata } from "next";
-import { Instrument_Serif } from "next/font/google";
-import Script from "next/script";
+import localFont from "next/font/local";
 import "./globals.css";
 
-const instrumentSerif = Instrument_Serif({
+const lineSeed = localFont({
+  src: [
+    { path: "./fonts/LINESeedKR-Rg.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/LINESeedKR-Bd.woff2", weight: "700", style: "normal" },
+  ],
+  variable: "--font-ui",
+  display: "swap",
+});
+
+const roundedSmile = localFont({
+  src: "./fonts/HakgyoansimDunggeunmisoTTF-R.woff2",
   weight: "400",
-  style: ["normal", "italic"],
-  subsets: ["latin"],
-  variable: "--font-serif",
+  style: "normal",
+  variable: "--font-display",
   display: "swap",
 });
 
@@ -18,16 +26,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ko" className={`${instrumentSerif.variable} h-full`}>
+    <html lang="ko" className={`${lineSeed.variable} ${roundedSmile.variable} h-full`}>
       <body className="min-h-full flex flex-col">
         {children}
-        <Script
-          id="pretendard"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `(function(){var l=document.createElement('link');l.rel='stylesheet';l.href='https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css';document.head.appendChild(l)})()`,
-          }}
-        />
       </body>
     </html>
   );
