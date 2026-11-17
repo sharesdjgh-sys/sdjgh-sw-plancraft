@@ -1,15 +1,11 @@
-import Link from "next/link";
-import { ArrowRight, Lightbulb, Target, Users, Cpu, PenLine, Trophy } from "lucide-react";
-import ScrollReveal from "@/components/ScrollReveal";
+"use client";
 
-const STEP_COLORS = [
-  "#D4547A", // 01 Rose
-  "#E06E48", // 02 Coral
-  "#D49E40", // 03 Amber
-  "#50A882", // 04 Sage
-  "#8060C0", // 05 Violet
-  "#B85890", // 06 Mauve
-];
+import { useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { ArrowLeft, ArrowRight, Check, ChevronRight, Clock3, Lightbulb, Target, Users, Cpu, PenLine, Trophy, MoveHorizontal } from "lucide-react";
+import base from "@/app/project/[id]/idea/idea.module.css";
+import styles from "./guide.module.css";
 
 const GUIDE_STEPS = [
   { icon: Lightbulb, step: 1, title: "아이디어 발굴", time: "1~2일", desc: "해결하고 싶은 사회 문제나 불편함을 SW로 풀 아이디어를 찾는 단계예요.",
@@ -26,82 +22,160 @@ const GUIDE_STEPS = [
     tips: ["기획서 전체 흐름을 처음부터 끝까지 다시 읽어봐요", "문제 정의, 기능, 기대 효과의 일관성을 확인해요", "공모전 제출 형식과 규정을 꼼꼼히 확인해요", "지원 동기에 진심을 담아 써봐요"] },
 ];
 
+
+const OUTCOMES = [
+  { title: "해결하고 싶은 문제와 아이디어 한 줄", example: "학교 공지와 신청 일정을 한곳에서 확인하는 알림 서비스를 만들고 싶어요." },
+  { title: "문제의 배경과 SW로 해결할 방법", example: "공지가 여러 채널에 흩어져 신청을 놓쳐요. 공지를 모아 일정별로 알려주면 좋겠어요." },
+  { title: "주요 사용자와 각자의 필요", example: "학부모는 필요한 공지만 빠르게, 선생님은 전달 여부를 쉽게 확인하고 싶어요." },
+  { title: "핵심 기능과 입력·처리·출력 흐름", example: "공지 등록 → 날짜와 대상 분류 → 해당 사용자에게 일정 알림 보내기" },
+  { title: "문제부터 기대 효과까지 이어지는 기획서", example: "문제의 배경, 사용 대상, 핵심 기능, 구현 방법과 기대 효과를 하나의 흐름으로 정리해요." },
+  { title: "점검을 마친 최종 기획서", example: "빠진 내용과 어색한 문장을 확인하고, 제출 형식과 파일까지 마지막으로 점검해요." },
+];
+
 export default function GuidePage() {
+  const railRef = useRef<HTMLDivElement>(null);
+  const navRef = useRef<HTMLOListElement>(null);
+  const activeRef = useRef(0);
+  const [active, setActive] = useState(0);
+
+  const goTo = useCallback((index: number) => {
+    const rail = railRef.current;
+    if (!rail) return;
+    const next = Math.max(0, Math.min(GUIDE_STEPS.length - 1, index));
+    rail.scrollTo({
+      left: next * rail.clientWidth,
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
+    });
+  }, []);
+
+  useEffect(() => {
+    const rail = railRef.current;
+    if (!rail) return;
+    let lastWheel = -Infinity;
+    // Convert a vertical mouse wheel only within the guide; release at either end.
+    function onWheel(event: WheelEvent) {
+      if (!rail || event.ctrlKey || event.shiftKey || event.altKey || Math.abs(event.deltaX) >= Math.abs(event.deltaY) || Math.abs(event.deltaY) < 4) return;
+      const direction = event.deltaY > 0 ? 1 : -1;
+      const atEdge = direction < 0 ? rail.scrollLeft <= 2 : rail.scrollLeft >= rail.scrollWidth - rail.clientWidth - 2;
+      if (atEdge) return;
+      event.preventDefault();
+      if (performance.now() - lastWheel < 650) return;
+      lastWheel = performance.now();
+      goTo(Math.round(rail.scrollLeft / rail.clientWidth) + direction);
+    }
+    rail.addEventListener("wheel", onWheel, { passive: false });
+    let previousWidth = rail.clientWidth;
+    const observer = new ResizeObserver(() => {
+      if (rail.clientWidth === previousWidth) return;
+      previousWidth = rail.clientWidth;
+      rail.scrollTo({ left: activeRef.current * previousWidth, behavior: "instant" });
+    });
+    observer.observe(rail);
+    return () => { rail.removeEventListener("wheel", onWheel); observer.disconnect(); };
+  }, [goTo]);
+
+  useEffect(() => {
+    const nav = navRef.current;
+    const item = nav?.children[active] as HTMLElement | undefined;
+    if (nav && item) nav.scrollTo({
+      left: item.offsetLeft - nav.offsetLeft - (nav.clientWidth - item.clientWidth) / 2,
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
+    });
+  }, [active]);
+
   return (
-    <div className="min-h-screen bg-[#FBF9F6]">
-      <header className="bg-white border-b border-[#EBE7E0] px-6 py-4 sticky top-0 z-40">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <img src="/plancraft-logo-remove.png" className="w-6 h-6 rounded-lg object-cover" alt="PlanCraft" />
-            <span className="text-sm font-semibold text-[#1A1A1A] tracking-tight">PlanCraft</span>
-          </Link>
-          <Link href="/dashboard" className="flex items-center gap-1.5 bg-[#D4547A] text-white text-xs font-semibold px-4 py-2 rounded-full hover:bg-[#B8405F] transition-all duration-300">
-            시작하기 <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
+    <div className={base.page}>
+      <header className={base.header + " " + styles.header}>
+        <Link href="/" className={base.brand}>
+          <Image src="/plancraft-logo-remove.png" width={29} height={29} alt="" unoptimized />
+          <span>PlanCraft</span>
+        </Link>
+        <div className={base.breadcrumb}><Link href="/dashboard">내 작업 공간</Link><ChevronRight size={13} /><span>사용 가이드</span></div>
+        <Link href="/dashboard" className={styles.backLink}>내 프로젝트 <ArrowRight size={15} /></Link>
       </header>
 
-      <main className="max-w-4xl mx-auto px-6 py-12">
-        <ScrollReveal>
-          <div className="mb-12">
-            <p className="text-xs font-medium text-[#D4547A] uppercase tracking-widest mb-3">Guide</p>
-            <h1 className="text-3xl font-bold text-[#1A1A1A] tracking-tight mb-3">
-              SW 아이디어 공모전 가이드
-            </h1>
-            <p className="text-sm text-[#7A7067] leading-relaxed">
-              처음이어도 괜찮아요. 6단계로 공모전 기획서를 완성해봐요.
-            </p>
+      <main className={styles.main}>
+        <section className={styles.intro} aria-labelledby="guide-title">
+          <div>
+            <p className={base.eyebrow}>PLANCRAFT GUIDE · 아이디어를 기획으로</p>
+            <h1 id="guide-title">좋은 기획은,<br />한 단계씩 만들어져요.</h1>
+            <p className={styles.description}>처음이어도 괜찮아요. 작은 생각을 꺼내는 순간부터<br className={styles.desktopBreak} /> 기획서를 완성하기까지, 6단계의 여정을 살펴보세요.</p>
           </div>
-        </ScrollReveal>
+          <div className={styles.introAside}>
+            <Image src="/ideabot-remove.png" width={88} height={88} alt="" unoptimized />
+            <div><strong>혼자 고민하지 않아도 돼요.</strong><p>막힐 때는 각 단계의 AI 멘토에게<br />지금의 생각을 편하게 이야기해보세요.</p></div>
+          </div>
+        </section>
 
-        <div className="space-y-3">
-          {GUIDE_STEPS.map((s, idx) => {
-            const Icon = s.icon;
-            const color = STEP_COLORS[idx];
-            return (
-              <ScrollReveal key={s.step} delay={idx * 55}>
-                <div className="relative rounded-2xl border border-[#EBE7E0] p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)]" style={{ backgroundColor: color + "0d" }}>
-                  <div
-                    className="w-11 h-11 rounded-xl flex items-center justify-center absolute top-6 right-6"
-                    style={{ backgroundColor: color + "1a" }}
-                  >
-                    <Icon className="w-5 h-5" style={{ color }} />
+        <section className={styles.reader} aria-label="6단계 기획 가이드">
+          <div className={styles.readerHeading}>
+            <p>생각에서 완성까지 <span>THE PLANNING JOURNEY</span></p>
+            <span className={styles.scrollHint}><MoveHorizontal size={15} /><span className={styles.desktopHint}>휠로 옆으로 넘겨보세요</span><span className={styles.mobileHint}>옆으로 밀어보세요</span></span>
+          </div>
+          <nav aria-label="가이드 단계 선택">
+            <ol className={styles.chapterNav} ref={navRef}>
+              {GUIDE_STEPS.map((step, index) => (
+                <li key={step.step}>
+                  <button aria-current={active === index ? "step" : undefined} aria-controls={"guide-step-" + step.step} onClick={() => goTo(index)}>
+                    <span>{String(step.step).padStart(2, "0")}</span>{step.title}
+                  </button>
+                </li>
+              ))}
+            </ol>
+          </nav>
+
+          <p className={styles.srOnly} id="guide-keyboard">좌우 방향키로 이전·다음 단계를, Home과 End 키로 처음·마지막 단계를 볼 수 있습니다.</p>
+          <div className={styles.rail} ref={railRef} role="region" aria-roledescription="슬라이드" aria-label="단계별 상세 가이드" aria-describedby="guide-keyboard" tabIndex={0}
+            onScroll={() => {
+              const rail = railRef.current;
+              if (!rail) return;
+              const index = Math.max(0, Math.min(GUIDE_STEPS.length - 1, Math.round(rail.scrollLeft / rail.clientWidth)));
+              activeRef.current = index;
+              setActive(index);
+            }}
+            onKeyDown={(event) => {
+              const next = event.key === "ArrowRight" ? active + 1 : event.key === "ArrowLeft" ? active - 1 : event.key === "Home" ? 0 : event.key === "End" ? GUIDE_STEPS.length - 1 : null;
+              if (next !== null) { event.preventDefault(); goTo(next); }
+            }}
+          >
+            {GUIDE_STEPS.map((step, index) => {
+              const Icon = step.icon;
+              return (
+                <article key={step.step} id={"guide-step-" + step.step} className={styles.chapter} aria-labelledby={"guide-heading-" + step.step} aria-hidden={active !== index} inert={active !== index}>
+                  <div className={styles.overview}>
+                    <div className={styles.chapterMark}><span aria-hidden="true">{String(step.step).padStart(2, "0")}</span><Icon size={30} strokeWidth={1.35} aria-hidden="true" /></div>
+                    <div className={styles.chapterLabel}>STEP {String(step.step).padStart(2, "0")} <span><Clock3 size={12} /> 예상 {step.time}</span></div>
+                    <h2 id={"guide-heading-" + step.step}>{step.title}</h2>
+                    <p>{step.desc}</p>
+                    <span className={styles.chapterSubtitle}>{index === 0 ? "거창한 아이디어보다, 가까운 불편함부터." : index === 1 ? "무엇을 만들지보다, 왜 필요한지부터." : index === 2 ? "만드는 사람의 생각에서, 쓰는 사람의 입장으로." : index === 3 ? "할 수 있는 모든 것보다, 꼭 필요한 기능부터." : index === 4 ? "흩어진 생각을, 하나의 설득력 있는 이야기로." : "마지막 점검이, 기획의 완성도를 높여줘요."}</span>
                   </div>
-                  <div>
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="text-[10px] font-mono font-semibold" style={{ color }}> STEP {String(s.step).padStart(2, "0")}</span>
-                        <span className="text-[10px] border border-[#EBE7E0] text-[#ADA8A0] px-2.5 py-0.5 rounded-full bg-[#F4F1EC]">예상 {s.time}</span>
-                      </div>
-                      <h3 className="text-base font-bold text-[#1A1A1A] tracking-tight mb-1">{s.title}</h3>
-                      <p className="text-xs text-[#7A7067] mb-4 leading-relaxed">{s.desc}</p>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        {s.tips.map((tip, i) => (
-                          <div key={i} className="flex items-start gap-2 text-xs text-[#7A7067] bg-[#FBF9F6] rounded-xl px-3 py-2.5 border border-[#EBE7E0]">
-                            <div className="w-1 h-1 rounded-full flex-shrink-0 mt-1.5" style={{ backgroundColor: color }} />
-                            <span className="leading-relaxed">{tip}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                </div>
-              </ScrollReveal>
-            );
-          })}
-        </div>
+                  <div className={styles.detail}>
+                    <h3>이렇게 해보세요 <span>작은 질문부터 차근차근</span></h3>
+                    <ol className={styles.tips}>
+                      {step.tips.map((tip, tipIndex) => <li key={tip}><span>{String(tipIndex + 1).padStart(2, "0")}</span><p>{tip}</p><Check size={14} strokeWidth={1.5} aria-hidden="true" /></li>)}
+                    </ol>
+                    <div className={styles.outcome}><p className={styles.outcomeLabel}>이 단계에서 남길 것</p><h3>{OUTCOMES[index].title}</h3><p className={styles.example}><span>예를 들면</span>{OUTCOMES[index].example}</p></div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
 
-        <ScrollReveal>
-          <div className="mt-10 relative overflow-hidden bg-[#D4547A] rounded-3xl p-10 text-center">
-            <div className="absolute top-0 right-0 w-72 h-72 bg-white blob opacity-10 pointer-events-none" />
-            <div className="relative z-10">
-              <p className="text-white/70 text-xs font-medium tracking-widest uppercase mb-4">지금 바로</p>
-              <h2 className="text-2xl font-bold text-white tracking-tight mb-3">시작할 준비가 됐나요?</h2>
-              <p className="text-sm text-white/70 mb-8 leading-relaxed">AI 멘토가 첫 질문부터 마지막 제출까지 함께해요.</p>
-              <Link href="/dashboard" className="inline-flex items-center gap-2 bg-white text-[#D4547A] px-6 py-3 rounded-full text-sm font-semibold hover:bg-[#FBF9F6] transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_24px_rgba(0,0,0,0.12)]">
-                무료로 시작하기 <ArrowRight className="w-4 h-4" />
-              </Link>
+          <div className={styles.readerFooter}>
+            <div className={styles.position} role="status" aria-live="polite" aria-atomic="true"><span>{String(active + 1).padStart(2, "0")}</span><span>/ 06</span><p>{GUIDE_STEPS[active].title}</p></div>
+            <div className={styles.progress} aria-hidden="true">{GUIDE_STEPS.map((step, index) => <span key={step.step} className={index <= active ? styles.reached : undefined} />)}</div>
+            <div className={styles.controls}>
+              <button onClick={() => goTo(active - 1)} disabled={active === 0} aria-label="이전 단계"><ArrowLeft size={18} /></button>
+              <button onClick={() => goTo(active + 1)} disabled={active === GUIDE_STEPS.length - 1} aria-label="다음 단계"><ArrowRight size={18} /></button>
             </div>
           </div>
-        </ScrollReveal>
+        </section>
+
+        <section className={styles.start}>
+          <div><p className={base.eyebrow}>{active === 5 ? "이제, 나의 기획을 시작할 시간" : "읽는 것에서, 만드는 것으로"}</p><h2>작은 생각 하나면 시작할 수 있어요.</h2><p>완벽한 아이디어가 없어도 괜찮아요. 첫 질문부터 함께 정리해봐요.</p></div>
+          <Link href="/dashboard" className={base.primary}>내 아이디어 기획하기 <ArrowRight size={16} /></Link>
+        </section>
+        <footer className={styles.footer}><span>PlanCraft · 생각에서 기획까지</span><span>YOUR IDEA, ONE STEP CLOSER.</span></footer>
       </main>
     </div>
   );

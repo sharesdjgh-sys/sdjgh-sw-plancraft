@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PlanCraft · 대시보드 Before / After</title>
+  <link rel="icon" href="data:,">
+  <style>
+    *{box-sizing:border-box}body{margin:0;padding:28px;background:#FBF9F6;color:#1A1A1A;font-family:"Malgun Gothic",sans-serif}header,main,footer{max-width:1500px;margin:auto}header{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:24px}h1{font-size:24px;margin:0 0 10px}p{font-size:13px;line-height:1.8;color:#7A7067}nav{display:flex;gap:10px;flex-wrap:wrap}select{padding:11px;border:1px solid #EBE7E0;background:white;border-radius:6px;color:#7A7067;font:inherit;font-size:12px}.pair{display:grid;grid-template-columns:1fr 1fr;gap:24px}.pair.mobile{max-width:850px}figure{margin:0;min-width:0}figcaption{font-size:13px;margin-bottom:12px}strong{display:inline-block;margin-right:9px;padding:5px 9px;border:1px solid #EBE7E0;border-radius:4px;font-size:11px}.after strong{background:#FCEEF3;color:#B8405F}img{display:block;width:100%;height:auto;border:1px solid #EBE7E0;border-radius:8px}footer{margin-top:24px}a{color:#B8405F}a:focus-visible,select:focus-visible{outline:3px solid #D4547A;outline-offset:4px}label{display:flex;align-items:center;gap:7px;font-size:12px;color:#7A7067}@media(max-width:900px){header{align-items:flex-start;flex-direction:column}}@media(max-width:700px){body{padding:20px 14px}.pair{grid-template-columns:1fr}h1{font-size:21px}}
+  </style>
+</head>
+<body>
+  <header>
+    <div><h1>프로젝트 대시보드</h1><p>같은 프로젝트 데이터와 화면 크기로 비교했습니다.<br>이미지를 누르면 원본 크기로 볼 수 있습니다.</p></div>
+    <nav aria-label="비교 조건">
+      <label>상태 <select id="state"><option value="">프로젝트 목록</option><option value="empty-">첫 사용 화면</option></select></label>
+      <label>화면 <select id="mode"><option value="desktop">PC · 1440 × 1000</option><option value="mobile">모바일 · 390 × 844</option></select></label>
+    </nav>
+  </header>
+  <main class="pair" id="pair">
+    <figure><figcaption><strong>BEFORE</strong>변경 전</figcaption><a id="before-link" href="dashboard-before-desktop.png" target="_blank"><img id="before" src="dashboard-before-desktop.png" alt="변경 전 대시보드"></a></figure>
+    <figure class="after"><figcaption><strong>AFTER</strong>변경 후</figcaption><a id="after-link" href="dashboard-after-desktop.png" target="_blank"><img id="after" src="dashboard-after-desktop.png" alt="변경 후 대시보드"></a></figure>
+  </main>
+  <footer><p>기존 색상·로고 유지 · 단계별 기획 화면과 같은 작업 공간 · 목록 중심 구성 · 상태 필터·검색·정렬 · 시작 안내</p><p><a href="http://localhost:3000/dashboard?type=general">실제 대시보드 열기</a> · <a href="index.html">01~06 단계 비교</a></p></footer>
+  <script>
+    (()=>{const state=document.getElementById('state'),mode=document.getElementById('mode');function render(){document.getElementById('pair').classList.toggle('mobile',mode.value==='mobile');for(const version of ['before','after']){const file='dashboard-'+version+'-'+state.value+mode.value+'.png';document.getElementById(version).src=file;document.getElementById(version+'-link').href=file;}}state.addEventListener('change',render);mode.addEventListener('change',render);})();
+  </script>
+</body>
+</html>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useSyncExternalStore } from "react";
-import { getProject, PROJECTS_CHANGED_EVENT } from "./storage";
+import { getProject, getProjects, PROJECTS_CHANGED_EVENT } from "./storage";
 
 function subscribe(onChange: () => void) {
   window.addEventListener(PROJECTS_CHANGED_EVENT, onChange);
@@ -20,4 +20,10 @@ const getServerSnapshot = () => null;
 export function useProject(id: string) {
   const snapshot = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   return useMemo(() => snapshot === null ? undefined : getProject(id), [id, snapshot]);
+}
+
+/** Read the latest project list after hydration and whenever storage changes. */
+export function useProjects() {
+  const snapshot = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  return useMemo(() => snapshot === null ? undefined : getProjects(), [snapshot]);
 }

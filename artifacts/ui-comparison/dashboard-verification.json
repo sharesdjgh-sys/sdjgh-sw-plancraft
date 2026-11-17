@@ -1,0 +1,41 @@
+{
+  "date": "2026-11-17",
+  "url": "http://localhost:3000/dashboard?type=general",
+  "conditions": {
+    "comparisonProjects": 3,
+    "desktop": "1440x1000",
+    "mobile": "390x844",
+    "additionalWidths": [320, 768, 1024],
+    "originalBrandingPreserved": true,
+    "testDataRemoved": true,
+    "liveAiCalls": 0
+  },
+  "passed": [
+    "No horizontal overflow at all tested widths",
+    "Create/edit modal fits 320px screen and focuses title",
+    "Active/completed filters and reset",
+    "Search by title, author, genre and program",
+    "Recent update, progress and deadline sorting",
+    "Progress: stage01=0%, stage03=33%, completed=100%",
+    "Resume link points to last saved stage",
+    "Whitespace-only title rejected",
+    "Edit preserves createdAt and userType, updates recent order",
+    "Delete cancellation preserves project; confirmation removes it",
+    "Create trims title, uses query mode and opens step01",
+    "General/student modal labels",
+    "Folder connection optional; cancelling picker still opens project",
+    "Full JSON backup download and contents",
+    "Invalid import preserves stored data",
+    "Single-project import updates list immediately",
+    "Empty state and first-project guidance",
+    "TypeScript noEmit",
+    "ESLint: 0 errors, 7 existing native-image warnings",
+    "git diff --check",
+    "Fresh dashboard navigation: no browser console errors"
+  ],
+  "limits": [
+    "Real directory selection and disk writing were not performed",
+    "Production build was not rerun; a prior build was blocked by Google Fonts network access"
+  ],
+  "versionControl": "Local commit only; no push"
+}

@@ -1,0 +1,28 @@
+{
+  "date": "2026-11-17",
+  "url": "http://localhost:3000/guide",
+  "comparisonViewports": ["1440x1000", "390x844"],
+  "overflowCheckedWidths": [320, 390, 768, 1024, 1440],
+  "passed": [
+    "All six chapter navigation buttons and content",
+    "Previous and next controls with disabled endpoints",
+    "Vertical mouse wheel moves horizontally in reader",
+    "Wheel burst advances a single chapter",
+    "At the last chapter, vertical wheel returns to page scrolling",
+    "Real touch events swipe from step01 to step02",
+    "ArrowRight, Home and End keyboard navigation",
+    "Only current chapter exposed to assistive technology",
+    "Live position announcement and visible selected mobile navigation",
+    "Viewport resize preserves selected chapter",
+    "Reduced motion navigation",
+    "No page horizontal overflow at checked widths",
+    "TypeScript noEmit",
+    "ESLint: 0 errors, 6 existing native-image warnings"
+  ],
+  "notes": [
+    "Original six stages and tips preserved",
+    "Original PlanCraft cream/rose branding and logo preserved",
+    "No AI calls or project data modifications",
+    "Local commit only; no push"
+  ]
+}

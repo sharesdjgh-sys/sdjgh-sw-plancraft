@@ -1,408 +1,263 @@
 "use client";
 
-import { useState, useEffect, useRef, Suspense } from "react";
+import { Suspense, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Input } from "@/components/ui/input";
-import { STEPS, GENRES } from "@/lib/utils";
-import { Plus, ChevronRight, X, Trophy, Download, Upload, Trash2, User, Pencil, Search } from "lucide-react";
-import { getProjects, createProject, deleteProject, updateProject, type Project, type UserType } from "@/lib/storage";
+import * as Dialog from "@radix-ui/react-dialog";
+import { ArrowRight, BookOpen, Check, ChevronRight, Download, LayoutGrid, Loader2, Pencil, Plus, Search, Trash2, Upload, X } from "lucide-react";
+import { GENRES, STEPS } from "@/lib/utils";
+import { createProject, deleteProject, updateProject, type Project, type UserType } from "@/lib/storage";
+import { useProjects } from "@/lib/use-project";
+import { getDaysUntil, getProjectHref, getProjectProgress } from "@/lib/project-status";
 import { exportAllProjects, importProjects } from "@/lib/download";
-import { isFileSystemAccessSupported, requestDirectory } from "@/lib/fileStorage";
-
-const STEP_ROUTES = ["idea", "story", "characters", "episodes", "script", "submit"];
-
-function getProjectHref(p: Project) {
-  const route = STEP_ROUTES[Math.min(p.currentStep, STEP_ROUTES.length) - 1];
-  return `/project/${p.id}/${route}`;
-}
-
-function getDday(deadline: string): { label: string; urgent: boolean; warning: boolean } | null {
-  if (!deadline) return null;
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const due = new Date(deadline);
-  due.setHours(0, 0, 0, 0);
-  const diff = Math.round((due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-  if (diff < 0) return { label: `D+${Math.abs(diff)}`, urgent: true, warning: false };
-  if (diff === 0) return { label: "D-Day", urgent: true, warning: false };
-  return {
-    label: `D-${diff}`,
-    urgent: diff <= 3,
-    warning: diff <= 7,
-  };
-}
+import { clearDirectory, isFileSystemAccessSupported, requestDirectory } from "@/lib/fileStorage";
+import base from "@/app/project/[id]/idea/idea.module.css";
+import styles from "./dashboard.module.css";
 
 type FormState = { title: string; author: string; genre: string; targetCompetition: string; deadline: string; userType: UserType };
+type Filter = "all" | "active" | "completed";
+type Sort = "recent" | "progress" | "deadline";
 const EMPTY_FORM: FormState = { title: "", author: "", genre: "", targetCompetition: "", deadline: "", userType: "student" };
+
+function updatedTime(project: Project) {
+  return Date.parse(project.updatedAt ?? project.createdAt) || 0;
+}
+
+function formatDate(value: string, dateOnly = false) {
+  const date = new Date(dateOnly ? value + "T00:00:00" : value);
+  if (!Number.isFinite(date.getTime())) return "미정";
+  return [date.getFullYear(), String(date.getMonth() + 1).padStart(2, "0"), String(date.getDate()).padStart(2, "0")].join(".");
+}
 
 function DashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const preferredUserType: UserType = searchParams.get("type") === "general" ? "general" : "student";
-  const [projects, setProjects] = useState<Project[]>([]);
+  const stored = useProjects();
+  const projects = stored ?? [];
+  const [filter, setFilter] = useState<Filter>("all");
+  const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState<Sort>("recent");
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [creating, setCreating] = useState(false);
-  const [search, setSearch] = useState("");
-  const [sortBy, setSortBy] = useState<"recent" | "progress" | "deadline">("recent");
+  const [connectFolder, setConnectFolder] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<Project | null>(null);
+  const [formError, setFormError] = useState("");
+  const [deleteError, setDeleteError] = useState("");
+  const [notice, setNotice] = useState("");
   const importRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    setProjects(getProjects());
-  }, []);
-
-  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    try {
-      await importProjects(file);
-      setProjects(getProjects());
-    } catch (err) {
-      alert(err instanceof Error ? err.message : "가져오기 실패");
+  const completed = projects.filter((project) => project.isCompleted).length;
+  const active = projects.length - completed;
+  const term = search.trim().toLocaleLowerCase();
+  const filtered = projects.filter((project) => {
+    const matchesState = filter === "all" || (filter === "completed" ? project.isCompleted : !project.isCompleted);
+    return matchesState && [project.title, project.author, project.genre, project.targetCompetition].some((value) => String(value ?? "").toLocaleLowerCase().includes(term));
+  }).sort((a, b) => {
+    if (sortBy === "progress") return getProjectProgress(b) - getProjectProgress(a) || updatedTime(b) - updatedTime(a);
+    if (sortBy === "deadline") {
+      const difference = (a.isCompleted ? Infinity : getDaysUntil(a.deadline) ?? Infinity) - (b.isCompleted ? Infinity : getDaysUntil(b.deadline) ?? Infinity);
+      if (Number.isFinite(difference) && difference !== 0) return difference;
+      if (difference === -Infinity || difference === Infinity) return difference;
     }
-    e.target.value = "";
-  };
+    return updatedTime(b) - updatedTime(a);
+  });
 
-  const openCreate = () => {
+  function openCreate() {
     setEditingId(null);
     setForm({ ...EMPTY_FORM, userType: preferredUserType });
+    setConnectFolder(false);
+    setFormError("");
     setShowModal(true);
-  };
+  }
 
-  const openEdit = (e: React.MouseEvent, p: Project) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setEditingId(p.id);
-    setForm({
-      title: p.title,
-      author: p.author ?? "",
-      genre: p.genre ?? "",
-      targetCompetition: p.targetCompetition ?? "",
-      deadline: p.deadline ?? "",
-      userType: p.userType ?? "student",
-    });
+  function openEdit(project: Project) {
+    setEditingId(project.id);
+    setForm({ title: project.title, author: project.author ?? "", genre: project.genre ?? "", targetCompetition: project.targetCompetition ?? "", deadline: project.deadline ?? "", userType: project.userType ?? "student" });
+    setConnectFolder(false);
+    setFormError("");
     setShowModal(true);
-  };
+  }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!form.title) return;
+  async function handleSubmit(event: React.FormEvent) {
+    event.preventDefault();
+    if (creating) return;
+    if (!form.title.trim()) { setFormError("프로젝트 제목을 입력해주세요."); return; }
     setCreating(true);
-    if (editingId) {
-      updateProject(editingId, form);
-      setProjects(getProjects());
-      setShowModal(false);
-      setCreating(false);
-    } else {
-      const p = createProject(form);
-      setProjects(getProjects());
-      setShowModal(false);
-      setForm({ ...EMPTY_FORM, userType: preferredUserType });
-      setCreating(false);
-      if (isFileSystemAccessSupported()) {
-        await requestDirectory(p.id);
+    setFormError("");
+    try {
+      const data = { ...form, title: form.title.trim(), author: form.author.trim(), targetCompetition: form.targetCompetition.trim() };
+      if (editingId) {
+        updateProject(editingId, data);
+        setShowModal(false);
+        setNotice("프로젝트 정보를 저장했어요.");
+      } else {
+        const project = createProject(data);
+        if (connectFolder && isFileSystemAccessSupported()) await requestDirectory(project.id);
+        setShowModal(false);
+        router.push(getProjectHref(project));
       }
-      router.push(`/project/${p.id}/idea`);
-    }
-  };
+    } catch {
+      setFormError("저장하지 못했어요. 브라우저 저장 공간과 설정을 확인해주세요.");
+    } finally { setCreating(false); }
+  }
 
-  const selectClass =
-    "flex h-11 w-full rounded-xl border border-[#EBE7E0] bg-white px-4 py-2 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-[#D4547A]/20 focus:border-[#D4547A]/40 transition-all duration-200";
+  async function handleImport(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try { await importProjects(file); setNotice("프로젝트를 가져왔어요. 같은 프로젝트는 백업 파일의 내용으로 업데이트됩니다."); }
+    catch (error) { setNotice(error instanceof Error ? error.message : "백업 파일을 가져오지 못했어요."); }
+    finally { event.target.value = ""; }
+  }
 
-  const filtered = projects
-    .filter((p) => p.title.toLowerCase().includes(search.toLowerCase()))
-    .sort((a, b) => {
-      if (sortBy === "progress") return b.currentStep - a.currentStep;
-      if (sortBy === "deadline") {
-        if (!a.deadline && !b.deadline) return 0;
-        if (!a.deadline) return 1;
-        if (!b.deadline) return -1;
-        return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
-      }
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    });
+  function handleExport() {
+    try { exportAllProjects(); setNotice("전체 프로젝트의 백업 파일을 다운로드했어요."); }
+    catch { setNotice("백업 파일을 만들지 못했어요. 다시 시도해주세요."); }
+  }
+
+  async function handleDelete() {
+    if (!deleteTarget || deleting) return;
+    setDeleting(true);
+    setDeleteError("");
+    try {
+      deleteProject(deleteTarget.id);
+      await clearDirectory(deleteTarget.id);
+      setDeleteTarget(null);
+      setNotice("프로젝트를 삭제했어요.");
+    } catch { setDeleteError("삭제하지 못했어요. 다시 시도해주세요."); }
+    finally { setDeleting(false); }
+  }
+
+  const dashboardHref = preferredUserType === "general" ? "/dashboard?type=general" : "/dashboard?type=student";
+  const backupButtons = <>
+    <button onClick={() => importRef.current?.click()}><Upload size={14} /> 백업 가져오기</button>
+    <button onClick={handleExport} disabled={projects.length === 0}><Download size={14} /> 전체 백업</button>
+  </>;
 
   return (
-    <div className="min-h-screen bg-[#FBF9F6]">
-      {/* Header */}
-      <header className="bg-white border-b border-[#EBE7E0] px-6 py-4 sticky top-0 z-40">
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <img src="/plancraft-logo-remove.png" className="w-6 h-6 rounded-lg object-cover" alt="PlanCraft" />
-            <span className="text-sm font-semibold text-[#1A1A1A] tracking-tight">PlanCraft</span>
-          </Link>
-          <div className="flex items-center gap-2">
-            <input ref={importRef} type="file" accept=".json" className="hidden" onChange={handleImport} />
-            <button
-              onClick={() => importRef.current?.click()}
-              className="flex items-center gap-1.5 text-xs text-[#7A7067] hover:text-[#1A1A1A] px-3 py-1.5 rounded-full border border-[#EBE7E0] hover:bg-[#F4F1EC] transition-all duration-200"
-            >
-              <Upload className="w-3 h-3" /> 가져오기
-            </button>
-            <button
-              onClick={exportAllProjects}
-              className="flex items-center gap-1.5 text-xs text-[#7A7067] hover:text-[#1A1A1A] px-3 py-1.5 rounded-full border border-[#EBE7E0] hover:bg-[#F4F1EC] transition-all duration-200"
-            >
-              <Download className="w-3 h-3" /> 내보내기
-            </button>
-            <Link href="/guide" className="text-xs text-[#7A7067] hover:text-[#1A1A1A] transition-colors px-3 py-1.5">
-              가이드
-            </Link>
-            <span className="text-[10px] px-2.5 py-1 rounded-full bg-[#F4F1EC] border border-[#EBE7E0] text-[#7A7067]">
-              {preferredUserType === "general" ? "선생님·일반인 모드" : "학생 모드"}
-            </span>
-          </div>
-        </div>
+    <div className={base.page}>
+      <input ref={importRef} type="file" accept=".json,application/json" aria-label="프로젝트 백업 파일 선택" hidden onChange={handleImport} />
+      <header className={base.header + " " + styles.header}>
+        <Link href="/" className={base.brand}><Image src="/plancraft-logo-remove.png" width={29} height={29} alt="" unoptimized /><span>PlanCraft</span></Link>
+        <div className={base.breadcrumb}><span>내 작업 공간</span><ChevronRight size={13} /><span>프로젝트</span></div>
+        <span className={styles.mode}>{preferredUserType === "general" ? "선생님·일반인 모드" : "학생 모드"}</span>
       </header>
 
-      <main className="max-w-5xl mx-auto px-6 py-10">
-        {/* Welcome */}
-        <div className="flex items-end justify-between mb-8">
-          <div>
-            <p className="text-xs font-medium text-[#D4547A] mb-1">생각을 아이디어로 만들어보세요</p>
-            <h1 className="text-2xl font-bold text-[#1A1A1A] tracking-tight">내 소프트웨어 아이디어 목록</h1>
+      <div className={base.layout}>
+        <aside className={base.sidebar + " " + styles.sidebar}>
+          <p className={base.sidebarLabel}>나의 작업 공간</p>
+          <nav className={base.steps} aria-label="작업 공간 메뉴">
+            <Link href={dashboardHref} className={base.activeStep} aria-current="page"><LayoutGrid size={16} /> 프로젝트 <span className={styles.navCount}>{projects.length}</span></Link>
+            <Link href="/guide"><BookOpen size={16} /> 사용 가이드</Link>
+          </nav>
+          <div className={styles.sidebarFooter}>
+            <p className={styles.toolsLabel}>데이터 보관</p>
+            <div className={styles.backupTools}>{backupButtons}</div>
+            <p className={styles.localNote}>프로젝트는 현재 브라우저에 저장돼요.<br />백업 파일을 따로 보관해주세요.</p>
           </div>
-          <button
-            onClick={openCreate}
-            className="flex items-center gap-2 bg-[#D4547A] text-white text-sm font-medium px-4 py-2.5 rounded-full hover:bg-[#B8405F] transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_16px_rgba(212,84,122,0.25)]"
-          >
-            <Plus className="w-4 h-4" /> 새 프로젝트
-          </button>
-        </div>
+        </aside>
 
-        {/* Search & Sort */}
-        {projects.length > 0 && (
-          <div className="flex items-center gap-3 mb-5">
-            <div className="relative flex-1 max-w-xs">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#ADA8A0]" />
-              <input
-                type="text"
-                placeholder="프로젝트 검색..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-9 pr-3 h-9 rounded-xl border border-[#EBE7E0] bg-white text-xs text-[#1A1A1A] placeholder-[#ADA8A0] focus:outline-none focus:ring-2 focus:ring-[#D4547A]/20 focus:border-[#D4547A]/40 transition-all duration-200"
-              />
-            </div>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-              className="h-9 px-3 rounded-xl border border-[#EBE7E0] bg-white text-xs text-[#7A7067] focus:outline-none focus:ring-2 focus:ring-[#D4547A]/20 transition-all duration-200"
-            >
-              <option value="recent">최근 순</option>
-              <option value="progress">진행률 순</option>
-              <option value="deadline">마감 임박 순</option>
-            </select>
+        <main className={styles.main}>
+          <div className={styles.heading}>
+            <div><p className={base.eyebrow}>나의 작업 공간 · 생각을 기획으로</p><h1>내 프로젝트</h1><p>떠오른 생각을 기록하고, 나만의 기획서로 구체화해보세요.</p></div>
+            <button className={base.primary} onClick={openCreate}><Plus size={16} /> 새 프로젝트</button>
           </div>
-        )}
+          <div className={styles.mobileTools}>{backupButtons}<Link href="/guide"><BookOpen size={14} /> 사용 가이드</Link></div>
 
-        {/* Modal */}
-        {showModal && (
-          <div className="fixed inset-0 bg-black/25 backdrop-blur-sm z-50 flex items-center justify-center px-4">
-            <div className="bg-white rounded-3xl p-8 w-full max-w-lg shadow-[0_24px_80px_rgba(0,0,0,0.12)] border border-[#EBE7E0]">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h2 className="text-lg font-bold text-[#1A1A1A] tracking-tight">
-                    {editingId ? "프로젝트 정보 수정" : "새 SW 아이디어 프로젝트"}
-                  </h2>
-                  <p className="text-xs text-[#ADA8A0] mt-0.5">
-                    {editingId ? "수정할 내용을 입력해주세요." : "어떤 문제를 해결하고 싶으신가요?"}
-                  </p>
+          {notice && <div className={styles.notice} role="status"><p>{notice}</p><button onClick={() => setNotice("")} aria-label="알림 닫기"><X size={16} /></button></div>}
+
+          {projects.length > 0 && (
+            <>
+              <div className={styles.toolbar}>
+                <div className={styles.filters} role="group" aria-label="프로젝트 상태 필터">
+                  {([{ value: "all", label: "전체", count: projects.length }, { value: "active", label: "작성 중", count: active }, { value: "completed", label: "완료", count: completed }] as const).map((item) => <button key={item.value} aria-pressed={filter === item.value} onClick={() => setFilter(item.value)}>{item.label}<span>{item.count}</span></button>)}
                 </div>
-                <button onClick={() => setShowModal(false)} className="text-[#ADA8A0] hover:text-[#7A7067] transition-colors">
-                  <X className="w-5 h-5" />
-                </button>
+                <div className={styles.searchSort}>
+                  <div className={styles.search}><Search size={15} /><label className={styles.srOnly} htmlFor="project-search">프로젝트 검색</label><input id="project-search" value={search} placeholder="제목, 작성자, 분야 검색" onChange={(event) => setSearch(event.target.value)} />{search && <button aria-label="검색어 지우기" onClick={() => setSearch("")}><X size={14} /></button>}</div>
+                  <label className={styles.srOnly} htmlFor="project-sort">프로젝트 정렬</label><select id="project-sort" value={sortBy} onChange={(event) => setSortBy(event.target.value as Sort)}><option value="recent">최근 수정 순</option><option value="progress">진행률 순</option><option value="deadline">일정 임박 순</option></select>
+                </div>
               </div>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-semibold text-[#1A1A1A] mb-1.5">프로젝트 제목 *</label>
-                    <Input
-                      placeholder="예: 급식 잔반 줄이기 앱"
-                      value={form.title}
-                      onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-[#1A1A1A] mb-1.5">팀/작성자 이름</label>
-                    <Input
-                      placeholder="예: 홍길동"
-                      value={form.author}
-                      onChange={(e) => setForm((f) => ({ ...f, author: e.target.value }))}
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-semibold text-[#1A1A1A] mb-1.5">SW 분야</label>
-                    <select
-                      value={form.genre}
-                      onChange={(e) => setForm((f) => ({ ...f, genre: e.target.value }))}
-                      className={selectClass}
-                    >
-                      <option value="">분야 선택</option>
-                      {GENRES.map((g) => (
-                        <option key={g} value={g}>{g}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-[#1A1A1A] mb-1.5">{form.userType === "general" ? "목표 출시일" : "마감일"}</label>
-                    <Input
-                      type="date"
-                      value={form.deadline}
-                      onChange={(e) => setForm((f) => ({ ...f, deadline: e.target.value }))}
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-[#1A1A1A] mb-1.5">{form.userType === "general" ? "관련 프로그램 / 강의명" : "참가 공모전명"}</label>
-                  <Input
-                    placeholder={form.userType === "general" ? "예: 방과후 AI 수업, 자유학기제 프로젝트" : "예: SW 아이디어 공모전"}
-                    value={form.targetCompetition}
-                    onChange={(e) => setForm((f) => ({ ...f, targetCompetition: e.target.value }))}
-                  />
-                </div>
-                <div className="flex gap-3 pt-2">
-                  <button
-                    type="submit"
-                    disabled={creating}
-                    className="flex-1 bg-[#D4547A] text-white h-11 rounded-full text-sm font-semibold hover:bg-[#B8405F] transition-all duration-300 disabled:opacity-50 shadow-[0_4px_16px_rgba(212,84,122,0.25)]"
-                  >
-                    {creating ? "저장 중..." : editingId ? "저장하기" : "시작하기"}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowModal(false)}
-                    className="h-11 px-5 rounded-full text-sm border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] transition-all duration-200"
-                  >
-                    취소
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
+              <div className={styles.listNote}><p>프로젝트를 선택하면 마지막 작업 단계에서 이어집니다.</p><span aria-live="polite">{filtered.length}개의 프로젝트</span></div>
+            </>
+          )}
 
-        {/* Projects */}
-        {projects.length === 0 ? (
-          <div className="text-center py-24 bg-white rounded-3xl border border-[#EBE7E0]">
-            <img src="/plancraft-logo-remove.png" className="w-14 h-14 rounded-2xl object-cover mx-auto mb-5" alt="" />
-            <p className="text-base font-bold text-[#1A1A1A] mb-1">아직 프로젝트가 없어요</p>
-            <p className="text-sm text-[#7A7067] mb-6">첫 번째 SW 아이디어 프로젝트를 만들어볼까요?</p>
-            <button
-              onClick={openCreate}
-              className="inline-flex items-center gap-2 bg-[#D4547A] text-white text-sm font-medium px-5 py-2.5 rounded-full hover:bg-[#B8405F] transition-all duration-300 shadow-[0_4px_16px_rgba(212,84,122,0.25)]"
-            >
-              <Plus className="w-4 h-4" /> 새 프로젝트 만들기
-            </button>
-          </div>
-        ) : filtered.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-3xl border border-[#EBE7E0]">
-            <p className="text-sm font-bold text-[#1A1A1A] mb-1">검색 결과가 없어요</p>
-            <p className="text-xs text-[#7A7067]">다른 검색어를 입력해보세요.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {filtered.map((p) => {
-              const progress = p.isCompleted ? 100 : Math.round((p.currentStep / STEPS.length) * 100);
-              const dday = getDday(p.deadline);
-              return (
-                <div key={p.id} className="relative group">
-                  <Link href={getProjectHref(p)}>
-                  <div className="bg-white rounded-2xl border border-[#EBE7E0] p-5 hover:border-[#D4547A]/30 hover:shadow-[0_4px_24px_rgba(212,84,122,0.08)] transition-all duration-300 cursor-pointer">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1 min-w-0 pr-2">
-                        <h3 className="text-sm font-bold text-[#1A1A1A] mb-1.5">{p.title}</h3>
-                        <div className="flex items-center gap-2 flex-wrap">
-                          {p.author && (
-                            <span className="flex items-center gap-1 text-[10px] text-[#D4547A] font-medium">
-                              <User className="w-3 h-3" /> {p.author}
-                            </span>
-                          )}
-                          {p.genre && (
-                            <span className="text-[10px] border border-[#EBE7E0] text-[#7A7067] px-2.5 py-1 rounded-full bg-[#F4F1EC]">
-                              {p.genre}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-1 flex-shrink-0 mt-0.5">
-                        {/* Edit button */}
-                        <button
-                          onClick={(e) => openEdit(e, p)}
-                          className="opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center w-6 h-6 rounded hover:bg-[#F4F1EC]"
-                          title="프로젝트 편집"
-                        >
-                          <Pencil className="w-3.5 h-3.5 text-[#ADA8A0] hover:text-[#7A7067]" />
-                        </button>
-                        {/* Chevron / Delete */}
-                        <div className="relative w-5 h-5">
-                          <ChevronRight className="w-4 h-4 text-[#EBE7E0] group-hover:opacity-0 transition-all duration-200 absolute inset-0" />
-                          <button
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              if (confirm(`"${p.title}" 프로젝트를 삭제할까요? 이 작업은 되돌릴 수 없어요.`)) {
-                                deleteProject(p.id);
-                                setProjects(getProjects());
-                              }
-                            }}
-                            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center rounded hover:bg-red-50"
-                            title="프로젝트 삭제"
-                          >
-                            <Trash2 className="w-3.5 h-3.5 text-[#ADA8A0] hover:text-red-400" />
-                          </button>
-                        </div>
-                      </div>
+          {stored === undefined ? <div className={styles.loading} role="status"><Loader2 size={22} className="animate-spin" /> 프로젝트를 불러오고 있어요.</div> : projects.length === 0 ? (
+            <section className={styles.empty} aria-labelledby="empty-title">
+              <Image src="/ideabot-remove.png" width={54} height={54} alt="" unoptimized />
+              <p className={base.eyebrow}>아이디어의 첫 페이지</p>
+              <h2 id="empty-title">작은 생각 하나부터 시작해요.</h2>
+              <p>프로젝트에 이름을 붙이면 준비 끝.<br />아이디어봇과 함께 해결하고 싶은 문제를 찾아보세요.</p>
+              <button className={base.primary} onClick={openCreate}><Plus size={16} /> 첫 프로젝트 시작하기</button>
+              <ol className={styles.startFlow}><li><span>01</span><strong>제목 정하기</strong><p>떠오르는 이름이면 충분해요.</p></li><li><span>02</span><strong>아이디어 꺼내기</strong><p>불편했던 경험부터 이야기해요.</p></li><li><span>03</span><strong>기획서로 구체화</strong><p>질문을 따라 한 단계씩 정리해요.</p></li></ol>
+            </section>
+          ) : filtered.length === 0 ? (
+            <section className={styles.noResults}><Search size={28} /><h2>조건에 맞는 프로젝트가 없어요</h2><p>다른 검색어를 입력하거나 상태 필터를 바꿔보세요.</p><button className={base.secondary} onClick={() => { setFilter("all"); setSearch(""); }}>검색·필터 초기화 <ArrowRight size={14} /></button></section>
+          ) : (
+            <section aria-label="내 프로젝트 목록">
+              <div className={styles.columnHead} aria-hidden="true"><span>프로젝트</span><span>진행 상황</span><span className={styles.scheduleHead}>일정</span><span>관리</span></div>
+              <ul className={styles.projectList}>
+                {filtered.map((project) => {
+                  const progress = getProjectProgress(project);
+                  const days = getDaysUntil(project.deadline);
+                  return <li key={project.id} className={styles.projectRow}>
+                    <Link className={styles.projectInfo} href={getProjectHref(project)} aria-label={project.title + (project.isCompleted ? " · 최종본 보기" : " · 이어서 작성")}>
+                      <div className={styles.titleLine}><h2>{project.title}</h2><span className={project.isCompleted ? styles.completed : styles.active}>{project.isCompleted ? <Check size={11} /> : <span />}{project.isCompleted ? "기획 완료" : "작성 중"}</span></div>
+                      <p className={styles.projectDescription}>{project.story.logline || (project.isCompleted ? "작성한 기획서를 확인해보세요." : "한 줄 소개를 적으며 아이디어를 구체화해보세요.")}</p>
+                      <div className={styles.projectMeta}><span>{project.genre || "분야 미지정"}</span>{project.author && <span>{project.author}</span>}{project.targetCompetition && <span>{project.targetCompetition}</span>}</div>
+                    </Link>
+                    <div className={styles.progress}><div><span>{project.isCompleted ? "최종 검토 완료" : STEPS[project.currentStep - 1]?.label}</span><strong>{progress}%</strong></div><div className={styles.progressTrack} role="progressbar" aria-label={project.title + " 단계 진행률"} aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100}><span style={{ width: progress + "%" }} /></div></div>
+                    <div className={styles.schedule}>
+                      {project.isCompleted ? <span>기획 완료</span> : days !== null ? <><span className={days <= 7 ? styles.urgent : styles.due}>{days < 0 ? (project.userType === "general" ? "목표일 지남" : "마감 지남") : days === 0 ? "오늘까지" : "D-" + days}</span><span>{formatDate(project.deadline, true)}</span></> : <span>일정 미정</span>}
+                      <small>수정 {formatDate(project.updatedAt ?? project.createdAt)}</small>
                     </div>
+                    <div className={styles.rowActions} role="group" aria-label={project.title + " 관리"}>
+                      <button onClick={() => openEdit(project)} aria-label={project.title + " 정보 수정"} title="프로젝트 정보 수정"><Pencil size={15} /></button>
+                      <button onClick={() => { setDeleteTarget(project); setDeleteError(""); }} aria-label={project.title + " 삭제"} title="프로젝트 삭제"><Trash2 size={15} /></button>
+                      <Link className={styles.openProject} href={getProjectHref(project)} aria-label={project.title + " 열기"} title="프로젝트 열기"><ArrowRight size={17} /></Link>
+                    </div>
+                  </li>;
+                })}
+              </ul>
+            </section>
+          )}
+          <footer className={styles.footer}><span>PlanCraft · 생각에서 기획까지</span><span>지금의 생각을 다음 작업으로 이어가세요.</span></footer>
+        </main>
+      </div>
 
-                    <div className="mb-3.5">
-                      <div className="flex justify-between text-xs mb-2">
-                        <span className="text-[#7A7067]">{STEPS[p.currentStep - 1]?.label ?? "완료"}</span>
-                        <span className="font-semibold text-[#D4547A]">{progress}%</span>
-                      </div>
-                      <div className="w-full bg-[#F4F1EC] rounded-full h-1.5">
-                        <div
-                          className="bg-[#D4547A] h-1.5 rounded-full transition-all duration-500"
-                          style={{ width: `${progress}%` }}
-                        />
-                      </div>
-                    </div>
+      <Dialog.Root open={showModal} onOpenChange={(open) => { if (!creating) setShowModal(open); }}>
+        <Dialog.Portal><Dialog.Overlay className={base.overlay} /><Dialog.Content className={base.dialog + " " + styles.projectDialog}>
+          <p className={base.eyebrow}>{editingId ? "프로젝트 설정" : "새로운 생각의 시작"}</p>
+          <Dialog.Title>{editingId ? "프로젝트 정보 수정" : "어떤 아이디어인가요?"}</Dialog.Title>
+          <Dialog.Description>{editingId ? "프로젝트의 기본 정보를 수정해주세요." : "제목만 입력하면 바로 시작할 수 있어요. 나머지 정보는 나중에 채워도 괜찮아요."}</Dialog.Description>
+          <form className={styles.form} onSubmit={handleSubmit}>
+            <div className={styles.field}><label htmlFor="dashboard-title">프로젝트 제목 <span>필수</span></label><input id="dashboard-title" value={form.title} onChange={(event) => setForm((value) => ({ ...value, title: event.target.value }))} placeholder="예: 학교 알림을 한곳에" maxLength={120} required /></div>
+            <div className={styles.formRow}><div className={styles.field}><label htmlFor="dashboard-author">작성자 또는 팀 이름</label><input id="dashboard-author" value={form.author} onChange={(event) => setForm((value) => ({ ...value, author: event.target.value }))} placeholder="이름 또는 팀 이름" /></div><div className={styles.field}><label htmlFor="dashboard-genre">아이디어 분야</label><select id="dashboard-genre" value={form.genre} onChange={(event) => setForm((value) => ({ ...value, genre: event.target.value }))}><option value="">나중에 선택</option>{GENRES.map((genre) => <option key={genre}>{genre}</option>)}</select></div></div>
+            <div className={styles.formRow}><div className={styles.field}><label htmlFor="dashboard-target">{form.userType === "general" ? "관련 프로그램·수업" : "참가 공모전"}</label><input id="dashboard-target" value={form.targetCompetition} onChange={(event) => setForm((value) => ({ ...value, targetCompetition: event.target.value }))} placeholder="선택 사항" /></div><div className={styles.field}><label htmlFor="dashboard-deadline">{form.userType === "general" ? "목표 완료일" : "마감일"}</label><input id="dashboard-deadline" type="date" value={form.deadline} onChange={(event) => setForm((value) => ({ ...value, deadline: event.target.value }))} /></div></div>
+            {!editingId && isFileSystemAccessSupported() && <label className={styles.folderOption}><input type="checkbox" checked={connectFolder} onChange={(event) => setConnectFolder(event.target.checked)} /><span>작성 내용을 저장할 폴더 연결 <small>선택</small></span></label>}
+            <p className={styles.formNote}>{form.userType === "general" ? "선생님·일반인" : "학생"} 모드 · 프로젝트는 현재 브라우저에 저장됩니다.</p>
+            {formError && <p className={styles.formError} role="alert">{formError}</p>}
+            <div className={styles.formActions}><Dialog.Close type="button" disabled={creating} className={base.secondary}>취소</Dialog.Close><button type="submit" className={base.primary} disabled={creating}>{creating ? <Loader2 size={14} className="animate-spin" /> : editingId ? <Check size={14} /> : <Plus size={14} />}{creating ? "저장 중..." : editingId ? "변경 사항 저장" : "프로젝트 시작하기"}</button></div>
+          </form>
+          <Dialog.Close className={base.close} disabled={creating} aria-label="프로젝트 창 닫기"><X size={19} /></Dialog.Close>
+        </Dialog.Content></Dialog.Portal>
+      </Dialog.Root>
 
-                    <div className="flex items-center gap-3">
-                      {p.targetCompetition && (
-                        <div className="flex items-center gap-1 text-xs text-[#D4547A]">
-                          <Trophy className="w-3 h-3" />
-                          <span className="truncate max-w-[140px]">{p.targetCompetition}</span>
-                        </div>
-                      )}
-                      {dday && (
-                        <p className={`text-xs ml-auto font-semibold ${
-                          dday.urgent ? "text-red-500" : dday.warning ? "text-orange-400" : "text-[#ADA8A0]"
-                        }`}>
-                          {dday.label}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                  </Link>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </main>
+      <Dialog.Root open={deleteTarget !== null} onOpenChange={(open) => { if (!open && !deleting) setDeleteTarget(null); }}>
+        <Dialog.Portal><Dialog.Overlay className={base.overlay} /><Dialog.Content className={base.dialog}>
+          <p className={base.eyebrow}>프로젝트 관리</p><Dialog.Title>프로젝트를 삭제할까요?</Dialog.Title><Dialog.Description>‘{deleteTarget?.title}’ 프로젝트가 이 브라우저에서 삭제됩니다. 이 작업은 되돌릴 수 없으니 필요한 내용은 먼저 백업해주세요.</Dialog.Description>
+          {deleteError && <p className={styles.formError} role="alert">{deleteError}</p>}
+          <div className={base.dialogActions}><Dialog.Close disabled={deleting} className={base.secondary}>취소</Dialog.Close><button onClick={handleDelete} disabled={deleting} className={base.primary}>{deleting ? "삭제 중..." : "프로젝트 삭제"}</button></div>
+          <Dialog.Close className={base.close} disabled={deleting} aria-label="삭제 창 닫기"><X size={19} /></Dialog.Close>
+        </Dialog.Content></Dialog.Portal>
+      </Dialog.Root>
     </div>
   );
 }
 
 export default function DashboardPage() {
-  return (
-    <Suspense fallback={<div className="min-h-screen bg-[#FBF9F6]" />}>
-      <DashboardContent />
-    </Suspense>
-  );
+  return <Suspense fallback={<main className={base.status} role="status">작업 공간을 준비하고 있어요.</main>}><DashboardContent /></Suspense>;
 }
