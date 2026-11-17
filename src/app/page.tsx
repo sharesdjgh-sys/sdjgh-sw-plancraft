@@ -1,10 +1,12 @@
 import Link from "next/link";
 import {
   ArrowRight, Lightbulb, Target, Users, Cpu,
-  PenLine, Trophy, Star, Heart, GraduationCap, BookOpen
+  PenLine, Trophy, Heart, GraduationCap, BookOpen
 } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
 import BrandMark from "@/components/brand/BrandMark";
+import HeroIdeaScene from "@/components/home/HeroIdeaScene";
+import styles from "./home.module.css";
 
 const STEP_COLORS = [
   "#D4547A", // 01 Rose
@@ -29,7 +31,7 @@ export default function HomePage() {
     <div className="min-h-screen bg-[#FBF9F6] text-[#1A1A1A] overflow-x-hidden">
 
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 h-[65px] flex items-center justify-between px-4 sm:px-8 bg-[#FBF9F6]/85 backdrop-blur-xl border-b border-[#EBE7E0]">
+      <nav className={styles.navigation + " fixed top-0 left-0 right-0 z-50 h-[65px] flex items-center justify-between px-4 sm:px-8 bg-[#FBF9F6]/85 backdrop-blur-xl border-b border-[#EBE7E0]"}>
         <Link href="/" aria-label="PlanCraft 홈"><BrandMark /></Link>
         <div className="flex items-center gap-2 sm:gap-5">
           <Link href="/guide" className="text-xs sm:text-sm text-[#7A7067] hover:text-[#1A1A1A] transition-colors duration-200">
@@ -45,124 +47,28 @@ export default function HomePage() {
       </nav>
 
       {/* Hero */}
-      <section className="relative min-h-[100dvh] flex items-center px-8 pt-20 overflow-hidden">
-        {/* Decorative blobs */}
-        <div className="absolute top-24 right-[8%] w-[420px] h-[420px] bg-[#D4547A] blob blob-anim pointer-events-none" />
-        <div className="absolute bottom-12 left-[5%] w-[280px] h-[280px] bg-[#E8C9A0] blob pointer-events-none opacity-25" />
-
-        <div className="relative z-10 max-w-6xl mx-auto w-full grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-16 items-center py-16">
-          <div>
-            {/* Badge */}
-            <div className="hero-enter inline-flex items-center gap-2 border border-[#D4547A]/25 bg-[#D4547A]/[0.07] text-[#D4547A] px-3.5 py-1.5 rounded-full text-xs font-medium mb-7">
-              <Star className="w-3 h-3 fill-[#D4547A]" />
-              SW 아이디어 공모전 공식 준비 플랫폼
+      <section className={styles.hero} aria-labelledby="hero-title">
+        <div className={styles.heroInner}>
+          <div className={styles.heroCopy + " hero-enter"}>
+            <p className={styles.eyebrow}><Lightbulb size={16} aria-hidden="true" /> 학생의 상상부터, 선생님의 수업까지</p>
+            <h1 id="hero-title" className={styles.heroTitle}>해보고 싶은 생각,<br /><span>기획으로 꺼내봐요.</span></h1>
+            <p className={styles.heroLead}>학교에서 느낀 불편함도, 수업을 바꿀 아이디어도.<br className={styles.desktopBreak} /> 아이디어봇과 이야기하며 <strong>만들어보고 싶은 것</strong>을<br className={styles.desktopBreak} /> 나만의 기획서로 정리해보세요.</p>
+            <div className={styles.heroActions}>
+              <Link href="/dashboard?type=student" className={styles.studentAction} aria-label="학생으로 내 아이디어 꺼내기">
+                <GraduationCap size={22} aria-hidden="true" />
+                <span><small>학생</small><strong>내 아이디어 꺼내기</strong></span>
+                <ArrowRight size={17} aria-hidden="true" />
+              </Link>
+              <Link href="/dashboard?type=general" className={styles.teacherAction} aria-label="선생님으로 수업 아이디어 기획하기">
+                <BookOpen size={21} aria-hidden="true" />
+                <span><small>선생님</small><strong>수업 아이디어 기획하기</strong></span>
+                <ArrowRight size={17} aria-hidden="true" />
+              </Link>
             </div>
-
-            {/* Headline */}
-            <h1 className="hero-enter-2 text-[clamp(2.6rem,6vw,4.5rem)] font-normal tracking-tight leading-[1.08] mb-6">
-              내 아이디어를<br />
-              <span className="text-[#D4547A]">기획서</span>로<br />
-              완성해봐요
-            </h1>
-
-            <p className="hero-enter-3 text-[#7A7067] text-lg leading-relaxed max-w-md mb-10">
-              아이디어가 막막해도 괜찮아요.<br />
-              AI 멘토가 아이디어 발굴부터 기획 정리까지<br />
-              6단계 전 과정을 함께해요.
-            </p>
-
-            <div className="hero-enter-3 flex flex-col gap-3 max-w-sm">
-              <div className="flex gap-2.5">
-                <Link
-                  href="/dashboard?type=student"
-                  className="group flex-1 flex items-center gap-3 bg-[#D4547A] text-white px-4 py-3 rounded-xl hover:bg-[#B8405F] transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_20px_rgba(212,84,122,0.28)]"
-                >
-                  <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0">
-                    <GraduationCap className="w-4 h-4" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="font-semibold text-sm leading-tight">학생</p>
-                    <p className="text-[11px] opacity-70 leading-tight truncate">SW 공모전 준비</p>
-                  </div>
-                  <ArrowRight className="w-3.5 h-3.5 opacity-50 ml-auto flex-shrink-0 group-hover:translate-x-0.5 transition-transform duration-200" />
-                </Link>
-                <Link
-                  href="/dashboard?type=general"
-                  className="group flex-1 flex items-center gap-3 bg-white text-[#1A1A1A] border border-[#EBE7E0] px-4 py-3 rounded-xl hover:border-[#D4547A]/30 hover:shadow-[0_4px_16px_rgba(212,84,122,0.08)] transition-all duration-300 hover:scale-[1.02]"
-                >
-                  <div className="w-8 h-8 rounded-lg bg-[#F4F1EC] flex items-center justify-center flex-shrink-0">
-                    <BookOpen className="w-4 h-4 text-[#7A7067]" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="font-semibold text-sm leading-tight">선생님</p>
-                    <p className="text-[11px] text-[#ADA8A0] leading-tight truncate">수업·프로그램 기획</p>
-                  </div>
-                  <ArrowRight className="w-3.5 h-3.5 text-[#C8C3BC] ml-auto flex-shrink-0 group-hover:translate-x-0.5 transition-transform duration-200" />
-                </Link>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <div className="h-px flex-1 bg-[#EBE7E0]" />
-                <Link
-                  href="/guide"
-                  className="flex items-center gap-1 text-xs text-[#ADA8A0] hover:text-[#7A7067] transition-colors duration-200 px-2"
-                >
-                  준비 가이드 보기 <ArrowRight className="w-3 h-3" />
-                </Link>
-                <div className="h-px flex-1 bg-[#EBE7E0]" />
-              </div>
-            </div>
+            <p className={styles.reassurance}>아이디어가 아직 없어도 괜찮아요. 첫 질문부터 함께해요.</p>
+            <Link href="/guide" className={styles.guideLink}>어떻게 시작하나요? <ArrowRight size={14} aria-hidden="true" /></Link>
           </div>
-
-          {/* Preview card */}
-          <div className="hidden lg:block hero-enter-3">
-            <div className="bg-white rounded-3xl border border-[#EBE7E0] p-6 shadow-[0_8px_48px_rgba(0,0,0,0.06)]">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-[10px] font-medium text-[#ADA8A0] uppercase tracking-wider">진행 중인 프로젝트</span>
-                <span className="text-[10px] bg-[#D4547A]/10 text-[#D4547A] px-2.5 py-1 rounded-full font-medium">3 / 6단계</span>
-              </div>
-              <p className="text-base font-bold text-[#1A1A1A] mb-1">급식 잔반 줄이기 앱</p>
-              <p className="text-xs text-[#ADA8A0] mb-4">교육 · SW 아이디어 공모전</p>
-
-              <div className="w-full bg-[#F4F1EC] rounded-full h-1.5 mb-5">
-                <div className="bg-[#D4547A] h-1.5 rounded-full" style={{ width: "45%" }} />
-              </div>
-
-              <div className="space-y-2">
-                {[
-                  { label: "문제 정의", done: true },
-                  { label: "이해관계자 분석", done: true },
-                  { label: "기능 설계", done: false, current: true },
-                  { label: "기획서 작성", done: false },
-                ].map((item) => (
-                  <div
-                    key={item.label}
-                    className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs ${
-                      item.done ? "bg-[#F4F1EC] text-[#ADA8A0]" :
-                      item.current ? "bg-[#D4547A]/8 text-[#D4547A] border border-[#D4547A]/15" :
-                      "text-[#D4CFC9]"
-                    }`}
-                  >
-                    <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
-                      item.done ? "bg-[#ADA8A0]" : item.current ? "bg-[#D4547A]" : "bg-[#EBE7E0]"
-                    }`} />
-                    <span>{item.label}</span>
-                    {item.done && <span className="ml-auto text-[10px]">완료</span>}
-                    {item.current && <span className="ml-auto text-[10px] font-semibold">진행중</span>}
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-4 pt-4 border-t border-[#EBE7E0]">
-                <div className="flex items-start gap-2.5">
-                  <img src="/plancraft-logo-remove.png" className="w-6 h-6 rounded-lg object-cover flex-shrink-0 mt-0.5" alt="" />
-                  <div>
-                    <p className="text-[10px] text-[#ADA8A0] mb-0.5">AI 멘토 아이디어봇</p>
-                    <p className="text-xs text-[#7A7067] leading-relaxed">이해관계자 분석이 완성됐어요! 이제 핵심 기능 설계부터 함께 잡아봐요.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <div className={styles.heroScene + " hero-enter-3"}><HeroIdeaScene /></div>
         </div>
       </section>
 
