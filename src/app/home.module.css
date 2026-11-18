@@ -12,6 +12,8 @@
 .heroActions>a>svg{flex-shrink:0}.heroActions>a>svg:last-child{margin-left:auto;width:15px}.heroActions>a>span{min-width:0}.heroActions small{display:block;font-size:11px;margin-bottom:2px}.heroActions strong{display:block;font-size:14px;font-weight:700;word-break:keep-all;overflow-wrap:anywhere}
 .studentAction{background:var(--brand-rose);color:#fff;box-shadow:0 5px 18px #b8405f20}.studentAction small{color:#fff}.studentAction:hover{background:var(--brand-rose-deep);box-shadow:0 7px 22px #b8405f2b;transform:translateY(-2px)}
 .heroActions>.teacherAction{border-color:#d8b6bc;background:#fffaf8;color:#754554}.teacherAction small{color:#9B6576}.teacherAction:hover{background:#FCEEF3;border-color:#B8405F;transform:translateY(-2px)}
+.heroActions>.generalAction{grid-column:1 / -1;border-color:var(--brand-craft-border);background:var(--brand-craft-light);color:var(--brand-craft-deep)}
+.generalAction small{color:#9a5268}.generalAction:hover{background:#fbe0e9;border-color:var(--brand-craft);transform:translateY(-2px)}
 .heroActions>a:active{transform:translateY(0)}.heroActions>a:focus-visible,.guideLink:focus-visible{outline:2px solid #B8405F;outline-offset:4px}
 .reassurance{font-size:12px;line-height:1.9;color:#6e5d56;margin-top:17px;word-break:keep-all}.guideLink{display:inline-flex;align-items:center;gap:7px;font-size:13px;line-height:1.8;color:#685348;margin-top:12px;padding:3px 0;border-bottom:1px solid #d8c7bb}.guideLink:hover{color:#A53B58;border-color:#B8405F}
 @media(min-width:1600px){.heroInner{gap:84px}.heroTitle{font-size:64px}.hero{padding-block:145px 100px}}

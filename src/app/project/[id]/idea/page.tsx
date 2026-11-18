@@ -33,7 +33,7 @@ export default function IdeaPage({ params }: { params: Promise<{ id: string }> }
   const hasConversation = project?.ideaChat?.some((message) => message.role === "user") ?? false;
   const prompts = userType === "general"
     ? [
-        ["학교 알림을 자주 놓쳐요", "학교 알림이 여러 채널에 흩어져 중요한 공지를 놓쳐요."],
+        ["반복되는 일이 번거로워요", "일상이나 업무에서 같은 일을 반복하느라 시간이 많이 들어요."],
         ["자료를 찾기 어려워요", "수업이나 업무에 필요한 자료를 찾는 데 시간이 오래 걸려요."],
       ]
     : [

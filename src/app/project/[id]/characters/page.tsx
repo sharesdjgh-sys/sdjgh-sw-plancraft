@@ -218,7 +218,7 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
                           <Input
                             value={ch.name}
                             onChange={(e) => updateChar(idx, "name", e.target.value)}
-                            placeholder={userType === "general" ? "예: 담임 학급 학생, 학부모" : "예: 고등학생, 학교 선생님"}
+                            placeholder={userType === "general" ? "예: 모임 참여자, 운영 담당자" : "예: 고등학생, 학교 선생님"}
                           />
                         </div>
                         <div>
@@ -236,7 +236,7 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
                           <Input
                             value={ch.age}
                             onChange={(e) => updateChar(idx, "age", e.target.value)}
-                            placeholder={userType === "general" ? "예: 중학생, 13~15세" : "예: 15~17세, 고등학생"}
+                            placeholder={userType === "general" ? "예: 직장인, 스마트폰을 주로 사용" : "예: 15~17세, 고등학생"}
                           />
                         </div>
                       </div>

@@ -28,6 +28,14 @@ const GUIDE_STEPS = [
 ];
 
 
+const GENERAL_GUIDE_COPY: Partial<Record<number, { desc?: string; tips?: string[] }>> = {
+  1: { tips: ["생활·업무·취미에서 반복되는 불편함을 찾아봐요", "직접 겪은 상황과 그때 어려웠던 점을 이야기해요", "누구에게 어떤 도움이 필요한 서비스인지 생각해봐요", "아이디어봇과 대화하며 만들고 싶은 것을 구체화해요"] },
+  4: { tips: ["핵심 기능 3~5가지를 명확하게 정리해봐요", "각 기능의 입력·처리·출력 흐름을 구체화해봐요", "바이브코딩으로 직접 구현 가능한 기술과 범위를 선택해요", "기능이 너무 복잡하면 핵심에 집중해서 줄여봐요"] },
+  5: { desc: "직접 만들 서비스의 기준이 될 기획서를 완성하는 단계예요." },
+  6: { desc: "기획서를 점검하고 공유하거나 직접 개발할 준비를 하는 단계예요.", tips: ["기획서 전체 흐름을 처음부터 끝까지 다시 읽어봐요", "문제 정의, 기능, 기대 효과의 일관성을 확인해요", "공유할 대상과 문서 형식을 확인해요", "먼저 만들 기능과 다음 실행 계획을 정리해요"] },
+};
+const GENERAL_GUIDE_STEPS = GUIDE_STEPS.map((step) => ({ ...step, ...GENERAL_GUIDE_COPY[step.step] }));
+
 const OUTCOMES = [
   { title: "해결하고 싶은 문제와 아이디어 한 줄", example: "학교 공지와 신청 일정을 한곳에서 확인하는 알림 서비스를 만들고 싶어요." },
   { title: "문제의 배경과 SW로 해결할 방법", example: "공지가 여러 채널에 흩어져 신청을 놓쳐요. 공지를 모아 일정별로 알려주면 좋겠어요." },
@@ -40,6 +48,7 @@ const OUTCOMES = [
 function GuideContent() {
   const searchParams = useSearchParams();
   const userType: UserType = searchParams.get("type") === "general" ? "general" : "student";
+  const guideSteps = userType === "general" ? GENERAL_GUIDE_STEPS : GUIDE_STEPS;
   const dashboardHref = "/dashboard?type=" + userType;
   const projects = useProjects();
   const railRef = useRef<HTMLDivElement>(null);
@@ -50,12 +59,12 @@ function GuideContent() {
   const goTo = useCallback((index: number) => {
     const rail = railRef.current;
     if (!rail || rail.clientWidth === 0 || !Number.isFinite(index)) return;
-    const next = Math.max(0, Math.min(GUIDE_STEPS.length - 1, index));
+    const next = Math.max(0, Math.min(guideSteps.length - 1, index));
     rail.scrollTo({
       left: next * rail.clientWidth,
       behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
     });
-  }, []);
+  }, [guideSteps]);
 
   useEffect(() => {
     const rail = railRef.current;
@@ -123,7 +132,7 @@ function GuideContent() {
           </div>
           <nav aria-label="가이드 단계 선택">
             <ol className={styles.chapterNav} ref={navRef}>
-              {GUIDE_STEPS.map((step, index) => (
+              {guideSteps.map((step, index) => (
                 <li key={step.step}>
                   <button aria-current={active === index ? "step" : undefined} aria-controls={"guide-step-" + step.step} onClick={() => goTo(index)}>
                     <span>{String(step.step).padStart(2, "0")}</span>{step.title}
@@ -138,16 +147,16 @@ function GuideContent() {
             onScroll={() => {
               const rail = railRef.current;
               if (!rail || rail.clientWidth === 0) return;
-              const index = Math.max(0, Math.min(GUIDE_STEPS.length - 1, Math.round(rail.scrollLeft / rail.clientWidth)));
+              const index = Math.max(0, Math.min(guideSteps.length - 1, Math.round(rail.scrollLeft / rail.clientWidth)));
               activeRef.current = index;
               setActive(index);
             }}
             onKeyDown={(event) => {
-              const next = event.key === "ArrowRight" ? active + 1 : event.key === "ArrowLeft" ? active - 1 : event.key === "Home" ? 0 : event.key === "End" ? GUIDE_STEPS.length - 1 : null;
+              const next = event.key === "ArrowRight" ? active + 1 : event.key === "ArrowLeft" ? active - 1 : event.key === "Home" ? 0 : event.key === "End" ? guideSteps.length - 1 : null;
               if (next !== null) { event.preventDefault(); goTo(next); }
             }}
           >
-            {GUIDE_STEPS.map((step, index) => {
+            {guideSteps.map((step, index) => {
               const Icon = step.icon;
               return (
                 <article key={step.step} id={"guide-step-" + step.step} className={styles.chapter} aria-labelledby={"guide-heading-" + step.step} aria-hidden={active !== index} inert={active !== index}>
@@ -171,11 +180,11 @@ function GuideContent() {
           </div>
 
           <div className={styles.readerFooter}>
-            <div className={styles.position} role="status" aria-live="polite" aria-atomic="true"><span>{String(active + 1).padStart(2, "0")}</span><span>/ 06</span><p>{GUIDE_STEPS[active].title}</p></div>
-            <div className={styles.progress} aria-hidden="true">{GUIDE_STEPS.map((step, index) => <span key={step.step} className={index <= active ? styles.reached : undefined} />)}</div>
+            <div className={styles.position} role="status" aria-live="polite" aria-atomic="true"><span>{String(active + 1).padStart(2, "0")}</span><span>/ 06</span><p>{guideSteps[active].title}</p></div>
+            <div className={styles.progress} aria-hidden="true">{guideSteps.map((step, index) => <span key={step.step} className={index <= active ? styles.reached : undefined} />)}</div>
             <div className={styles.controls}>
               <button onClick={() => goTo(active - 1)} disabled={active === 0} aria-label="이전 단계"><ArrowLeft size={18} /></button>
-              <button onClick={() => goTo(active + 1)} disabled={active === GUIDE_STEPS.length - 1} aria-label="다음 단계"><ArrowRight size={18} /></button>
+              <button onClick={() => goTo(active + 1)} disabled={active === guideSteps.length - 1} aria-label="다음 단계"><ArrowRight size={18} /></button>
             </div>
           </div>
         </section>

@@ -22,12 +22,12 @@ const STEP_COLORS = [
 ];
 
 const STEPS = [
-  { icon: Lightbulb, label: "아이디어 발굴", desc: "AI와 함께 공모전 아이디어 브레인스토밍" },
+  { icon: Lightbulb, label: "아이디어 발굴", desc: "AI와 함께 서비스 아이디어 브레인스토밍" },
   { icon: Target,    label: "문제 정의",     desc: "해결할 문제와 배경을 구체적으로 명확화" },
   { icon: Users,     label: "이해관계자 분석", desc: "누구를 위한 SW인지 사용자와 환경 파악" },
   { icon: Cpu,       label: "기능 설계",     desc: "핵심 기능 구성과 구현 흐름 계획" },
-  { icon: PenLine,   label: "기획서 작성",   desc: "공모전 수준의 기획서 완성" },
-  { icon: Trophy,    label: "최종 검토",     desc: "공모전 규정 점검 및 제출 준비" },
+  { icon: PenLine,   label: "기획서 작성",   desc: "직접 만들기 위한 기획서 완성" },
+  { icon: Trophy,    label: "최종 검토",     desc: "기획의 완성도 점검 및 실행 준비" },
 ];
 
 export default function HomePage() {
@@ -38,11 +38,11 @@ export default function HomePage() {
       <HomeHeader className={styles.navigation + " fixed top-0 left-0 right-0 z-50 h-[65px] flex items-center justify-between px-4 sm:px-8"}>
         <Link href="/" aria-label="PlanCraft 홈"><BrandMark /></Link>
         <div className="flex items-center gap-2 sm:gap-5">
-          <Link href="/guide" className="text-xs sm:text-sm text-[#7A7067] hover:text-[#1A1A1A] transition-colors duration-200">
+          <Link href="/guide?type=general" className="text-xs sm:text-sm text-[#7A7067] hover:text-[#1A1A1A] transition-colors duration-200">
             가이드
           </Link>
           <Link
-            href="/dashboard"
+            href="/dashboard?type=general"
             className="flex items-center gap-1.5 bg-[var(--brand-rose)] text-white text-xs sm:text-sm font-medium px-3 sm:px-4 py-2 rounded-full hover:bg-[var(--brand-rose-deep)] transition-all duration-300 hover:scale-[1.02]"
           >
             시작하기 <ArrowRight className="w-3.5 h-3.5" />
@@ -55,9 +55,9 @@ export default function HomePage() {
         <AuroraBackground />
         <div className={styles.heroInner}>
           <div className={styles.heroCopy + " hero-enter"}>
-            <p className={styles.eyebrow}><Lightbulb size={16} aria-hidden="true" /> 학생의 상상부터, 선생님의 수업까지</p>
+            <p className={styles.eyebrow}><Lightbulb size={16} aria-hidden="true" /> 누구나 시작하는 바이브코딩 기획</p>
             <h1 id="hero-title" className={styles.heroTitle}>일상의 불편함을,<br /><span>만들고 싶은 서비스로.</span></h1>
-            <p className={styles.heroLead}>학교에서 느낀 불편함도, 수업을 바꿀 아이디어도.<br className={styles.desktopBreak} /> 아이디어봇과 이야기하며 <strong>만들어보고 싶은 것</strong>을<br className={styles.desktopBreak} /> 나만의 기획서로 정리해보세요.</p>
+            <p className={styles.heroLead}>일상 속 불편함도, 수업과 업무를 바꿀 아이디어도.<br className={styles.desktopBreak} /> 아이디어봇과 이야기하며 <strong>만들어보고 싶은 것</strong>을<br className={styles.desktopBreak} /> 나만의 기획서로 정리해보세요.</p>
             <div className={styles.heroActions}>
               <Link href="/dashboard?type=student" className={styles.studentAction} aria-label="학생으로 내 아이디어 꺼내기">
                 <GraduationCap size={22} aria-hidden="true" />
@@ -69,9 +69,14 @@ export default function HomePage() {
                 <span><small>선생님</small><strong>수업 아이디어 기획하기</strong></span>
                 <ArrowRight size={17} aria-hidden="true" />
               </Link>
+              <Link href="/dashboard?type=general" className={styles.generalAction} aria-label="일반 사용자로 일상·업무 아이디어 기획하기">
+                <Users size={21} aria-hidden="true" />
+                <span><small>일반 사용자</small><strong>일상·업무 아이디어 기획하기</strong></span>
+                <ArrowRight size={17} aria-hidden="true" />
+              </Link>
             </div>
             <p className={styles.reassurance}>아이디어가 아직 없어도 괜찮아요. 첫 질문부터 함께해요.</p>
-            <Link href="/guide" className={styles.guideLink}>어떻게 시작하나요? <ArrowRight size={14} aria-hidden="true" /></Link>
+            <Link href="/guide?type=general" className={styles.guideLink}>어떻게 시작하나요? <ArrowRight size={14} aria-hidden="true" /></Link>
           </div>
           <div className={styles.heroScene + " hero-enter-3"}><HeroIdeaScene /></div>
         </div>
@@ -155,9 +160,9 @@ export default function HomePage() {
               <div className="w-10 h-10 rounded-xl bg-[#F4F1EC] flex items-center justify-center mb-5">
                 <Trophy className="w-4.5 h-4.5 text-[#7A7067]" />
               </div>
-              <h3 className="text-xl font-bold tracking-tight mb-2">공모전 맞춤 일정</h3>
+              <h3 className="text-xl font-bold tracking-tight mb-2">목표에 맞춘 일정</h3>
               <p className="text-sm text-[#7A7067] leading-relaxed">
-                마감일을 입력하면 단계별 일정을 자동으로 계산해 드려요.
+                목표일을 정하고, 아이디어부터 기획서 완성까지 한 단계씩 진행해요.
               </p>
             </div>
           </ScrollReveal>
@@ -186,13 +191,13 @@ export default function HomePage() {
             <div className="absolute top-0 right-0 w-72 h-72 bg-white blob opacity-10 pointer-events-none" />
             <div className="relative z-10">
               <h2 className="text-3xl font-bold text-white tracking-tight mb-3">
-                공모전 참가를 망설이고 있나요?
+                만들고 싶은 서비스가 있나요?
               </h2>
               <p className="text-white/70 text-sm mb-8 leading-relaxed">
-                처음이어도 괜찮아요. AI 멘토가 첫 아이디어부터 마지막 제출까지 함께해요.
+                처음이어도 괜찮아요. AI 멘토가 첫 아이디어부터 기획서 완성까지 함께해요.
               </p>
               <Link
-                href="/dashboard"
+                href="/dashboard?type=general"
                 className="inline-flex items-center gap-2 bg-white text-[#D4547A] px-7 py-3.5 rounded-full font-semibold text-sm hover:bg-[#FBF9F6] transition-all duration-300 hover:scale-[1.02] shadow-[0_4px_24px_rgba(0,0,0,0.12)]"
               >
                 무료로 시작하기 <ArrowRight className="w-4 h-4" />

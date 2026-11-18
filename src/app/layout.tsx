@@ -20,8 +20,8 @@ const roundedSmile = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "PlanCraft — AI와 함께 완성하는 SW 아이디어 공모전 기획서",
-  description: "AI 멘토와 함께 SW 아이디어 공모전을 준비하세요. 아이디어 발굴부터 기획서 제출까지 6단계로 완성합니다.",
+  title: "PlanCraft — AI와 함께 완성하는 서비스 기획서",
+  description: "학생, 선생님, 일반 사용자 누구나 일상과 업무의 아이디어를 서비스로 기획하세요. 아이디어봇과 6단계로 바이브코딩을 위한 기획서를 완성합니다.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

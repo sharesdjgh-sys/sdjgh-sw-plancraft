@@ -25,9 +25,9 @@ const STUDENT_CHECKLIST = [
 ];
 
 const GENERAL_CHECKLIST = [
-  { id: "idea", label: "서비스 한 줄 소개가 학생들이 이해할 수 있게 작성되었나요?" },
-  { id: "problem", label: "교육 현장의 문제 배경과 필요성을 구체적으로 설명했나요?" },
-  { id: "stakeholder", label: "서비스를 사용할 학생·운영자 등 이해관계자를 분석했나요?" },
+  { id: "idea", label: "서비스 한 줄 소개가 대상 사용자에게 이해하기 쉽게 작성되었나요?" },
+  { id: "problem", label: "해결하려는 문제의 배경과 필요성을 구체적으로 설명했나요?" },
+  { id: "stakeholder", label: "서비스를 사용할 사람과 운영자 등 이해관계자를 분석했나요?" },
   { id: "features", label: "핵심 기능 3~5가지가 바이브코딩으로 구현 가능한 수준인가요?" },
   { id: "proposal", label: "기획서 전체 내용이 논리적으로 연결되어 있나요?" },
   { id: "format", label: "공유/제출용 문서 형식(분량, 구성, 전달 대상)을 점검했나요?" },

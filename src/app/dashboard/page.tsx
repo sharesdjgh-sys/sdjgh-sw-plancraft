@@ -145,7 +145,7 @@ function DashboardContent() {
       <input ref={importRef} type="file" accept=".json,application/json" aria-label="프로젝트 백업 파일 선택" hidden onChange={handleImport} />
       <header className={base.header + " " + styles.header}>
         <Link href="/" className={base.brand}><BrandMark /></Link>
-        <span className={styles.mode}>{preferredUserType === "general" ? "선생님·일반인 모드" : "학생 모드"}</span>
+        <span className={styles.mode}>{preferredUserType === "general" ? "선생님·일반 사용자 모드" : "학생 모드"}</span>
       </header>
 
       <div className={base.layout + " " + base.journeyLayout}>
@@ -239,11 +239,11 @@ function DashboardContent() {
           <Dialog.Title>{editingId ? "프로젝트 정보 수정" : "어떤 아이디어인가요?"}</Dialog.Title>
           <Dialog.Description>{editingId ? "프로젝트의 기본 정보를 수정해주세요." : "제목만 입력하면 바로 시작할 수 있어요. 나머지 정보는 나중에 채워도 괜찮아요."}</Dialog.Description>
           <form className={styles.form} onSubmit={handleSubmit}>
-            <div className={styles.field}><label htmlFor="dashboard-title">프로젝트 제목 <span>필수</span></label><input id="dashboard-title" value={form.title} onChange={(event) => setForm((value) => ({ ...value, title: event.target.value }))} placeholder="예: 학교 알림을 한곳에" maxLength={120} required /></div>
+            <div className={styles.field}><label htmlFor="dashboard-title">프로젝트 제목 <span>필수</span></label><input id="dashboard-title" value={form.title} onChange={(event) => setForm((value) => ({ ...value, title: event.target.value }))} placeholder={form.userType === "general" ? "예: 모임 일정을 한곳에" : "예: 학교 알림을 한곳에"} maxLength={120} required /></div>
             <div className={styles.formRow}><div className={styles.field}><label htmlFor="dashboard-author">작성자 또는 팀 이름</label><input id="dashboard-author" value={form.author} onChange={(event) => setForm((value) => ({ ...value, author: event.target.value }))} placeholder="이름 또는 팀 이름" /></div><div className={styles.field}><label htmlFor="dashboard-genre">아이디어 분야</label><select id="dashboard-genre" value={form.genre} onChange={(event) => setForm((value) => ({ ...value, genre: event.target.value }))}><option value="">나중에 선택</option>{GENRES.map((genre) => <option key={genre}>{genre}</option>)}</select></div></div>
-            <div className={styles.formRow}><div className={styles.field}><label htmlFor="dashboard-target">{form.userType === "general" ? "관련 프로그램·수업" : "참가 공모전"}</label><input id="dashboard-target" value={form.targetCompetition} onChange={(event) => setForm((value) => ({ ...value, targetCompetition: event.target.value }))} placeholder="선택 사항" /></div><div className={styles.field}><label htmlFor="dashboard-deadline">{form.userType === "general" ? "목표 완료일" : "마감일"}</label><input id="dashboard-deadline" type="date" value={form.deadline} onChange={(event) => setForm((value) => ({ ...value, deadline: event.target.value }))} /></div></div>
+            <div className={styles.formRow}><div className={styles.field}><label htmlFor="dashboard-target">{form.userType === "general" ? "활용 분야·프로그램" : "참가 공모전"}</label><input id="dashboard-target" value={form.targetCompetition} onChange={(event) => setForm((value) => ({ ...value, targetCompetition: event.target.value }))} placeholder="선택 사항" /></div><div className={styles.field}><label htmlFor="dashboard-deadline">{form.userType === "general" ? "목표 완료일" : "마감일"}</label><input id="dashboard-deadline" type="date" value={form.deadline} onChange={(event) => setForm((value) => ({ ...value, deadline: event.target.value }))} /></div></div>
             {!editingId && isFileSystemAccessSupported() && <label className={styles.folderOption}><input type="checkbox" checked={connectFolder} onChange={(event) => setConnectFolder(event.target.checked)} /><span>작성 내용을 저장할 폴더 연결 <small>선택</small></span></label>}
-            <p className={styles.formNote}>{form.userType === "general" ? "선생님·일반인" : "학생"} 모드 · 프로젝트는 현재 브라우저에 저장됩니다.</p>
+            <p className={styles.formNote}>{form.userType === "general" ? "선생님·일반 사용자" : "학생"} 모드 · 프로젝트는 현재 브라우저에 저장됩니다.</p>
             {formError && <p className={styles.formError} role="alert">{formError}</p>}
             <div className={styles.formActions}><Dialog.Close type="button" disabled={creating} className={base.secondary}>취소</Dialog.Close><button type="submit" className={base.primary} disabled={creating}>{creating ? <Loader2 size={14} className="animate-spin" /> : editingId ? <Check size={14} /> : <Plus size={14} />}{creating ? "저장 중..." : editingId ? "변경 사항 저장" : "프로젝트 시작하기"}</button></div>
           </form>

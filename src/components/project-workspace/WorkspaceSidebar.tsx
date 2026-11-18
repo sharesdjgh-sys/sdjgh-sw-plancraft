@@ -22,7 +22,7 @@ export default function WorkspaceSidebar({ userType, active, projectCount, foote
     <aside className={journey.sidebar + " " + styles.sidebar} aria-label="작업 공간">
       <Link href="/" className={journey.sidebarBrand} aria-label="PlanCraft 홈으로"><BrandMark /></Link>
       <div className={journey.overview}>
-        <p className={journey.projectLabel}>{userType === "general" ? "선생님·일반인 모드" : "학생 모드"}</p>
+        <p className={journey.projectLabel}>{userType === "general" ? "선생님·일반 사용자 모드" : "학생 모드"}</p>
         <p className={journey.projectTitle}>나의 작업 공간</p>
       </div>
       <nav className={journey.navigation} aria-label="작업 공간 메뉴">

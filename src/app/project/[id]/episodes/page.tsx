@@ -327,7 +327,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
             <div className="space-y-3">
               <Input
                 placeholder={userType === "general"
-                  ? `기능 ${ep?.episodeNumber} 이름 (예: 출석 체크, 알림 발송, 학습 현황 조회)`
+                  ? `기능 ${ep?.episodeNumber} 이름 (예: 일정 확인, 알림 발송, 요청 현황 조회)`
                   : `기능 ${ep?.episodeNumber} 이름 (예: 식단 추천, 잔반 분석)`}
                 value={ep?.title ?? ""}
                 onChange={(e) => updateEp("title", e.target.value)}
@@ -430,7 +430,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
                           <Input
                             value={cut.dialogue}
                             onChange={(e) => updateCut(cutIdx, "dialogue", e.target.value)}
-                            placeholder={userType === "general" ? "예: 교사 ID, 학급 코드" : "예: 학생 ID, 메뉴 선택값"}
+                            placeholder={userType === "general" ? "예: 사용자 ID, 검색 조건" : "예: 학생 ID, 메뉴 선택값"}
                             className="text-xs"
                           />
                         </div>
@@ -439,7 +439,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
                           <Input
                             value={cut.soundEffect}
                             onChange={(e) => updateCut(cutIdx, "soundEffect", e.target.value)}
-                            placeholder={userType === "general" ? "예: 출석 현황 목록, 알림 발송 완료" : "예: 추천 식단 목록, 오류 메시지"}
+                            placeholder={userType === "general" ? "예: 요청 목록, 알림 발송 완료" : "예: 추천 식단 목록, 오류 메시지"}
                             className="text-xs"
                           />
                         </div>

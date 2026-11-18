@@ -182,10 +182,10 @@ export function downloadProposalScript(project: Project) {
 export function downloadFullSummary(project: Project) {
   const s = project.story;
   const lines = [
-    `[ ${project.title} — 최종 제출 요약 ]`,
+    `[ ${project.title} — ${project.userType === "general" ? "최종 기획 요약" : "최종 제출 요약"} ]`,
     project.author ? `작성자: ${project.author}` : "",
     `작성일: ${new Date().toLocaleDateString("ko-KR")}`,
-    project.targetCompetition ? `대상 공모전: ${project.targetCompetition}` : "",
+    project.targetCompetition ? `${project.userType === "general" ? "활용 분야·프로그램" : "대상 공모전"}: ${project.targetCompetition}` : "",
     "",
     "═══ 문제 정의 ═══",
     `한 줄 소개: ${s.logline || "(미작성)"}`,

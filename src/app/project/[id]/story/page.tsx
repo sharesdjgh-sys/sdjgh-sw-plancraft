@@ -138,12 +138,12 @@ export default function StoryPage({ params }: { params: Promise<{ id: string }> 
             <label className="block text-xs font-bold text-[#1A1A1A] mb-1">아이디어 한 줄 소개</label>
             <p className="text-[10px] text-[#ADA8A0] mb-3">
               {userType === "general"
-                ? "서비스를 사용할 학생들이 들었을 때 바로 이해할 수 있는 한 문장"
+                ? "대상 사용자가 들었을 때 바로 이해할 수 있는 한 문장"
                 : "심사위원이 읽었을 때 SW가 궁금해지는 한 문장"}
             </p>
             <Input
               placeholder={userType === "general"
-                ? "예: 수업 중 학생 이해도를 실시간으로 파악하는 교사용 피드백 앱"
+                ? "예: 모임 일정과 신청 정보를 한곳에서 확인하는 알림 서비스"
                 : "예: 급식 잔반 데이터를 분석해 학교 식단을 개선하는 AI 추천 시스템"}
               value={story.logline}
               onChange={(e) => setStory((s) => ({ ...s, logline: e.target.value }))}
@@ -156,7 +156,7 @@ export default function StoryPage({ params }: { params: Promise<{ id: string }> 
               <p className="text-[10px] text-[#ADA8A0] mb-3">왜 이 문제가 중요한지, 현재 어떤 불편함이 있는지</p>
               <Textarea
                 placeholder={userType === "general"
-                  ? "교육 현장에서 어떤 불편함을 겪고 계신가요? 학생 지도·수업·행정 중 개선하고 싶은 상황을 구체적으로 써주세요."
+                  ? "일상·업무·수업에서 어떤 불편함을 겪고 계신가요? 누가 어떤 상황에서 어려움을 겪는지 구체적으로 써주세요."
                   : "어떤 사회적 문제 또는 불편함을 해결하려 하나요? 현재 상황과 문제의 심각성을 구체적으로 써봐요."}
                 value={story.theme}
                 onChange={(e) => setStory((s) => ({ ...s, theme: e.target.value }))}
@@ -168,7 +168,7 @@ export default function StoryPage({ params }: { params: Promise<{ id: string }> 
               <p className="text-[10px] text-[#ADA8A0] mb-3">문제가 발생하는 환경, 관련 통계나 사례</p>
               <Textarea
                 placeholder={userType === "general"
-                  ? "이 문제가 발생하는 교육 환경과, 이 서비스가 왜 필요한지 설명해주세요."
+                  ? "이 문제가 발생하는 생활·업무 환경과, 이 서비스가 왜 필요한지 설명해주세요."
                   : "문제가 발생하는 배경과 이 SW가 왜 필요한지 설명해주세요."}
                 value={story.setting}
                 onChange={(e) => setStory((s) => ({ ...s, setting: e.target.value }))}
