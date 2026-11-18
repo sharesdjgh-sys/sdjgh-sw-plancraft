@@ -1,5 +1,6 @@
 "use client";
 
+import { AiAutofillButton } from "@/components/project-workspace/AiAutofill";
 import ProjectWorkspace from "@/components/project-workspace/ProjectWorkspace";
 import workspaceStyles from "@/components/project-workspace/workspace.module.css";
 
@@ -9,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { type AiChatHandle } from "@/components/ai-assistant/AiChat";
 import EmptyContentModal from "@/components/EmptyContentModal";
-import { Plus, Trash2, Save, CheckCircle, Check, Download, Cpu, Wand2, GripVertical } from "lucide-react";
+import { Plus, Trash2, Save, CheckCircle, Check, Download, Cpu, GripVertical } from "lucide-react";
 import { getProject, updateProject, type Episode, type Cut, type Project } from "@/lib/storage";
 import { downloadEpisode, downloadAllEpisodes } from "@/lib/download";
 import { saveProjectToDir } from "@/lib/fileStorage";
@@ -165,6 +166,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
   };
 
   const autofill = async () => {
+    if (saving || autofilling || autofillingCuts) return;
     if (!project?.ideaChat || project.ideaChat.length === 0) {
       alert("먼저 아이디어 발굴 단계에서 AI와 대화해주세요!");
       return;
@@ -222,6 +224,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
   const [autofillingCuts, setAutofillingCuts] = useState(false);
 
   const autofillCuts = async () => {
+    if (saving || autofilling || autofillingCuts) return;
     const currentEp = episodes[activeEp];
     if (!project?.ideaChat || project.ideaChat.length === 0) {
       alert("먼저 아이디어 발굴 단계에서 AI와 대화해주세요!");
@@ -281,7 +284,8 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
         mentorMessage={panelInitialMessage}
         mentorPlaceholder="기능 설계에 대해 질문하세요..."
         onSave={save} busy={saving || autofilling || autofillingCuts} onNext={goNext} nextLabel="다음: 기획서 작성"
-        actions={<><button onClick={autofill} disabled={autofilling}><Wand2 size={14} />{autofilling ? "채우는 중..." : "AI 자동채우기"}</button><button disabled={!project} onClick={() => { if (project) downloadEpisode({ ...project, episodes }, activeEp); }}><Download size={14} />이 기능 다운로드</button><button disabled={!project} onClick={() => { if (project) downloadAllEpisodes({ ...project, episodes }); }}><Download size={14} />전체 다운로드</button><button onClick={save} disabled={saving} className={workspaceStyles.saveButton}>{saved ? <><Check size={14} /> 저장됨</> : saving ? "저장 중..." : <><Save size={14} /> 저장</>}</button></>}
+        autofillMessage={autofilling ? "AI가 핵심 기능을 구성하고 있어요" : autofillingCuts ? "AI가 이 기능의 처리 단계를 설계하고 있어요" : undefined}
+        actions={<><AiAutofillButton onClick={autofill} loading={autofilling} disabled={saving || autofillingCuts} /><button disabled={!project} onClick={() => { if (project) downloadEpisode({ ...project, episodes }, activeEp); }}><Download size={14} />이 기능 다운로드</button><button disabled={!project} onClick={() => { if (project) downloadAllEpisodes({ ...project, episodes }); }}><Download size={14} />전체 다운로드</button><button onClick={save} disabled={saving || autofilling || autofillingCuts} className={workspaceStyles.saveButton}>{saved ? <><Check size={14} /> 저장됨</> : saving ? "저장 중..." : <><Save size={14} /> 저장</>}</button></>}
       >
         {/* 모바일 기능 탭 */}
           <div className={workspaceStyles.featureTabs}>
@@ -345,14 +349,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
                 <span className="text-sm font-bold text-[#1A1A1A]">처리 단계 구성</span>
               </div>
               <div className="flex items-center gap-2">
-                <button
-                  onClick={autofillCuts}
-                  disabled={autofillingCuts}
-                  className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border border-[#D4547A]/30 text-[#D4547A] hover:bg-[#D4547A]/5 transition-all duration-200 disabled:opacity-50"
-                >
-                  <Wand2 className="w-3.5 h-3.5" />
-                  {autofillingCuts ? "채우는 중..." : "AI 채우기"}
-                </button>
+                <AiAutofillButton loading={autofillingCuts} disabled={autofilling || saving} onClick={autofillCuts}>AI 채우기</AiAutofillButton>
                 <button
                   onClick={addCut}
                   className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border border-[#EBE7E0] text-[#7A7067] hover:bg-[#F4F1EC] hover:border-[#D4547A]/30 transition-all duration-200"
@@ -370,14 +367,7 @@ export default function EpisodesPage({ params }: { params: Promise<{ id: string 
                   <Cpu className="w-8 h-8 text-[#D4CFC9] mx-auto mb-3" />
                   <p className="text-xs text-[#ADA8A0] mb-3">아직 단계가 없어요. AI 도움을 받거나 직접 추가해봐요!</p>
                   <div className="flex items-center justify-center gap-2">
-                    <button
-                      onClick={autofillCuts}
-                      disabled={autofillingCuts}
-                      className="inline-flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-full border border-[#D4547A]/30 text-[#D4547A] hover:bg-[#D4547A]/5 transition-all duration-200 disabled:opacity-50"
-                    >
-                      <Wand2 className="w-3.5 h-3.5" />
-                      {autofillingCuts ? "채우는 중..." : "AI로 채우기"}
-                    </button>
+                    <AiAutofillButton loading={autofillingCuts} disabled={autofilling || saving} onClick={autofillCuts}>AI로 채우기</AiAutofillButton>
                     <button
                       onClick={addCut}
                       className="inline-flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-full bg-[#D4547A] text-white hover:bg-[#B8405F] transition-all duration-200"

@@ -15,6 +15,10 @@
   --brand-rose-deep: #9F304B;
   --brand-rose-light: #FBF0F3;
   --brand-rose-border: #E7C3CD;
+  --brand-craft: #D66A87;
+  --brand-craft-deep: #A83D5C;
+  --brand-craft-light: #FFF2F6;
+  --brand-craft-border: #E8BAC8;
 }
 
 @theme inline {

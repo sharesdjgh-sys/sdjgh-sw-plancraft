@@ -1,6 +1,6 @@
 "use client";
 
-import { Wand2, Sparkles, ArrowRight, X } from "lucide-react";
+import { LoaderCircle, Wand2, Sparkles, ArrowRight, X } from "lucide-react";
 
 interface EmptyContentModalProps {
   title: string;
@@ -46,9 +46,10 @@ export default function EmptyContentModal({
           <button
             onClick={onAutofill}
             disabled={autofilling}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-[#D4547A] text-white hover:bg-[#B8405F] transition-all duration-200 disabled:opacity-60 text-left"
+            aria-busy={Boolean(autofilling)}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-[var(--brand-craft-deep)] text-white hover:bg-[#92314d] transition-all duration-200 text-left"
           >
-            <Wand2 className="w-4 h-4 flex-shrink-0" />
+            {autofilling ? <LoaderCircle className="w-4 h-4 flex-shrink-0 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : <Wand2 className="w-4 h-4 flex-shrink-0" aria-hidden="true" />}
             <div>
               <p className="text-xs font-semibold">{autofilling ? "AI가 채우는 중..." : "AI 자동채우기"}</p>
               <p className="text-[10px] text-white/70">아이디어 발굴 대화를 바탕으로 자동 작성</p>

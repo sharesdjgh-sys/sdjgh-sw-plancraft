@@ -1,5 +1,6 @@
 "use client";
 
+import { AiAutofillButton } from "@/components/project-workspace/AiAutofill";
 import ProjectWorkspace from "@/components/project-workspace/ProjectWorkspace";
 import workspaceStyles from "@/components/project-workspace/workspace.module.css";
 
@@ -9,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { type AiChatHandle } from "@/components/ai-assistant/AiChat";
 import EmptyContentModal from "@/components/EmptyContentModal";
 import { useRouter } from "next/navigation";
-import { Save, Check, Download, Wand2 } from "lucide-react";
+import { Save, Check, Download } from "lucide-react";
 import { getProject, updateProject, type Project } from "@/lib/storage";
 import { downloadStory } from "@/lib/download";
 import { saveProjectToDir } from "@/lib/fileStorage";
@@ -76,6 +77,7 @@ export default function StoryPage({ params }: { params: Promise<{ id: string }> 
   };
 
   const autofill = async () => {
+    if (saving || autofilling) return;
     if (!project?.ideaChat || project.ideaChat.length === 0) {
       alert("먼저 아이디어 발굴 단계에서 AI와 대화해주세요!");
       return;
@@ -129,7 +131,8 @@ export default function StoryPage({ params }: { params: Promise<{ id: string }> 
         mentorMessage={storyInitialMessage}
         mentorPlaceholder="문제 정의에 대해 질문하세요..."
         onSave={save} busy={saving || autofilling} onNext={goNext} nextLabel="다음: 이해관계자 분석"
-        actions={<><button onClick={autofill} disabled={autofilling}><Wand2 size={14} />{autofilling ? "채우는 중..." : "AI 자동채우기"}</button><button disabled={!project} onClick={() => { if (project) downloadStory({ ...project, story }); }}><Download size={14} />다운로드</button><button onClick={save} disabled={saving} className={workspaceStyles.saveButton}>{saved ? <><Check size={14} /> 저장됨</> : saving ? "저장 중..." : <><Save size={14} /> 저장</>}</button></>}
+        autofillMessage={autofilling ? "AI가 문제 정의를 작성하고 있어요" : undefined}
+        actions={<><AiAutofillButton onClick={autofill} loading={autofilling} disabled={saving} /><button disabled={!project} onClick={() => { if (project) downloadStory({ ...project, story }); }}><Download size={14} />다운로드</button><button onClick={save} disabled={saving || autofilling} className={workspaceStyles.saveButton}>{saved ? <><Check size={14} /> 저장됨</> : saving ? "저장 중..." : <><Save size={14} /> 저장</>}</button></>}
       >
         <div className="bg-white rounded-2xl border border-[#EBE7E0] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
             <label className="block text-xs font-bold text-[#1A1A1A] mb-1">아이디어 한 줄 소개</label>

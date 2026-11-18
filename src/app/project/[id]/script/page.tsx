@@ -1,5 +1,6 @@
 "use client";
 
+import { AiAutofillButton } from "@/components/project-workspace/AiAutofill";
 import ProjectWorkspace from "@/components/project-workspace/ProjectWorkspace";
 import workspaceStyles from "@/components/project-workspace/workspace.module.css";
 
@@ -8,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { Textarea } from "@/components/ui/textarea";
 import { type AiChatHandle } from "@/components/ai-assistant/AiChat";
 import EmptyContentModal from "@/components/EmptyContentModal";
-import { Save, Check, Download, FileText, CheckCircle, Wand2 } from "lucide-react";
+import { Save, Check, Download, FileText, CheckCircle } from "lucide-react";
 import { getProject, updateProject, type Episode, type Project, type Character } from "@/lib/storage";
 import { downloadProposalScript } from "@/lib/download";
 import { saveProjectToDir } from "@/lib/fileStorage";
@@ -132,6 +133,7 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
   };
 
   const autofill = async () => {
+    if (saving || autofilling) return;
     if (!project?.ideaChat || project.ideaChat.length === 0) {
       alert("먼저 아이디어 발굴 단계에서 AI와 대화해주세요!");
       return;
@@ -188,7 +190,8 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
         mentorMessage={scriptInitialMessage}
         mentorPlaceholder="기획서 작성에 대해 질문하세요..."
         onSave={save} busy={saving || autofilling} onNext={goNext} nextLabel="다음: 최종 검토"
-        actions={<><button onClick={autofill} disabled={autofilling}><Wand2 size={14} />{autofilling ? "채우는 중..." : "AI 자동채우기"}</button><button disabled={!project} onClick={() => { if (project) downloadProposalScript({ ...project, proposalScript }); }}><Download size={14} />다운로드</button><button onClick={save} disabled={saving} className={workspaceStyles.saveButton}>{saved ? <><Check size={14} /> 저장됨</> : saving ? "저장 중..." : <><Save size={14} /> 저장</>}</button></>}
+        autofillMessage={autofilling ? "AI가 기획서 초안을 작성하고 있어요" : undefined}
+        actions={<><AiAutofillButton onClick={autofill} loading={autofilling} disabled={saving} /><button disabled={!project} onClick={() => { if (project) downloadProposalScript({ ...project, proposalScript }); }}><Download size={14} />다운로드</button><button onClick={save} disabled={saving || autofilling} className={workspaceStyles.saveButton}>{saved ? <><Check size={14} /> 저장됨</> : saving ? "저장 중..." : <><Save size={14} /> 저장</>}</button></>}
       >
         <details className={workspaceStyles.references}><summary>지금까지 정리한 내용 확인 · 기능과 이해관계자</summary><div className={workspaceStyles.referenceGrid}><FeatureListPanel episodes={project?.episodes ?? []} /><CharacterPanel characters={project?.characters ?? []} /></div></details>
 {/* 기획서 내용 */}

@@ -5,32 +5,15 @@ import Link from "next/link";
 import BrandMark from "@/components/brand/BrandMark";
 import FullscreenToggle from "@/components/FullscreenToggle";
 import JourneySidebar from "@/components/project-workspace/JourneySidebar";
+import StepHelpDialog from "@/components/project-workspace/StepHelpDialog";
 import { useRouter } from "next/navigation";
 import * as Dialog from "@radix-ui/react-dialog";
-import { ArrowRight, BookOpen, Check, Loader2, X } from "lucide-react";
+import { ArrowRight, BookOpen, Loader2, X } from "lucide-react";
 import AiChat, { type AiChatHandle } from "@/components/ai-assistant/AiChat";
 import { getProject, updateProject, type ChatMessage } from "@/lib/storage";
 import { useProject } from "@/lib/use-project";
 import { saveProjectToDir } from "@/lib/fileStorage";
 import styles from "./idea.module.css";
-
-const GUIDE = [
-  {
-    label: "불편함 이야기",
-    detail: "직접 겪은 상황과 그때 불편했던 점을 아이디어봇에게 적어요. 주제가 떠오르지 않으면 예시 버튼을 눌러 대화를 시작하고, 기능을 정하기보다 경험을 설명해보세요.",
-    example: "예: 학교 알림이 흩어져 중요한 공지를 놓쳐요.",
-  },
-  {
-    label: "사용자·상황 구체화",
-    detail: "아이디어봇의 질문에 답하며 누가, 언제, 어디서 어려움을 겪는지 좁혀가요. ‘모든 사람’ 대신 구체적인 사용자를 정하고, 문제가 생기는 상황을 하나 들어보세요.",
-    example: "예: 학부모가 체험학습 신청 기한을 놓쳤어요.",
-  },
-  {
-    label: "아이디어 한 줄 정리",
-    detail: "대화에서 정리한 내용을 바탕으로 아래 입력란에 ‘누구의 어떤 문제를 해결하는 서비스인지’를 한 문장으로 적어요. 이 문장은 다음 단계의 한 줄 소개로 이어지며, 이후에도 수정할 수 있어요.",
-    example: "예: 학부모가 필요한 학교 공지를 한곳에서 확인하는 서비스",
-  },
-] as const;
 
 export default function IdeaPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -171,22 +154,7 @@ export default function IdeaPage({ params }: { params: Promise<{ id: string }> }
         </main>
       </div>
 
-      <Dialog.Root open={helpOpen} onOpenChange={setHelpOpen}>
-        <Dialog.Portal>
-          <Dialog.Overlay className={styles.overlay} />
-          <Dialog.Content className={styles.dialog + " " + styles.detailedHelp}>
-            <p className={styles.eyebrow}>STEP 01 · 사용 방법</p>
-            <Dialog.Title>이렇게 시작해보세요.</Dialog.Title>
-            <Dialog.Description>아이디어봇과 대화하고, 개발할 아이디어의 출발점을 한 줄로 남기는 단계예요.</Dialog.Description>
-            <ol className={styles.helpSteps}>
-              {GUIDE.map((item) => <li key={item.label}><strong>{item.label}</strong><p>{item.detail}</p><p className={styles.helpExample}>{item.example}</p></li>)}
-            </ol>
-            <div className={styles.helpNote}><strong>저장과 다음 단계</strong><p>대화와 한 줄 정리는 이 브라우저에 자동 저장돼요. 단계 버튼을 누를 필요 없이 대화를 이어가고, 아래 한 줄 정리를 다듬은 뒤 ‘다음: 문제 정의’로 이어가세요.</p></div>
-            <Dialog.Close className={styles.close} aria-label="사용 방법 닫기"><X size={19} /></Dialog.Close>
-            <div className={styles.dialogActions}><Dialog.Close className={styles.primary}><Check size={15} /> 이해했어요</Dialog.Close></div>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
+      <StepHelpDialog step={1} open={helpOpen} onOpenChange={setHelpOpen} />
 
       <Dialog.Root open={confirmOpen} onOpenChange={setConfirmOpen}>
         <Dialog.Portal>

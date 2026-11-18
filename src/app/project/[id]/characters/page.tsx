@@ -1,5 +1,6 @@
 "use client";
 
+import { AiAutofillButton } from "@/components/project-workspace/AiAutofill";
 import ProjectWorkspace from "@/components/project-workspace/ProjectWorkspace";
 import workspaceStyles from "@/components/project-workspace/workspace.module.css";
 
@@ -9,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { type AiChatHandle } from "@/components/ai-assistant/AiChat";
 import EmptyContentModal from "@/components/EmptyContentModal";
-import { Plus, Trash2, Check, Save, User, Download, Wand2 } from "lucide-react";
+import { Plus, Trash2, Check, Save, User, Download } from "lucide-react";
 import { getProject, updateProject, type Character, type Project } from "@/lib/storage";
 import { downloadCharacters } from "@/lib/download";
 import { saveProjectToDir } from "@/lib/fileStorage";
@@ -93,6 +94,7 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
   };
 
   const autofill = async () => {
+    if (saving || autofilling) return;
     if (!project?.ideaChat || project.ideaChat.length === 0) {
       alert("먼저 아이디어 발굴 단계에서 AI와 대화해주세요!");
       return;
@@ -154,7 +156,8 @@ export default function CharactersPage({ params }: { params: Promise<{ id: strin
         mentorMessage={characterInitialMessage}
         mentorPlaceholder="이해관계자 분석에 대해 질문하세요..."
         onSave={save} busy={saving || autofilling} onNext={goNext} nextLabel="다음: 기능 설계"
-        actions={<><button onClick={autofill} disabled={autofilling}><Wand2 size={14} />{autofilling ? "채우는 중..." : "AI 자동채우기"}</button><button disabled={!project} onClick={() => { if (project) downloadCharacters({ ...project, characters }); }}><Download size={14} />다운로드</button><button onClick={save} disabled={saving} className={workspaceStyles.saveButton}>{saved ? <><Check size={14} /> 저장됨</> : saving ? "저장 중..." : <><Save size={14} /> 저장</>}</button></>}
+        autofillMessage={autofilling ? "AI가 이해관계자를 정리하고 있어요" : undefined}
+        actions={<><AiAutofillButton onClick={autofill} loading={autofilling} disabled={saving} /><button disabled={!project} onClick={() => { if (project) downloadCharacters({ ...project, characters }); }}><Download size={14} />다운로드</button><button onClick={save} disabled={saving || autofilling} className={workspaceStyles.saveButton}>{saved ? <><Check size={14} /> 저장됨</> : saving ? "저장 중..." : <><Save size={14} /> 저장</>}</button></>}
       >
         <div className={workspaceStyles.featureHeading}><h2>등록한 이해관계자 <span>{characters.length}명</span></h2><button onClick={addCharacter} className="flex items-center gap-2 text-xs border border-[#EBE7E0] rounded-lg px-3 py-2 text-[#7A7067]"><Plus size={14} /> 이해관계자 추가</button></div>
 {characters.length === 0 ? (
