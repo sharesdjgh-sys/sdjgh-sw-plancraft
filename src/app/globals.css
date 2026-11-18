@@ -11,6 +11,10 @@
   --accent:       #D4547A;
   --accent-light: #FCEEF3;
   --accent-hover: #B8405F;
+  --brand-rose: #BF4664;
+  --brand-rose-deep: #9F304B;
+  --brand-rose-light: #FBF0F3;
+  --brand-rose-border: #E7C3CD;
 }
 
 @theme inline {

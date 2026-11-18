@@ -2,4 +2,8 @@
 .icon{display:block;width:40px;height:40px;flex-shrink:0;object-fit:contain;border-radius:8px}
 .wordmark{display:block;width:154px;height:auto;flex-shrink:0;object-fit:contain}
 .compact{gap:4px}.compact .icon{width:30px;height:30px;border-radius:6px}.compact .wordmark{width:116px}
+.journeySignature{display:flex;align-items:center;gap:7px;width:150px;max-width:100%;margin:26px auto 0}
+.signatureMark{display:block;flex:0 0 24px;height:28px;background:linear-gradient(90deg,#A45D76 0 72%,#DCA0B3 72% 100%);mask:url('/brand/life-professor-logo.png') left center / auto 100% no-repeat}
+.signatureWordmark{position:relative;display:block;flex:1;min-width:0;aspect-ratio:333 / 67;background:#B28394;mask:url('/brand/life-professor-logo.png') right center / auto 100% no-repeat}
+.signatureSource{position:absolute;inset:0;display:block;width:100%;height:100%;opacity:0}
 @media(max-width:760px){.lockup{gap:4px}.icon{width:36px;height:36px}.wordmark{width:124px}}

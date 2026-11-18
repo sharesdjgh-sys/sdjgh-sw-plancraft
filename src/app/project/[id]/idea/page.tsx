@@ -3,6 +3,7 @@
 import { use, useRef, useState } from "react";
 import Link from "next/link";
 import BrandMark from "@/components/brand/BrandMark";
+import JourneySidebar from "@/components/project-workspace/JourneySidebar";
 import { useRouter } from "next/navigation";
 import * as Dialog from "@radix-ui/react-dialog";
 import { ArrowRight, BookOpen, Check, ChevronRight, Loader2, X } from "lucide-react";
@@ -10,7 +11,6 @@ import AiChat, { type AiChatHandle } from "@/components/ai-assistant/AiChat";
 import { getProject, updateProject, type ChatMessage } from "@/lib/storage";
 import { useProject } from "@/lib/use-project";
 import { saveProjectToDir } from "@/lib/fileStorage";
-import { STEPS } from "@/lib/utils";
 import styles from "./idea.module.css";
 
 const GUIDE = [
@@ -18,6 +18,7 @@ const GUIDE = [
     label: "불편함 이야기",
     title: "불편함 하나부터 이야기해보세요.",
     description: "최근 학교·업무·일상에서 반복해서 불편했던 일을 적어보세요.",
+    detail: "직접 겪은 상황과 그때 불편했던 점을 아이디어봇에게 적어요. 주제가 떠오르지 않으면 예시 버튼을 눌러 대화를 시작하고, 기능을 정하기보다 경험을 설명해보세요.",
     example: "예: 학교 알림이 흩어져 중요한 공지를 놓쳐요.",
     focus: "problem",
     placeholder: "그때의 상황을 편하게 이야기해주세요.",
@@ -26,6 +27,7 @@ const GUIDE = [
     label: "사용자·상황 구체화",
     title: "누가, 어떤 상황에서 불편했나요?",
     description: "아이디어봇과 대화하며 해결할 대상과 상황을 좁혀보세요.",
+    detail: "아이디어봇의 질문에 답하며 누가, 언제, 어디서 어려움을 겪는지 좁혀가요. ‘모든 사람’ 대신 구체적인 사용자를 정하고, 문제가 생기는 상황을 하나 들어보세요.",
     example: "예: 학부모가 체험학습 신청 기한을 놓쳤어요.",
     focus: "context",
     placeholder: "누가, 언제, 어떤 어려움을 겪었는지 이야기해주세요.",
@@ -34,6 +36,7 @@ const GUIDE = [
     label: "아이디어 한 줄 정리",
     title: "누구의 어떤 문제인지, 한 줄로 정리해요.",
     description: "아래 한 줄 정리를 직접 다듬고, 문제 정의 단계로 이어가세요.",
+    detail: "대화에서 정리한 내용을 바탕으로 아래 입력란에 ‘누구의 어떤 문제를 해결하는 서비스인지’를 한 문장으로 적어요. 이 문장은 다음 단계의 한 줄 소개로 이어지며, 이후에도 수정할 수 있어요.",
     example: "예: 학부모가 필요한 학교 공지를 한곳에서 확인하는 서비스",
     focus: "summary",
     placeholder: "아이디어봇과 해결하고 싶은 문제를 함께 정리해보세요.",
@@ -126,7 +129,7 @@ export default function IdeaPage({ params }: { params: Promise<{ id: string }> }
   );
 
   return (
-    <div className={styles.page}>
+    <div className={styles.page + " " + styles.workspacePage}>
       <header className={styles.header}>
         <Link href={dashboardHref} className={styles.brand} aria-label="PlanCraft 프로젝트 목록">
           <BrandMark />
@@ -140,23 +143,8 @@ export default function IdeaPage({ params }: { params: Promise<{ id: string }> }
         <span className={styles.mobileStage}>아이디어 발굴 · 1 / 6</span>
       </header>
 
-      <div className={styles.layout}>
-        <aside className={styles.sidebar}>
-          <p className={styles.sidebarLabel}>나의 기획 여정</p>
-          <nav className={styles.steps} aria-label="기획 단계">
-            {STEPS.map((step) => {
-              const available = step.id <= project.currentStep || project.isCompleted;
-              const content = <><span className={styles.stepNumber}>{String(step.id).padStart(2, "0")}</span><span>{step.label}</span></>;
-              return available
-                ? <Link key={step.id} href={"/project/" + encodeURIComponent(id) + "/" + step.route} className={step.id === 1 ? styles.activeStep : undefined} aria-current={step.id === 1 ? "step" : undefined}>{content}</Link>
-                : <span key={step.id} className={styles.futureStep}>{content}</span>;
-            })}
-          </nav>
-          <div className={styles.sidebarBottom}>
-            <button onClick={() => setHelpOpen(true)}><BookOpen size={14} /> 막막할 때, 사용 가이드</button>
-            <p>완벽한 생각이 아니어도 좋아요.<br />시작은 늘 작은 발견이니까요.</p>
-          </div>
-        </aside>
+      <div className={styles.layout + " " + styles.journeyLayout}>
+        <JourneySidebar project={project} step={1} />
 
         <main className={styles.main}>
           <div className={styles.heading}>
@@ -178,10 +166,9 @@ export default function IdeaPage({ params }: { params: Promise<{ id: string }> }
             ))}
           </ol>
 
-          <section className={styles.task} aria-labelledby="idea-task-title">
-            <p className={styles.taskLabel}>지금 할 일 <span>{String(stage + 1).padStart(2, "0")} / 03</span></p>
-            <h2 id="idea-task-title">{guide.title}</h2>
-            <p className={styles.taskDescription}>{guide.description}</p>
+          <section className={styles.quickGuide} aria-label="간단한 작성 안내">
+            <span>{guide.label}</span>
+            <p>{guide.description}</p>
             {stage === 0 && (
               <div className={styles.prompts}>
                 {[...prompts, ["아직 아이디어가 없어요", "아직 아이디어가 없어요. 일상에서 문제를 찾는 것부터 도와주세요."]].map(([label, prompt]) => (
@@ -189,11 +176,6 @@ export default function IdeaPage({ params }: { params: Promise<{ id: string }> }
                 ))}
               </div>
             )}
-            <details className={styles.answerGuide} key={stage}>
-              <summary>어떻게 답하면 좋나요?</summary>
-              <p>누가 · 언제 · 어떤 불편함을 겪었는지 짧게 이야기하세요. 처음부터 해결 방법이나 기능을 정할 필요는 없어요.</p>
-              <p className={styles.example}>{guide.example}</p>
-            </details>
             {hasConversation && stage < 2 && (
               <button className={styles.nextGuide} onClick={() => chooseStage((stage + 1) as 1 | 2)}>
                 {stage === 0 ? "주제를 골랐다면, 사용자와 상황 구체화" : "생각이 정리됐다면, 한 줄로 정리하기"} <ArrowRight size={13} />
@@ -239,16 +221,15 @@ export default function IdeaPage({ params }: { params: Promise<{ id: string }> }
       <Dialog.Root open={helpOpen} onOpenChange={setHelpOpen}>
         <Dialog.Portal>
           <Dialog.Overlay className={styles.overlay} />
-          <Dialog.Content className={styles.dialog}>
-            <p className={styles.eyebrow}>STEP 01 사용 가이드</p>
+          <Dialog.Content className={styles.dialog + " " + styles.detailedHelp}>
+            <p className={styles.eyebrow}>STEP 01 · 사용 방법</p>
             <Dialog.Title>이렇게 시작해보세요.</Dialog.Title>
             <Dialog.Description>아이디어봇과 대화하고, 개발할 아이디어의 출발점을 한 줄로 남기는 단계예요.</Dialog.Description>
             <ol className={styles.helpSteps}>
-              <li><strong>불편함 하나 이야기하기</strong><p>직접 경험한 일을 짧게 적어요. 막막하다면 화면의 예시를 눌러 시작해보세요.</p></li>
-              <li><strong>질문에 답하며 구체화하기</strong><p>누가, 언제, 어떤 불편함을 겪는지 좁혀가요. 안내 위치는 직접 앞뒤로 이동할 수 있어요.</p></li>
-              <li><strong>한 줄 정리 후 다음 단계로</strong><p>누구의 어떤 문제를 해결할지 직접 적어요. 문제 정의 단계에서 배경과 필요성을 다듬게 됩니다.</p></li>
+              {GUIDE.map((item, index) => <li key={item.focus} data-current={index === stage}><strong>{item.label}</strong><p>{item.detail}</p><p className={styles.helpExample}>{item.example}</p></li>)}
             </ol>
-            <Dialog.Close className={styles.close} aria-label="사용 가이드 닫기"><X size={19} /></Dialog.Close>
+            <div className={styles.helpNote}><strong>저장과 다음 단계</strong><p>대화와 한 줄 정리는 이 브라우저에 자동 저장돼요. 안내 탭은 앞뒤로 선택할 수 있으며, 한 줄 정리를 마치면 ‘다음: 문제 정의’로 이어가세요.</p></div>
+            <Dialog.Close className={styles.close} aria-label="사용 방법 닫기"><X size={19} /></Dialog.Close>
             <div className={styles.dialogActions}><Dialog.Close className={styles.primary}><Check size={15} /> 이해했어요</Dialog.Close></div>
           </Dialog.Content>
         </Dialog.Portal>

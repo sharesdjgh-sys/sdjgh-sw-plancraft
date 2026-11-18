@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 import Link from "next/link";
 import BrandMark from "@/components/brand/BrandMark";
+import JourneySidebar from "./JourneySidebar";
 import { useRouter } from "next/navigation";
 import * as Dialog from "@radix-ui/react-dialog";
 import { ArrowLeft, ArrowRight, BookOpen, ChevronRight, X } from "lucide-react";
@@ -120,37 +121,23 @@ export default function ProjectWorkspace({ projectId, step, children, actions, o
   }).slice(0, 28000);
 
   return (
-    <div className={base.page}>
+    <div className={base.page + " " + base.workspacePage}>
       <header className={base.header}>
         <Link href={dashboardHref} className={base.brand} onClick={(event) => { event.preventDefault(); void navigate(dashboardHref); }}><BrandMark /></Link>
         <div className={base.breadcrumb}><Link href={dashboardHref} onClick={(event) => { event.preventDefault(); void navigate(dashboardHref); }}>내 작업 공간</Link><ChevronRight size={13} /><span>{project.title}</span></div>
         <span className={base.storageNote}><span /> {onSave ? "저장 버튼으로 기획 보관" : "이 브라우저에 저장"}</span>
         <span className={base.mobileStage}>{STEPS[step - 1].label} · {step} / 6</span>
       </header>
-      <div className={base.layout}>
-        <aside className={base.sidebar + " " + styles.sidebar}>
-          <p className={base.sidebarLabel}>나의 기획 여정</p>
-          <nav className={base.steps} aria-label="기획 단계">
-            {STEPS.map((item) => {
-              const inner = <><span className={base.stepNumber}>{String(item.id).padStart(2, "0")}</span><span>{item.label}</span></>;
-              return item.id <= project.currentStep || project.isCompleted
-                ? <Link key={item.id} href={href(item.route)} className={item.id === step ? base.activeStep : undefined} aria-current={item.id === step ? "step" : undefined} onClick={(event) => { event.preventDefault(); void navigate(href(item.route)); }}>{inner}</Link>
-                : <span key={item.id} className={base.futureStep}>{inner}</span>;
-            })}
-          </nav>
-          <div className={base.sidebarBottom}><button onClick={() => setHelpOpen(true)}><BookOpen size={14} /> 막막할 때, 사용 가이드</button><p>한 단계씩 구체화하며,<br />실제로 만들 수 있는 기획으로.</p></div>
-        </aside>
+      <div className={base.layout + " " + base.journeyLayout}>
+        <JourneySidebar project={project} step={step} onNavigate={(target) => { void navigate(target); }} />
         <main className={base.main + " " + styles.withFloatingHelp}>
           <div className={base.heading}>
             <div><p className={base.eyebrow}>STEP {String(step).padStart(2, "0")} · 생각을 구체적으로</p><h1>{STEPS[step - 1].label}</h1><p className={base.description}>{config.description}</p></div>
             <button className={base.helpButton} onClick={() => setHelpOpen(true)}><BookOpen size={14} /> 사용 방법</button>
           </div>
           <ol className={base.flow} aria-label="이번 단계 사용 안내">{config.steps.map((item, index) => <li key={item[0]}><button onClick={() => setGuideIndex(index)} aria-current={index === guideIndex ? "step" : undefined}><span>{index + 1}</span>{item[0]}</button></li>)}</ol>
-          <section className={base.task} aria-labelledby="workspace-task-title">
-            <p className={base.taskLabel}>지금 할 일 <span>{String(guideIndex + 1).padStart(2, "0")} / 03</span></p>
-            <h2 id="workspace-task-title">{current[1]}</h2><p className={base.taskDescription}>{current[2]}</p>
-            <details key={guideIndex} className={base.answerGuide}><summary>어떻게 작성하면 좋나요?</summary><p>{current[3]}</p></details>
-            <button className={base.nextGuide} onClick={() => mentorRef.current?.setDraft(current[1] + " 현재 기획 내용을 구체화하는 방법을 도와주세요.")}>이 부분을 AI에게 물어보기 <ArrowRight size={13} /></button>
+          <section className={base.quickGuide} aria-label="간단한 작성 안내">
+            <span>{current[0]}</span><p>{current[1]}</p>
           </section>
           {actions && <div className={styles.toolbar} role="group" aria-label="작성 도구">{actions}</div>}
           {notice && <p className={base.error} role="status">{notice}</p>}
@@ -165,7 +152,26 @@ export default function ProjectWorkspace({ projectId, step, children, actions, o
         try { const latest = getProject(projectId); if (latest) updateProject(projectId, { mentorChats: { ...latest.mentorChats, [mentorStep]: messages } }); }
         catch { setNotice("AI 대화를 저장하지 못했어요. 브라우저 저장 공간을 확인해주세요."); }
       }} />
-      <Dialog.Root open={helpOpen} onOpenChange={setHelpOpen}><Dialog.Portal><Dialog.Overlay className={base.overlay} /><Dialog.Content className={base.dialog}><p className={base.eyebrow}>STEP {String(step).padStart(2, "0")} 사용 가이드</p><Dialog.Title>{STEPS[step - 1].label}, 이렇게 진행해요.</Dialog.Title><Dialog.Description>{config.goal}</Dialog.Description><ol className={base.helpSteps}>{config.steps.map((item) => <li key={item[0]}><strong>{item[0]}</strong><p>{item[2]}</p></li>)}</ol><Dialog.Close className={base.close} aria-label="사용 가이드 닫기"><X size={19} /></Dialog.Close><div className={base.dialogActions}><Dialog.Close className={base.primary}>이해했어요</Dialog.Close></div></Dialog.Content></Dialog.Portal></Dialog.Root>
+      <Dialog.Root open={helpOpen} onOpenChange={setHelpOpen}>
+        <Dialog.Portal>
+          <Dialog.Overlay className={base.overlay} />
+          <Dialog.Content className={base.dialog + " " + base.detailedHelp}>
+            <p className={base.eyebrow}>STEP {String(step).padStart(2, "0")} · 사용 방법</p>
+            <Dialog.Title>{STEPS[step - 1].label}, 이렇게 진행해요.</Dialog.Title>
+            <Dialog.Description>{config.goal}</Dialog.Description>
+            <ol className={base.helpSteps}>
+              {config.steps.map((item, index) => <li key={item[0]} data-current={index === guideIndex}>
+                <strong>{item[0]}</strong>
+                <p>{item[2]}</p>
+                <p className={base.helpExample}>{item[3]}</p>
+              </li>)}
+            </ol>
+            <div className={base.helpNote}><strong>다음 단계로 가기 전에</strong><p>{onSave ? "작성한 내용은 저장 버튼으로 보관해주세요. AI가 만든 초안을 사용했다면 사실과 맞는지 확인하고 내 기획에 맞게 다듬어요." : "체크리스트는 실제로 확인한 항목만 표시해주세요. 최종 요약을 내려받고 프로젝트 목록에서 전체 백업도 보관할 수 있어요."}</p></div>
+            <Dialog.Close className={base.close} aria-label="사용 방법 닫기"><X size={19} /></Dialog.Close>
+            <div className={base.dialogActions}><Dialog.Close className={base.primary}>이해했어요</Dialog.Close></div>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
     </div>
   );
 }

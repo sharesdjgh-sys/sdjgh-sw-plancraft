@@ -32,6 +32,4 @@
 
 @media(max-width:760px){.editor input:not([type=checkbox]),.editor select{min-height:42px}}
 
-.sidebar{position:sticky;top:0;align-self:start;height:calc(100dvh - 65px)}
 .editor input:not([type=checkbox]),.editor textarea,.editor select{background:#fff!important}
-@media(max-width:760px){.sidebar{display:none}}

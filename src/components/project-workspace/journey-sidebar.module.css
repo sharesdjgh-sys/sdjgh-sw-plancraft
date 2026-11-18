@@ -1,0 +1,108 @@
+.sidebar {
+  position: sticky;
+  top: 65px;
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: calc(100dvh - 65px);
+  overflow-y: auto;
+  padding: 28px 20px 22px;
+  border-right: 1px solid var(--brand-rose-border);
+  background: #faf3f5;
+  color: #583b44;
+  scrollbar-width: thin;
+}
+
+.overview { padding: 0 12px 24px; border-bottom: 1px solid #ead6dd; }
+.projectLabel { font-size: 11px; line-height: 1.8; color: #80616b; }
+.projectTitle { margin-top: 7px; font-size: 17px; font-weight: 700; line-height: 1.65; letter-spacing: -.4px; color: #873349; overflow-wrap: anywhere; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.progressLabel { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-top: 19px; font-size: 12px; color: #795660; }
+.progressLabel strong { color: var(--brand-rose-deep); font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.progressLabel strong span { margin-left: 2px; font-size: 11px; }
+.progressTrack { height: 5px; margin-top: 9px; border-radius: 4px; overflow: hidden; background: #ead4dc; }
+.progressTrack > span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #d76a85, var(--brand-rose)); }
+.navigation { padding-top: 25px; }
+.navHeading { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 0 12px; margin-bottom: 16px; }
+.navHeading h2 { font-family: var(--font-ui), sans-serif; font-size: 15px; font-weight: 700; line-height: 1.6; letter-spacing: -.3px; color: #873349; }
+.navHeading > span { color: var(--brand-rose-deep); font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.navHeading > span > span { color: #80616b; font-weight: 400; margin-left: 3px; }
+.steps { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 5px; }
+.steps li { min-width: 0; }
+.step { position: relative; display: flex; align-items: center; gap: 12px; min-height: 72px; padding: 12px; border: 1px solid transparent; border-radius: 10px; text-decoration: none; transition: background .18s ease, border-color .18s ease; }
+a.step:hover { background: #f3e2e8; }
+a.step:focus-visible { outline: 2px solid var(--brand-rose-deep); outline-offset: 3px; }
+.stepNumber { display: grid; place-items: center; width: 32px; height: 32px; flex-shrink: 0; border: 1px solid #dcbac5; border-radius: 50%; background: #fff9fb; color: #9a4059; font-size: 12px; font-variant-numeric: tabular-nums; }
+.stepCopy { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.stepName { font-size: 15px; font-weight: 700; line-height: 1.6; letter-spacing: -.25px; }
+.stepDescription { font-size: 11px; line-height: 1.7; color: #805c67; }
+.stepIndicator { margin-left: auto; flex-shrink: 0; color: #94717c; }
+.current, a.current:hover { background: linear-gradient(115deg, var(--brand-rose), var(--brand-rose-deep)); border-color: #ac3855; box-shadow: 0 4px 12px #9f304b18; }
+.current .stepNumber { border-color: #ffffff55; background: #ffffff1f; color: #fff; }
+.current .stepName, .current .stepIndicator { color: #fff; }
+.current .stepDescription { color: #fceaf0; }
+.passed .stepNumber { color: #9b3c55; background: #f1dce4; border-color: #e1b9c7; }
+.locked .stepName { color: #7e606a; font-weight: 400; }
+.locked .stepNumber { border-color: #e1cbd3; background: transparent; color: #94717c; }
+.locked .stepDescription { color: #856671; }
+.bottom { margin-top: auto; padding: 25px 4px 0; }
+.signature { padding-top: 19px; border-top: 1px solid #ead6dd; }
+.signature > span { margin: 0 auto; }
+
+@media (max-width: 1100px) and (min-width: 761px) {
+  .sidebar { padding: 24px 12px 20px; }
+  .overview { padding-inline: 10px; }
+  .navHeading { padding-inline: 10px; }
+  .step { gap: 10px; padding: 11px 9px; }
+  .stepName { font-size: 14px; }
+  .stepIndicator { display: none; }
+}
+
+@media (min-width: 761px) and (max-height: 950px) {
+  .sidebar { padding-block: 20px 18px; }
+  .overview { padding-bottom: 18px; }
+  .progressLabel { margin-top: 12px; }
+  .navigation { padding-top: 20px; }
+  .navHeading { margin-bottom: 12px; }
+  .step { min-height: 64px; padding-block: 8px; }
+  .stepCopy { gap: 2px; }
+  .bottom { padding-top: 18px; }
+  .signature { padding-top: 14px; }
+}
+
+@media (min-width: 761px) and (max-height: 800px) {
+  .sidebar { padding-block: 16px; }
+  .projectLabel { display: none; }
+  .projectTitle { margin-top: 0; font-size: 15px; }
+  .overview { padding-bottom: 14px; }
+  .progressLabel { margin-top: 10px; }
+  .navigation { padding-top: 16px; }
+  .navHeading { margin-bottom: 10px; }
+  .steps { gap: 3px; }
+  .step { min-height: 58px; padding-block: 7px; }
+  .stepName { font-size: 14px; line-height: 1.5; }
+  .stepDescription { line-height: 1.6; }
+  .bottom { padding-top: 14px; }
+  .signature { padding-top: 12px; }
+}
+
+@media (max-width: 760px) {
+  .sidebar { position: static; height: auto; overflow: visible; padding: 16px 0 12px; border-right: 0; border-bottom: 1px solid var(--brand-rose-border); }
+  .overview, .bottom { display: none; }
+  .navigation { padding: 0; }
+  .navHeading { padding: 0 22px; margin-bottom: 10px; }
+  .navHeading h2 { font-size: 13px; }
+  .navHeading > span { font-size: 11px; }
+  .steps { position: relative; flex-direction: row; gap: 7px; padding: 2px 22px 5px; overflow-x: auto; scrollbar-width: none; }
+  .steps::-webkit-scrollbar { display: none; }
+  .steps li { flex-shrink: 0; }
+  .step { min-height: 48px; padding: 9px 12px; gap: 8px; border-color: #e7cdd6; border-radius: 8px; }
+  .stepNumber { width: 25px; height: 25px; font-size: 10px; }
+  .stepName { font-size: 12px; white-space: nowrap; }
+  .stepDescription, .stepIndicator { display: none; }
+  .current { border-color: #ac3855; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .step { transition: none; }
+}
