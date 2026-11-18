@@ -3,6 +3,7 @@
 import { use, useRef, useState } from "react";
 import Link from "next/link";
 import BrandMark from "@/components/brand/BrandMark";
+import FullscreenToggle from "@/components/FullscreenToggle";
 import JourneySidebar from "@/components/project-workspace/JourneySidebar";
 import { useRouter } from "next/navigation";
 import * as Dialog from "@radix-ui/react-dialog";
@@ -126,7 +127,10 @@ export default function IdeaPage({ params }: { params: Promise<{ id: string }> }
               <h1>아이디어 발굴</h1>
               <p className={styles.description}>불편했던 일을 이야기하면, 아이디어봇이 질문하며 함께 구체화해요.</p>
             </div>
-            <button className={styles.helpButton} onClick={() => setHelpOpen(true)}><BookOpen size={14} /> 사용 방법</button>
+            <div className={styles.headingActions}>
+              <button className={styles.helpButton} onClick={() => setHelpOpen(true)}><BookOpen size={14} /> 사용 방법</button>
+              <FullscreenToggle />
+            </div>
           </div>
 
           {!hasConversation && <div className={styles.prompts} role="group" aria-label="대화를 시작하는 예시">

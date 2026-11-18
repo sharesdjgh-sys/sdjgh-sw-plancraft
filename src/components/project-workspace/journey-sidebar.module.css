@@ -1,4 +1,5 @@
 .sidebar {
+  --sidebar-scroll-thumb: #eadde2;
   position: sticky;
   top: 0;
   align-self: start;
@@ -12,7 +13,13 @@
   background: #faf3f5;
   color: #583b44;
   scrollbar-width: thin;
+  scrollbar-color: var(--sidebar-scroll-thumb) transparent;
 }
+
+.sidebar:hover,.sidebar:focus-within{--sidebar-scroll-thumb:#d7c0c9}
+.sidebar::-webkit-scrollbar{width:3px}
+.sidebar::-webkit-scrollbar-track{background:transparent}
+.sidebar::-webkit-scrollbar-thumb{background:var(--sidebar-scroll-thumb);border-radius:3px}
 
 .sidebarBrand { display: inline-flex; align-self: flex-start; margin: 0 12px 24px; border-radius: 3px; }
 .sidebarBrand:focus-visible { outline: 2px solid var(--brand-rose-deep); outline-offset: 5px; }

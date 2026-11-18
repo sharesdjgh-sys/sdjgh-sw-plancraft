@@ -4,6 +4,7 @@ import { Suspense, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import BrandMark from "@/components/brand/BrandMark";
+import FullscreenToggle from "@/components/FullscreenToggle";
 import WorkspaceSidebar from "@/components/project-workspace/WorkspaceSidebar";
 import { useRouter, useSearchParams } from "next/navigation";
 import * as Dialog from "@radix-ui/react-dialog";
@@ -159,7 +160,10 @@ function DashboardContent() {
         <main className={base.main}>
           <div className={styles.heading}>
             <div><p className={base.eyebrow}>나의 작업 공간 · 생각을 기획으로</p><h1>내 프로젝트</h1><p>떠오른 생각을 기록하고, 나만의 기획서로 구체화해보세요.</p></div>
-            <button className={base.primary} onClick={openCreate}><Plus size={16} /> 새 프로젝트</button>
+            <div className={base.headingActions}>
+              <button className={base.primary} onClick={openCreate}><Plus size={16} /> 새 프로젝트</button>
+              <FullscreenToggle />
+            </div>
           </div>
           <div className={styles.mobileTools}>{backupButtons}<Link href={"/guide?type=" + preferredUserType}><BookOpen size={14} /> 사용 가이드</Link></div>
 

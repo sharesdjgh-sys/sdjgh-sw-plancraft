@@ -3,6 +3,7 @@
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import BrandMark from "@/components/brand/BrandMark";
+import FullscreenToggle from "@/components/FullscreenToggle";
 import WorkspaceSidebar from "@/components/project-workspace/WorkspaceSidebar";
 import { useSearchParams } from "next/navigation";
 import { useProjects } from "@/lib/use-project";
@@ -109,7 +110,10 @@ function GuideContent() {
             <h1 id="guide-title">사용 가이드</h1>
             <p className={base.description}>아이디어 발굴부터 최종 검토까지, 단계별 작성 방법을 살펴보세요.</p>
           </div>
-          <Link href={dashboardHref} className={base.helpButton}>내 프로젝트 <ArrowRight size={15} /></Link>
+          <div className={base.headingActions}>
+            <Link href={dashboardHref} className={base.helpButton}>내 프로젝트 <ArrowRight size={15} /></Link>
+            <FullscreenToggle />
+          </div>
         </section>
 
         <section className={styles.reader} aria-label="6단계 기획 가이드">

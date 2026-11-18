@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 import Link from "next/link";
 import BrandMark from "@/components/brand/BrandMark";
+import FullscreenToggle from "@/components/FullscreenToggle";
 import JourneySidebar from "./JourneySidebar";
 import { useRouter } from "next/navigation";
 import * as Dialog from "@radix-ui/react-dialog";
@@ -131,7 +132,10 @@ export default function ProjectWorkspace({ projectId, step, children, actions, o
         <main className={base.main + " " + styles.withFloatingHelp}>
           <div className={base.heading}>
             <div><p className={base.eyebrow}>STEP {String(step).padStart(2, "0")} · 생각을 구체적으로</p><h1>{STEPS[step - 1].label}</h1><p className={base.description}>{config.description}</p></div>
-            <button className={base.helpButton} onClick={() => setHelpOpen(true)}><BookOpen size={14} /> 사용 방법</button>
+            <div className={base.headingActions}>
+              <button className={base.helpButton} onClick={() => setHelpOpen(true)}><BookOpen size={14} /> 사용 방법</button>
+              <FullscreenToggle />
+            </div>
           </div>
           {step === 6 && <>
             <ol className={base.flow} aria-label="이번 단계 사용 안내">{config.steps.map((item, index) => <li key={item[0]}><button onClick={() => setGuideIndex(index)} aria-current={index === guideIndex ? "step" : undefined}><span>{index + 1}</span>{item[0]}</button></li>)}</ol>

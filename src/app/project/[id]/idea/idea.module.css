@@ -23,6 +23,9 @@
 .sidebarBottom>p{font-size:11px;line-height:1.95;color:#8d8175;border-top:1px solid #EBE7E0;padding-top:20px;margin-top:24px}
 .main{width:100%;max-width:1080px;margin:0 auto;padding:34px 48px 28px;min-width:0}
 .heading{display:flex;align-items:center;justify-content:space-between;gap:24px}
+.headingActions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.headingActions>.helpButton{margin-top:0}
+@media(max-width:760px){.headingActions{margin-top:25px}}
 .eyebrow{font-size:11px;letter-spacing:.6px;font-weight:500;color:var(--brand-rose)}
 .heading h1{font-size:28px;font-weight:400;letter-spacing:-1px;line-height:1.5;margin-top:8px}
 .description{font-size:13px;line-height:1.9;color:#7A7067;margin-top:8px}
