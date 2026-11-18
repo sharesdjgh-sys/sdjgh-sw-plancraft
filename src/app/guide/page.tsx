@@ -1,10 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import BrandMark from "@/components/brand/BrandMark";
-import { ArrowLeft, ArrowRight, Check, ChevronRight, Clock3, Lightbulb, Target, Users, Cpu, PenLine, Trophy, MoveHorizontal } from "lucide-react";
+import WorkspaceSidebar from "@/components/project-workspace/WorkspaceSidebar";
+import { useSearchParams } from "next/navigation";
+import { useProjects } from "@/lib/use-project";
+import type { UserType } from "@/lib/storage";
+import { ArrowLeft, ArrowRight, Check, Clock3, Lightbulb, Target, Users, Cpu, PenLine, Trophy, MoveHorizontal } from "lucide-react";
 import base from "@/app/project/[id]/idea/idea.module.css";
 import styles from "./guide.module.css";
 
@@ -33,7 +36,11 @@ const OUTCOMES = [
   { title: "점검을 마친 최종 기획서", example: "빠진 내용과 어색한 문장을 확인하고, 제출 형식과 파일까지 마지막으로 점검해요." },
 ];
 
-export default function GuidePage() {
+function GuideContent() {
+  const searchParams = useSearchParams();
+  const userType: UserType = searchParams.get("type") === "general" ? "general" : "student";
+  const dashboardHref = "/dashboard?type=" + userType;
+  const projects = useProjects();
   const railRef = useRef<HTMLDivElement>(null);
   const navRef = useRef<HTMLOListElement>(null);
   const activeRef = useRef(0);
@@ -85,26 +92,24 @@ export default function GuidePage() {
   }, [active]);
 
   return (
-    <div className={base.page}>
+    <div className={base.page + " " + base.workspacePage}>
       <header className={base.header + " " + styles.header}>
         <Link href="/" className={base.brand}>
           <BrandMark />
         </Link>
-        <div className={base.breadcrumb}><Link href="/dashboard">내 작업 공간</Link><ChevronRight size={13} /><span>사용 가이드</span></div>
-        <Link href="/dashboard" className={styles.backLink}>내 프로젝트 <ArrowRight size={15} /></Link>
+        <span className={base.mobileStage}>사용 가이드</span>
       </header>
 
-      <main className={styles.main}>
-        <section className={styles.intro} aria-labelledby="guide-title">
+      <div className={base.layout + " " + base.journeyLayout}>
+        <WorkspaceSidebar userType={userType} active="guide" projectCount={projects?.length ?? 0} />
+        <main className={base.main + " " + styles.main}>
+        <section className={base.heading + " " + styles.intro} aria-labelledby="guide-title">
           <div>
-            <p className={base.eyebrow}>PLANCRAFT GUIDE · 아이디어를 기획으로</p>
-            <h1 id="guide-title">좋은 기획은,<br />한 단계씩 만들어져요.</h1>
-            <p className={styles.description}>처음이어도 괜찮아요. 작은 생각을 꺼내는 순간부터<br className={styles.desktopBreak} /> 기획서를 완성하기까지, 6단계의 여정을 살펴보세요.</p>
+            <p className={base.eyebrow}>나의 작업 공간 · 아이디어를 기획으로</p>
+            <h1 id="guide-title">사용 가이드</h1>
+            <p className={base.description}>아이디어 발굴부터 최종 검토까지, 단계별 작성 방법을 살펴보세요.</p>
           </div>
-          <div className={styles.introAside}>
-            <Image src="/ideabot-remove.png" width={88} height={88} alt="" unoptimized />
-            <div><strong>혼자 고민하지 않아도 돼요.</strong><p>막힐 때는 각 단계의 AI 멘토에게<br />지금의 생각을 편하게 이야기해보세요.</p></div>
-          </div>
+          <Link href={dashboardHref} className={base.helpButton}>내 프로젝트 <ArrowRight size={15} /></Link>
         </section>
 
         <section className={styles.reader} aria-label="6단계 기획 가이드">
@@ -173,10 +178,15 @@ export default function GuidePage() {
 
         <section className={styles.start}>
           <div><p className={base.eyebrow}>{active === 5 ? "이제, 나의 기획을 시작할 시간" : "읽는 것에서, 만드는 것으로"}</p><h2>작은 생각 하나면 시작할 수 있어요.</h2><p>완벽한 아이디어가 없어도 괜찮아요. 첫 질문부터 함께 정리해봐요.</p></div>
-          <Link href="/dashboard" className={base.primary}>내 아이디어 기획하기 <ArrowRight size={16} /></Link>
+          <Link href={dashboardHref} className={base.primary}>내 아이디어 기획하기 <ArrowRight size={16} /></Link>
         </section>
         <footer className={styles.footer}><span>PlanCraft · 생각에서 기획까지</span><span>YOUR IDEA, ONE STEP CLOSER.</span></footer>
       </main>
+      </div>
     </div>
   );
+}
+
+export default function GuidePage() {
+  return <Suspense fallback={<main className={base.status} role="status">사용 가이드를 준비하고 있어요.</main>}><GuideContent /></Suspense>;
 }

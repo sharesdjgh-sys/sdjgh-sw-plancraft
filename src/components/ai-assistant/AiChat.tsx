@@ -5,25 +5,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Send, User, Bot, Mic, MicOff, ArrowUp, Sparkles } from "lucide-react";
 import Image from "next/image";
 import discovery from "./discovery.module.css";
+import ChatMarkdown from "./ChatMarkdown";
 import { type UserType } from "@/lib/storage";
 
 type Message = { role: "user" | "assistant"; content: string };
-
-function stripMarkdown(text: string): string {
-  return text
-    .replace(/#{1,6}\s*/g, "")
-    .replace(/\*\*(.+?)\*\*/g, "$1")
-    .replace(/\*(.+?)\*/g, "$1")
-    .replace(/__(.+?)__/g, "$1")
-    .replace(/_(.+?)_/g, "$1")
-    .replace(/`{3}[\s\S]*?`{3}/g, "")
-    .replace(/`(.+?)`/g, "$1")
-    .replace(/^\s*[-*+]\s+/gm, "")
-    .replace(/^\s*\d+\.\s+/gm, "")
-    .replace(/\[(.+?)\]\(.+?\)/g, "$1")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim();
-}
 
 export interface AiChatHandle {
   focusInput: () => void;
@@ -174,7 +159,7 @@ const AiChat = forwardRef<AiChatHandle, AiChatProps>(function AiChat(
       });
       const data = await res.json();
       if (!res.ok || typeof data.reply !== "string") throw new Error(data.error || "AI 응답을 받지 못했어요. 잠시 후 다시 시도해주세요.");
-      const newMessages = [...next, { role: "assistant" as const, content: stripMarkdown(data.reply) }];
+      const newMessages = [...next, { role: "assistant" as const, content: data.reply }];
       setMessages(newMessages);
       onMessagesChange?.(newMessages);
     } catch (err) {
@@ -206,7 +191,7 @@ const AiChat = forwardRef<AiChatHandle, AiChatProps>(function AiChat(
           <div className={discovery.messages}>
             {messages.map((message, index) => message.role === "user"
               ? <div key={index} className={discovery.user}>{message.content}</div>
-              : <div key={index}><div className={discovery.role}><span><Sparkles size={12} /></span>아이디어봇</div><div className={discovery.assistantText}>{message.content}</div></div>
+              : <div key={index}><div className={discovery.role}><span><Sparkles size={12} /></span>아이디어봇</div><div className={discovery.assistantText}><ChatMarkdown>{message.content}</ChatMarkdown></div></div>
             )}
             {loading && <div className={discovery.loading} role="status"><span /> 생각을 정리하고 있어요…</div>}
           </div>
@@ -261,12 +246,12 @@ const AiChat = forwardRef<AiChatHandle, AiChatProps>(function AiChat(
                 : <Bot className="w-3 h-3 text-white" />
               }
             </div>
-            <div className={`max-w-[82%] whitespace-pre-wrap break-words rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed ${
+            <div className={`min-w-0 max-w-[88%] break-words rounded-2xl px-3.5 py-2.5 text-base leading-[1.85] ${
               msg.role === "user"
-                ? "bg-[#D4547A] text-white rounded-tr-sm"
-                : "bg-white text-[#1A1A1A] rounded-tl-sm border border-[#EBE7E0] shadow-[0_1px_4px_rgba(0,0,0,0.04)]"
+                ? "bg-[#BF4664] text-white rounded-tr-sm whitespace-pre-wrap"
+                : "bg-white text-[#352b31] rounded-tl-sm border border-[#EBE7E0] shadow-[0_1px_4px_rgba(0,0,0,0.04)]"
             }`}>
-              {msg.content}
+              {msg.role === "assistant" ? <ChatMarkdown>{msg.content}</ChatMarkdown> : msg.content}
             </div>
           </div>
         ))}
@@ -299,7 +284,7 @@ const AiChat = forwardRef<AiChatHandle, AiChatProps>(function AiChat(
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={placeholder ?? "Enter로 전송, Shift+Enter로 줄바꿈"}
-            className="resize-none min-h-[52px] max-h-[100px] text-xs"
+            className="resize-none min-h-[52px] max-h-[100px] text-base text-[#352b31]"
             rows={2}
           />
           <button

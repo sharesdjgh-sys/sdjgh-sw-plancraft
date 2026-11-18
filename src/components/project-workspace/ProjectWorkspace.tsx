@@ -6,7 +6,7 @@ import BrandMark from "@/components/brand/BrandMark";
 import JourneySidebar from "./JourneySidebar";
 import { useRouter } from "next/navigation";
 import * as Dialog from "@radix-ui/react-dialog";
-import { ArrowLeft, ArrowRight, BookOpen, ChevronRight, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, X } from "lucide-react";
 import { type AiChatHandle } from "@/components/ai-assistant/AiChat";
 import FloatingAiMentor from "@/components/ai-assistant/FloatingAiMentor";
 import { useProject } from "@/lib/use-project";
@@ -124,8 +124,6 @@ export default function ProjectWorkspace({ projectId, step, children, actions, o
     <div className={base.page + " " + base.workspacePage}>
       <header className={base.header}>
         <Link href={dashboardHref} className={base.brand} onClick={(event) => { event.preventDefault(); void navigate(dashboardHref); }}><BrandMark /></Link>
-        <div className={base.breadcrumb}><Link href={dashboardHref} onClick={(event) => { event.preventDefault(); void navigate(dashboardHref); }}>내 작업 공간</Link><ChevronRight size={13} /><span>{project.title}</span></div>
-        <span className={base.storageNote}><span /> {onSave ? "저장 버튼으로 기획 보관" : "이 브라우저에 저장"}</span>
         <span className={base.mobileStage}>{STEPS[step - 1].label} · {step} / 6</span>
       </header>
       <div className={base.layout + " " + base.journeyLayout}>
@@ -135,10 +133,12 @@ export default function ProjectWorkspace({ projectId, step, children, actions, o
             <div><p className={base.eyebrow}>STEP {String(step).padStart(2, "0")} · 생각을 구체적으로</p><h1>{STEPS[step - 1].label}</h1><p className={base.description}>{config.description}</p></div>
             <button className={base.helpButton} onClick={() => setHelpOpen(true)}><BookOpen size={14} /> 사용 방법</button>
           </div>
-          <ol className={base.flow} aria-label="이번 단계 사용 안내">{config.steps.map((item, index) => <li key={item[0]}><button onClick={() => setGuideIndex(index)} aria-current={index === guideIndex ? "step" : undefined}><span>{index + 1}</span>{item[0]}</button></li>)}</ol>
-          <section className={base.quickGuide} aria-label="간단한 작성 안내">
-            <span>{current[0]}</span><p>{current[1]}</p>
-          </section>
+          {step === 6 && <>
+            <ol className={base.flow} aria-label="이번 단계 사용 안내">{config.steps.map((item, index) => <li key={item[0]}><button onClick={() => setGuideIndex(index)} aria-current={index === guideIndex ? "step" : undefined}><span>{index + 1}</span>{item[0]}</button></li>)}</ol>
+            <section className={base.quickGuide} aria-label="간단한 작성 안내">
+              <span>{current[0]}</span><p>{current[1]}</p>
+            </section>
+          </>}
           {actions && <div className={styles.toolbar} role="group" aria-label="작성 도구">{actions}</div>}
           {notice && <p className={base.error} role="status">{notice}</p>}
           <div ref={editorRef} className={styles.editor}>{children}</div>
@@ -160,7 +160,7 @@ export default function ProjectWorkspace({ projectId, step, children, actions, o
             <Dialog.Title>{STEPS[step - 1].label}, 이렇게 진행해요.</Dialog.Title>
             <Dialog.Description>{config.goal}</Dialog.Description>
             <ol className={base.helpSteps}>
-              {config.steps.map((item, index) => <li key={item[0]} data-current={index === guideIndex}>
+              {config.steps.map((item, index) => <li key={item[0]} data-current={step === 6 && index === guideIndex}>
                 <strong>{item[0]}</strong>
                 <p>{item[2]}</p>
                 <p className={base.helpExample}>{item[3]}</p>

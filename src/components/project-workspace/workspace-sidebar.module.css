@@ -1,0 +1,6 @@
+.menuIcon{display:flex;align-items:center;justify-content:center;align-self:flex-start;flex-shrink:0;width:22px;height:24px;color:#96717f}
+.navCount{margin-left:auto;font-size:12px;font-weight:700;color:#8e304c;font-variant-numeric:tabular-nums}
+.footer{margin-top:auto;padding:25px 4px 0}
+.signature{padding-top:14px;border-top:1px solid #ead6dd}
+.signature>span{margin:0 auto}
+@media(max-width:760px){.sidebar{display:none}}

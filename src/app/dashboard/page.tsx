@@ -4,9 +4,10 @@ import { Suspense, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import BrandMark from "@/components/brand/BrandMark";
+import WorkspaceSidebar from "@/components/project-workspace/WorkspaceSidebar";
 import { useRouter, useSearchParams } from "next/navigation";
 import * as Dialog from "@radix-ui/react-dialog";
-import { ArrowRight, BookOpen, Check, ChevronRight, Download, LayoutGrid, Loader2, Pencil, Plus, Search, Trash2, Upload, X } from "lucide-react";
+import { ArrowRight, BookOpen, Check, Download, Loader2, Pencil, Plus, Search, Trash2, Upload, X } from "lucide-react";
 import { GENRES, STEPS } from "@/lib/utils";
 import { createProject, deleteProject, updateProject, type Project, type UserType } from "@/lib/storage";
 import { useProjects } from "@/lib/use-project";
@@ -133,41 +134,34 @@ function DashboardContent() {
     finally { setDeleting(false); }
   }
 
-  const dashboardHref = preferredUserType === "general" ? "/dashboard?type=general" : "/dashboard?type=student";
   const backupButtons = <>
     <button onClick={() => importRef.current?.click()}><Upload size={14} /> 백업 가져오기</button>
     <button onClick={handleExport} disabled={projects.length === 0}><Download size={14} /> 전체 백업</button>
   </>;
 
   return (
-    <div className={base.page}>
+    <div className={base.page + " " + base.workspacePage}>
       <input ref={importRef} type="file" accept=".json,application/json" aria-label="프로젝트 백업 파일 선택" hidden onChange={handleImport} />
       <header className={base.header + " " + styles.header}>
         <Link href="/" className={base.brand}><BrandMark /></Link>
-        <div className={base.breadcrumb}><span>내 작업 공간</span><ChevronRight size={13} /><span>프로젝트</span></div>
         <span className={styles.mode}>{preferredUserType === "general" ? "선생님·일반인 모드" : "학생 모드"}</span>
       </header>
 
-      <div className={base.layout}>
-        <aside className={base.sidebar + " " + styles.sidebar}>
-          <p className={base.sidebarLabel}>나의 작업 공간</p>
-          <nav className={base.steps} aria-label="작업 공간 메뉴">
-            <Link href={dashboardHref} className={base.activeStep} aria-current="page"><LayoutGrid size={16} /> 프로젝트 <span className={styles.navCount}>{projects.length}</span></Link>
-            <Link href="/guide"><BookOpen size={16} /> 사용 가이드</Link>
-          </nav>
+      <div className={base.layout + " " + base.journeyLayout}>
+        <WorkspaceSidebar userType={preferredUserType} active="projects" projectCount={projects.length} footer={
           <div className={styles.sidebarFooter}>
             <p className={styles.toolsLabel}>데이터 보관</p>
             <div className={styles.backupTools}>{backupButtons}</div>
             <p className={styles.localNote}>프로젝트는 현재 브라우저에 저장돼요.<br />백업 파일을 따로 보관해주세요.</p>
           </div>
-        </aside>
+        } />
 
-        <main className={styles.main}>
+        <main className={base.main}>
           <div className={styles.heading}>
             <div><p className={base.eyebrow}>나의 작업 공간 · 생각을 기획으로</p><h1>내 프로젝트</h1><p>떠오른 생각을 기록하고, 나만의 기획서로 구체화해보세요.</p></div>
             <button className={base.primary} onClick={openCreate}><Plus size={16} /> 새 프로젝트</button>
           </div>
-          <div className={styles.mobileTools}>{backupButtons}<Link href="/guide"><BookOpen size={14} /> 사용 가이드</Link></div>
+          <div className={styles.mobileTools}>{backupButtons}<Link href={"/guide?type=" + preferredUserType}><BookOpen size={14} /> 사용 가이드</Link></div>
 
           {notice && <div className={styles.notice} role="status"><p>{notice}</p><button onClick={() => setNotice("")} aria-label="알림 닫기"><X size={16} /></button></div>}
 

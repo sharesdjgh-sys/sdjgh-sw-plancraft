@@ -200,7 +200,7 @@ export default function HomePage() {
       {/* Footer */}
       <footer className="border-t border-[#EBE7E0] px-8 py-8 bg-white">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <BrandMark compact />
+          <BrandMark eager={false} />
           <p className="text-xs text-[#ADA8A0]">© 2026 PlanCraft</p>
         </div>
       </footer>

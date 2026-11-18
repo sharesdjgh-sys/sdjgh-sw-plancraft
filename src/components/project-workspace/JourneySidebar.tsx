@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { Check, LockKeyhole } from "lucide-react";
 import JourneySignature from "@/components/brand/JourneySignature";
+import BrandMark from "@/components/brand/BrandMark";
 import { getProjectProgress } from "@/lib/project-status";
 import type { Project } from "@/lib/storage";
 import { STEPS } from "@/lib/utils";
@@ -27,6 +28,7 @@ type Props = {
 export default function JourneySidebar({ project, step, onNavigate }: Props) {
   const navRef = useRef<HTMLOListElement>(null);
   const progress = getProjectProgress(project);
+  const dashboardHref = project.userType === "general" ? "/dashboard?type=general" : "/dashboard?type=student";
 
   useEffect(() => {
     if (!window.matchMedia("(max-width: 760px)").matches) return;
@@ -37,6 +39,9 @@ export default function JourneySidebar({ project, step, onNavigate }: Props) {
 
   return (
     <aside className={styles.sidebar} aria-label="나의 기획 여정">
+      <Link className={styles.sidebarBrand} href={dashboardHref} aria-label="PlanCraft 프로젝트 목록으로" onClick={onNavigate ? (event) => { event.preventDefault(); onNavigate(dashboardHref); } : undefined}>
+        <BrandMark />
+      </Link>
       <div className={styles.overview}>
         <p className={styles.projectLabel}>{project.isCompleted ? "완료한 프로젝트" : "진행 중인 프로젝트"}</p>
         <p className={styles.projectTitle} title={project.title}>{project.title}</p>
