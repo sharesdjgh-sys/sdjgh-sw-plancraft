@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
-import { Check, ChevronRight, LockKeyhole } from "lucide-react";
+import { Check, LockKeyhole } from "lucide-react";
 import JourneySignature from "@/components/brand/JourneySignature";
 import { getProjectProgress } from "@/lib/project-status";
 import type { Project } from "@/lib/storage";
@@ -62,12 +62,12 @@ export default function JourneySidebar({ project, step, onNavigate }: Props) {
             const href = `/project/${encodeURIComponent(project.id)}/${item.route}`;
             const className = `${styles.step} ${selected ? styles.current : !available ? styles.locked : passed ? styles.passed : ""}`;
             const content = <>
-              <span className={styles.stepNumber} aria-hidden="true">{passed ? <Check size={16} strokeWidth={2} /> : String(item.id).padStart(2, "0")}</span>
+              <span className={styles.stepNumber} aria-hidden="true">{String(item.id).padStart(2, "0")}</span>
               <span className={styles.stepCopy}>
                 <span className={styles.stepName}>{item.label}</span>
                 <span className={styles.stepDescription}>{DESCRIPTIONS[item.id - 1]}</span>
               </span>
-              {selected ? <ChevronRight className={styles.stepIndicator} size={16} aria-hidden="true" /> : !available ? <LockKeyhole className={styles.stepIndicator} size={13} aria-hidden="true" /> : null}
+              <span className={styles.stepIndicator} aria-hidden="true">{!available ? <LockKeyhole size={13} strokeWidth={1.5} /> : passed ? <Check size={14} strokeWidth={1.5} /> : null}</span>
             </>;
             return <li key={item.id}>
               {available ? <Link href={href} className={className} aria-current={selected ? "step" : undefined} onClick={onNavigate ? (event) => { event.preventDefault(); onNavigate(href); } : undefined}>{content}</Link>

@@ -27,24 +27,26 @@
 .navHeading h2 { font-family: var(--font-ui), sans-serif; font-size: 15px; font-weight: 700; line-height: 1.6; letter-spacing: -.3px; color: #873349; }
 .navHeading > span { color: var(--brand-rose-deep); font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .navHeading > span > span { color: #80616b; font-weight: 400; margin-left: 3px; }
-.steps { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 5px; }
+.steps { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0; }
 .steps li { min-width: 0; }
-.step { position: relative; display: flex; align-items: center; gap: 12px; min-height: 72px; padding: 12px; border: 1px solid transparent; border-radius: 10px; text-decoration: none; transition: background .18s ease, border-color .18s ease; }
-a.step:hover { background: #f3e2e8; }
+.step { position: relative; display: flex; align-items: center; gap: 12px; min-height: 88px; padding: 18px 12px; border-bottom: 1px solid #ecdee3; text-decoration: none; transition: background .18s ease; }
+.steps li:last-child .step { border-bottom-color: transparent; }
+a.step:hover { background: #f5e9ee; }
 a.step:focus-visible { outline: 2px solid var(--brand-rose-deep); outline-offset: 3px; }
-.stepNumber { display: grid; place-items: center; width: 32px; height: 32px; flex-shrink: 0; border: 1px solid #dcbac5; border-radius: 50%; background: #fff9fb; color: #9a4059; font-size: 12px; font-variant-numeric: tabular-nums; }
-.stepCopy { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-.stepName { font-size: 15px; font-weight: 700; line-height: 1.6; letter-spacing: -.25px; }
-.stepDescription { font-size: 11px; line-height: 1.7; color: #805c67; }
-.stepIndicator { margin-left: auto; flex-shrink: 0; color: #94717c; }
-.current, a.current:hover { background: linear-gradient(115deg, var(--brand-rose), var(--brand-rose-deep)); border-color: #ac3855; box-shadow: 0 4px 12px #9f304b18; }
-.current .stepNumber { border-color: #ffffff55; background: #ffffff1f; color: #fff; }
-.current .stepName, .current .stepIndicator { color: #fff; }
-.current .stepDescription { color: #fceaf0; }
-.passed .stepNumber { color: #9b3c55; background: #f1dce4; border-color: #e1b9c7; }
-.locked .stepName { color: #7e606a; font-weight: 400; }
-.locked .stepNumber { border-color: #e1cbd3; background: transparent; color: #94717c; }
-.locked .stepDescription { color: #856671; }
+.stepNumber { align-self: flex-start; display: block; width: 22px; flex-shrink: 0; padding-top: 2px; color: #96717f; font-size: 13px; font-weight: 400; line-height: 24px; letter-spacing: .3px; font-variant-numeric: tabular-nums; }
+.stepCopy { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+.stepName { font-size: 16px; font-weight: 400; line-height: 1.5; letter-spacing: -.4px; color: #49383f; }
+.stepDescription { font-size: 11px; line-height: 1.7; color: #826671; }
+.stepIndicator { display: grid; place-items: center; width: 14px; margin-left: auto; flex-shrink: 0; color: #a38a94; }
+.current, a.current:hover { background: #f4e4eb; }
+.current::before { content: ""; position: absolute; left: 0; top: 16px; bottom: 16px; width: 2px; background: var(--brand-rose); }
+.current .stepNumber { color: #8e304c; font-weight: 700; }
+.current .stepName { color: #8e304c; font-weight: 700; }
+.current .stepDescription { color: #88546a; }
+.passed .stepIndicator { color: #98717f; }
+.locked .stepName { color: #7c6470; }
+.locked .stepNumber { color: #9b7b89; }
+.locked .stepDescription { color: #856c77; }
 .bottom { margin-top: auto; padding: 25px 4px 0; }
 .signature { padding-top: 19px; border-top: 1px solid #ead6dd; }
 .signature > span { margin: 0 auto; }
@@ -53,8 +55,8 @@ a.step:focus-visible { outline: 2px solid var(--brand-rose-deep); outline-offset
   .sidebar { padding: 24px 12px 20px; }
   .overview { padding-inline: 10px; }
   .navHeading { padding-inline: 10px; }
-  .step { gap: 10px; padding: 11px 9px; }
-  .stepName { font-size: 14px; }
+  .step { gap: 10px; padding: 14px 10px; }
+  .stepName { font-size: 15px; }
   .stepIndicator { display: none; }
 }
 
@@ -64,8 +66,7 @@ a.step:focus-visible { outline: 2px solid var(--brand-rose-deep); outline-offset
   .progressLabel { margin-top: 12px; }
   .navigation { padding-top: 20px; }
   .navHeading { margin-bottom: 12px; }
-  .step { min-height: 64px; padding-block: 8px; }
-  .stepCopy { gap: 2px; }
+  .step { min-height: 82px; padding-block: 15px; }
   .bottom { padding-top: 18px; }
   .signature { padding-top: 14px; }
 }
@@ -78,9 +79,8 @@ a.step:focus-visible { outline: 2px solid var(--brand-rose-deep); outline-offset
   .progressLabel { margin-top: 10px; }
   .navigation { padding-top: 16px; }
   .navHeading { margin-bottom: 10px; }
-  .steps { gap: 3px; }
-  .step { min-height: 58px; padding-block: 7px; }
-  .stepName { font-size: 14px; line-height: 1.5; }
+  .step { min-height: 72px; padding-block: 11px; }
+  .stepName { font-size: 15px; line-height: 1.5; }
   .stepDescription { line-height: 1.6; }
   .bottom { padding-top: 14px; }
   .signature { padding-top: 12px; }
@@ -93,14 +93,16 @@ a.step:focus-visible { outline: 2px solid var(--brand-rose-deep); outline-offset
   .navHeading { padding: 0 22px; margin-bottom: 10px; }
   .navHeading h2 { font-size: 13px; }
   .navHeading > span { font-size: 11px; }
-  .steps { position: relative; flex-direction: row; gap: 7px; padding: 2px 22px 5px; overflow-x: auto; scrollbar-width: none; }
+  .steps { position: relative; flex-direction: row; gap: 18px; padding: 2px 22px 0; overflow-x: auto; scrollbar-width: none; }
   .steps::-webkit-scrollbar { display: none; }
   .steps li { flex-shrink: 0; }
-  .step { min-height: 48px; padding: 9px 12px; gap: 8px; border-color: #e7cdd6; border-radius: 8px; }
-  .stepNumber { width: 25px; height: 25px; font-size: 10px; }
-  .stepName { font-size: 12px; white-space: nowrap; }
+  .step { min-height: 43px; padding: 8px 0 12px; gap: 7px; border-bottom: 2px solid transparent; }
+  .stepNumber { align-self: center; width: auto; padding-top: 0; font-size: 11px; line-height: 21px; }
+  .stepName { font-size: 13px; white-space: nowrap; }
   .stepDescription, .stepIndicator { display: none; }
-  .current { border-color: #ac3855; }
+  .current, a.current:hover { background: transparent; border-bottom-color: var(--brand-rose); }
+  .steps li:last-child .current { border-bottom-color: var(--brand-rose); }
+  .current::before { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
