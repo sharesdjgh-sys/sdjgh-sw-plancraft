@@ -8,6 +8,7 @@ import ScrollReveal from "@/components/ScrollReveal";
 import BrandMark from "@/components/brand/BrandMark";
 import JourneySignature from "@/components/brand/JourneySignature";
 import HeroIdeaScene from "@/components/home/HeroIdeaScene";
+import HomeHeader from "@/components/home/HomeHeader";
 import AuroraBackground from "@/components/ui/AuroraBackground";
 import styles from "./home.module.css";
 
@@ -34,7 +35,7 @@ export default function HomePage() {
     <div className="min-h-screen bg-[#FBF9F6] text-[#1A1A1A] overflow-x-hidden">
 
       {/* Nav */}
-      <nav className={styles.navigation + " fixed top-0 left-0 right-0 z-50 h-[65px] flex items-center justify-between px-4 sm:px-8 bg-[#FBF9F6]/85 backdrop-blur-xl border-b border-[#EBE7E0]"}>
+      <HomeHeader className={styles.navigation + " fixed top-0 left-0 right-0 z-50 h-[65px] flex items-center justify-between px-4 sm:px-8"}>
         <Link href="/" aria-label="PlanCraft 홈"><BrandMark /></Link>
         <div className="flex items-center gap-2 sm:gap-5">
           <Link href="/guide" className="text-xs sm:text-sm text-[#7A7067] hover:text-[#1A1A1A] transition-colors duration-200">
@@ -47,7 +48,7 @@ export default function HomePage() {
             시작하기 <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
-      </nav>
+      </HomeHeader>
 
       {/* Hero */}
       <section className={styles.hero} aria-labelledby="hero-title">
@@ -77,7 +78,7 @@ export default function HomePage() {
       </section>
 
       {/* 6단계 */}
-      <section className="px-8 py-24 max-w-6xl mx-auto">
+      <section className="px-8 py-24 max-w-[1200px] mx-auto">
         <ScrollReveal>
           <div className="text-center mb-14">
             <p className="text-xs font-medium text-[#D4547A] uppercase tracking-widest mb-3">Process</p>
@@ -93,18 +94,18 @@ export default function HomePage() {
             const Icon = step.icon;
             const color = STEP_COLORS[i];
             return (
-              <ScrollReveal key={step.label} delay={i * 55}>
-                <div className="rounded-2xl border border-[#EBE7E0] p-5 transition-all duration-300 cursor-default" style={{ backgroundColor: color + "0d" }}>
+              <ScrollReveal key={step.label} delay={i * 55} className="h-full">
+                <div className="h-full min-h-[104px] rounded-2xl border border-[#EBE7E0] p-6 transition-all duration-300 cursor-default" style={{ backgroundColor: color + "0d" }}>
                   <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: color + "1a" }}>
-                      <Icon className="w-4.5 h-4.5" style={{ color }} />
+                    <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: color + "1a" }}>
+                      <Icon className="w-5 h-5" style={{ color }} />
                     </div>
-                    <div>
+                    <div className="min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-[10px] font-mono font-semibold" style={{ color }}>{String(i + 1).padStart(2, "0")}</span>
-                        <h3 className="text-sm font-semibold text-[#1A1A1A]">{step.label}</h3>
+                        <span className="text-[11px] font-mono font-semibold" style={{ color }}>{String(i + 1).padStart(2, "0")}</span>
+                        <h3 className="text-[15px] font-semibold text-[#1A1A1A]">{step.label}</h3>
                       </div>
-                      <p className="text-xs text-[#ADA8A0] leading-relaxed">{step.desc}</p>
+                      <p className="text-[13px] text-[#ADA8A0] leading-relaxed">{step.desc}</p>
                     </div>
                   </div>
                 </div>
