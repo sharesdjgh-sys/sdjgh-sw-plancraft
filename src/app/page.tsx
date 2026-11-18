@@ -56,7 +56,7 @@ export default function HomePage() {
         <div className={styles.heroInner}>
           <div className={styles.heroCopy + " hero-enter"}>
             <p className={styles.eyebrow}><Lightbulb size={16} aria-hidden="true" /> 학생의 상상부터, 선생님의 수업까지</p>
-            <h1 id="hero-title" className={styles.heroTitle}>해보고 싶은 생각,<br /><span>기획으로 꺼내봐요.</span></h1>
+            <h1 id="hero-title" className={styles.heroTitle}>일상의 불편함을,<br /><span>만들고 싶은 서비스로.</span></h1>
             <p className={styles.heroLead}>학교에서 느낀 불편함도, 수업을 바꿀 아이디어도.<br className={styles.desktopBreak} /> 아이디어봇과 이야기하며 <strong>만들어보고 싶은 것</strong>을<br className={styles.desktopBreak} /> 나만의 기획서로 정리해보세요.</p>
             <div className={styles.heroActions}>
               <Link href="/dashboard?type=student" className={styles.studentAction} aria-label="학생으로 내 아이디어 꺼내기">
