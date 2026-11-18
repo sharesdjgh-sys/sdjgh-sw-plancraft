@@ -31,6 +31,10 @@
 .description{font-size:13px;line-height:1.9;color:#7A7067;margin-top:8px}
 .helpButton{display:inline-flex;align-items:center;justify-content:center;gap:7px;font-size:12px;color:var(--brand-rose-deep);white-space:nowrap;padding:10px 13px;border:1px solid var(--brand-rose-border);border-radius:6px;background:#fff9fb}
 .helpButton:hover{background:var(--brand-rose-light)}
+.examplesButton{color:var(--brand-craft-deep);border-color:var(--brand-craft-border);background:var(--brand-craft-light)}
+.examplesButton:hover{background:#fbe0e9;border-color:var(--brand-craft)}
+.examplesButton:focus-visible{outline:2px solid var(--brand-craft-deep);outline-offset:3px}
+@media(max-width:760px){.heading.discoveryHeading{flex-direction:column;gap:15px}.discoveryHeading .headingActions{margin-top:0}.helpButton.examplesButton svg{display:block;width:12px;height:12px}}
 .flow{list-style:none;display:flex;gap:12px;margin:27px 0 0;padding:0 0 21px;border-bottom:1px solid #EBE7E0}
 .flow li{flex:1;min-width:0}.flow button{display:flex;align-items:center;gap:8px;font-size:12px;color:#7A7067;text-align:left;line-height:1.7;border-radius:4px}
 .flow button>span{width:22px;height:22px;display:grid;place-items:center;flex-shrink:0;border:1px solid #EBE7E0;border-radius:50%;font-size:10px}

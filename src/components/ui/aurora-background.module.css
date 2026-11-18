@@ -1,0 +1,18 @@
+.root{position:absolute;inset:0;z-index:-1;pointer-events:none;user-select:none}
+.canvas{position:fixed;inset:0;overflow:hidden;visibility:hidden;pointer-events:none;background:#faf6f5}
+.root[data-visible=true] .canvas{visibility:visible}
+.orb{position:absolute;display:block;width:min(115vw,480px);aspect-ratio:1;border-radius:50%;filter:blur(36px);pointer-events:none;animation-duration:28s;animation-timing-function:ease-in-out;animation-iteration-count:infinite;animation-play-state:paused}
+.root[data-running=true] .orb{animation-play-state:running;will-change:transform}
+.rose{left:-36%;top:5%;opacity:.62;background:radial-gradient(circle at 42% 42%,#b94a70 0%,#dc8ba3 36%,#dc8ba300 72%);animation-name:rose-drift}
+.lavender{right:-40%;top:12%;opacity:.52;background:radial-gradient(circle at 48% 45%,#8971b5 0%,#baa2d5 35%,#baa2d500 72%);animation-name:lavender-drift;animation-duration:34s;animation-delay:-11s}
+.teal{left:5%;bottom:-18%;opacity:.3;background:radial-gradient(circle at 45% 48%,#448f91 0%,#93c1b6 38%,#93c1b600 73%);animation-name:teal-drift;animation-duration:38s;animation-delay:-19s}
+/* A static light veil keeps the text surface calm at every animation position. */
+.canvas::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,#fbf9f6c9 0%,#fbf9f685 48%,#fbf9f630 100%),linear-gradient(0deg,#fbf9f6 0%,#fbf9f600 28%)}
+@keyframes rose-drift{0%,100%{transform:translate3d(0,-4%,0) scale(1)}50%{transform:translate3d(14%,14%,0) scale(1.14)}}
+@keyframes lavender-drift{0%,100%{transform:translate3d(0,0,0) scale(1.08)}50%{transform:translate3d(-18%,15%,0) scale(.96)}}
+@keyframes teal-drift{0%,100%{transform:translate3d(-5%,0,0) scale(1)}50%{transform:translate3d(13%,-17%,0) scale(1.12)}}
+@media(min-width:761px){
+  .orb{width:min(60vw,760px);filter:blur(56px)}
+  .rose{left:10%;top:-36%}.lavender{right:-8%;top:0}.teal{left:33%;bottom:-43%}
+}
+@media(prefers-reduced-motion:reduce){.root .orb{animation:none;will-change:auto}.rose{transform:translate3d(5%,4%,0)}.lavender{transform:translate3d(-6%,3%,0)}.teal{transform:translate3d(2%,-4%,0)}}

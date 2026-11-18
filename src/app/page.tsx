@@ -1,11 +1,14 @@
 import Link from "next/link";
+import Image from "next/image";
 import {
   ArrowRight, Lightbulb, Target, Users, Cpu,
   PenLine, Trophy, Heart, GraduationCap, BookOpen
 } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
 import BrandMark from "@/components/brand/BrandMark";
+import JourneySignature from "@/components/brand/JourneySignature";
 import HeroIdeaScene from "@/components/home/HeroIdeaScene";
+import AuroraBackground from "@/components/ui/AuroraBackground";
 import styles from "./home.module.css";
 
 const STEP_COLORS = [
@@ -39,7 +42,7 @@ export default function HomePage() {
           </Link>
           <Link
             href="/dashboard"
-            className="flex items-center gap-1.5 bg-[#1A1A1A] text-white text-xs sm:text-sm font-medium px-3 sm:px-4 py-2 rounded-full hover:bg-[#2D2D2D] transition-all duration-300 hover:scale-[1.02]"
+            className="flex items-center gap-1.5 bg-[var(--brand-rose)] text-white text-xs sm:text-sm font-medium px-3 sm:px-4 py-2 rounded-full hover:bg-[var(--brand-rose-deep)] transition-all duration-300 hover:scale-[1.02]"
           >
             시작하기 <ArrowRight className="w-3.5 h-3.5" />
           </Link>
@@ -48,6 +51,7 @@ export default function HomePage() {
 
       {/* Hero */}
       <section className={styles.hero} aria-labelledby="hero-title">
+        <AuroraBackground />
         <div className={styles.heroInner}>
           <div className={styles.heroCopy + " hero-enter"}>
             <p className={styles.eyebrow}><Lightbulb size={16} aria-hidden="true" /> 학생의 상상부터, 선생님의 수업까지</p>
@@ -125,7 +129,7 @@ export default function HomePage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <ScrollReveal delay={0} className="h-full">
             <div className="h-full bg-white rounded-3xl border border-[#EBE7E0] p-8 hover:shadow-[0_4px_32px_rgba(0,0,0,0.05)] transition-all duration-300">
-              <img src="/plancraft-logo-remove.png" className="w-10 h-10 rounded-xl object-cover mb-5" alt="" />
+              <Image src="/plancraft-logo-remove.png" width={40} height={40} className="w-10 h-10 rounded-xl object-cover mb-5" alt="" unoptimized />
               <h3 className="text-xl font-bold tracking-tight mb-2">AI 멘토 아이디어봇</h3>
               <p className="text-sm text-[#7A7067] leading-relaxed max-w-sm">
                 각 단계마다 전문 AI가 질문에 답하고, 막힌 부분을 함께 돌파해요. 혼자 고민하지 않아도 돼요.
@@ -199,9 +203,11 @@ export default function HomePage() {
 
       {/* Footer */}
       <footer className="border-t border-[#EBE7E0] px-8 py-8 bg-white">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <BrandMark eager={false} />
-          <p className="text-xs text-[#ADA8A0]">© 2026 PlanCraft</p>
+        <div className="max-w-6xl mx-auto flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <JourneySignature variant="footer" />
+          <p className="text-xs leading-relaxed text-[#7A7067] sm:text-right">
+            Copyright © 2026 인생교수의 AI 연구소. All rights reserved.
+          </p>
         </div>
       </footer>
     </div>

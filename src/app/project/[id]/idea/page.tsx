@@ -8,7 +8,7 @@ import JourneySidebar from "@/components/project-workspace/JourneySidebar";
 import StepHelpDialog from "@/components/project-workspace/StepHelpDialog";
 import { useRouter } from "next/navigation";
 import * as Dialog from "@radix-ui/react-dialog";
-import { ArrowRight, BookOpen, Loader2, X } from "lucide-react";
+import { ArrowRight, BookOpen, ExternalLink, Loader2, X } from "lucide-react";
 import AiChat, { type AiChatHandle } from "@/components/ai-assistant/AiChat";
 import { getProject, updateProject, type ChatMessage } from "@/lib/storage";
 import { useProject } from "@/lib/use-project";
@@ -104,7 +104,7 @@ export default function IdeaPage({ params }: { params: Promise<{ id: string }> }
         <JourneySidebar project={project} step={1} />
 
         <main className={styles.main}>
-          <div className={styles.heading}>
+          <div className={styles.heading + " " + styles.discoveryHeading}>
             <div>
               <p className={styles.eyebrow}>STEP 01 · 생각을 꺼내는 시간</p>
               <h1>아이디어 발굴</h1>
@@ -112,6 +112,14 @@ export default function IdeaPage({ params }: { params: Promise<{ id: string }> }
             </div>
             <div className={styles.headingActions}>
               <button className={styles.helpButton} onClick={() => setHelpOpen(true)}><BookOpen size={14} /> 사용 방법</button>
+              <a
+                className={styles.helpButton + " " + styles.examplesButton}
+                href="https://lifecraft-hub.vercel.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="바이브코딩 서비스 사례 보기 (새 탭)"
+                title="LifeCraft Hub에서 바이브코딩 서비스 사례 살펴보기 (새 탭)"
+              >서비스 사례 <ExternalLink size={14} aria-hidden="true" /></a>
               <FullscreenToggle />
             </div>
           </div>
