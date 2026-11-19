@@ -57,7 +57,10 @@ export default function HomePage() {
           <div className={styles.heroCopy + " hero-enter"}>
             <p className={styles.eyebrow}><Lightbulb size={16} aria-hidden="true" /> 누구나 시작하는 바이브코딩 기획</p>
             <h1 id="hero-title" className={styles.heroTitle}>일상의 불편함을,<br /><span>만들고 싶은 서비스로.</span></h1>
-            <p className={styles.heroLead}>일상 속 불편함도, 수업과 업무를 바꿀 아이디어도.<br className={styles.desktopBreak} /> 아이디어봇과 이야기하며 <strong>만들어보고 싶은 것</strong>을<br className={styles.desktopBreak} /> 나만의 기획서로 정리해보세요.</p>
+            <p className={styles.heroLead}>
+              “이런 게 있으면 좋겠다” 생각해본 적 있나요?<br />
+              아이디어봇과 이야기하며 <strong>나만의 기획서로</strong> 정리해보세요.
+            </p>
             <div className={styles.heroActions}>
               <Link href="/dashboard?type=student" className={styles.studentAction} aria-label="학생으로 내 아이디어 꺼내기">
                 <GraduationCap size={22} aria-hidden="true" />
