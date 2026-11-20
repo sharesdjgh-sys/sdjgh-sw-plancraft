@@ -45,3 +45,4 @@ next-env.d.ts
 
 # Browser automation output; curated comparisons are stored in artifacts/
 /.playwright-mcp/
+/.design-preview-runtime/

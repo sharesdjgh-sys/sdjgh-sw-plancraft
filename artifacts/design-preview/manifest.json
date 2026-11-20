@@ -1,0 +1,21 @@
+{
+  "capturedAt": "2026-11-19",
+  "repository": "https://github.com/sharesdjgh-sys/sdjgh-sw-plancraft",
+  "before": { "ref": "GitHub · main", "sha": "016a045c5f9db9c2d38ae2fc5998b8b5030ec960" },
+  "after": { "ref": "현재 로컬 · main", "sha": "59547c43ed22adcf0ad96acb807376aa7d54dbdc" },
+  "viewports": {
+    "desktop": { "width": 1440, "height": 1000, "label": "데스크톱" },
+    "mobile": { "width": 390, "height": 844, "label": "모바일" }
+  },
+  "screens": [
+    { "id": "home", "label": "히어로", "route": "/", "description": "오로라 배경, 워드마크, 예시 장면과 시작 버튼의 변화를 비교해 보세요." },
+    { "id": "dashboard", "label": "작업 공간", "route": "/dashboard?type=general", "description": "헤더부터 프로젝트 카드, 6단계 안내까지 전체 화면 구성을 비교합니다." },
+    { "id": "guide", "label": "사용 가이드", "route": "/guide?type=general", "description": "서비스의 공통 디자인과 단계별 안내가 어떻게 정리되었는지 확인해 보세요." },
+    { "id": "idea", "label": "01 아이디어 발굴", "route": "/project/design-preview/idea", "description": "기획 여정 사이드바와 아이디어봇 대화, 안내 방식의 변화입니다." },
+    { "id": "story", "label": "02 문제 정의", "route": "/project/design-preview/story", "description": "입력 영역, AI 도우미와 사이드바의 위계와 가독성을 비교합니다." },
+    { "id": "characters", "label": "03 사용자 분석", "route": "/project/design-preview/characters", "description": "사용자 정보와 작업 도구가 배치된 방식을 비교합니다." },
+    { "id": "episodes", "label": "04 기능 설계", "route": "/project/design-preview/episodes", "description": "기능 카드와 편집 화면의 공간 활용을 확인해 보세요." },
+    { "id": "script", "label": "05 기획서 작성", "route": "/project/design-preview/script", "description": "기획서 편집 화면과 상단 도구, 안내 영역의 변화입니다." },
+    { "id": "submit", "label": "06 최종 검토", "route": "/project/design-preview/submit", "description": "최종 검토와 다운로드까지 이어지는 화면을 비교합니다." }
+  ]
+}

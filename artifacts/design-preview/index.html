@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>PlanCraft · 디자인 Before & After</title>
+  <link rel="stylesheet" href="viewer.css">
+</head>
+<body>
+  <header class="header">
+    <a class="brand" href="#"><span>plan</span><span>craft</span><small>DESIGN PREVIEW</small></a>
+    <span class="capture-date">2026.11.19 · 디자인 기록</span>
+  </header>
+  <main>
+    <section class="intro" aria-labelledby="heading">
+      <p class="eyebrow">SAME SERVICE, A NEW EXPERIENCE</p>
+      <h1 id="heading">같은 아이디어, <em>달라진 경험.</em></h1>
+      <p class="lede">GitHub의 이전 화면과 지금의 PlanCraft를 한눈에 비교해 보세요.</p>
+      <div class="revisions">
+        <span><i class="dot before-dot"></i>Before <a href="https://github.com/sharesdjgh-sys/sdjgh-sw-plancraft/commit/016a045c5f9db9c2d38ae2fc5998b8b5030ec960" target="_blank" rel="noopener noreferrer">GitHub main · 016a045 ↗</a></span>
+        <span><i class="dot after-dot"></i>After <b>현재 로컬 · 59547c4</b></span>
+      </div>
+    </section>
+    <section class="workspace" aria-label="디자인 비교">
+      <div class="controls">
+        <div class="segmented" role="group" aria-label="화면 크기">
+          <button type="button" data-viewport="desktop" aria-pressed="true">데스크톱 <small>1440</small></button>
+          <button type="button" data-viewport="mobile" aria-pressed="false">모바일 <small>390</small></button>
+        </div>
+        <div class="right-controls">
+          <div class="segmented" role="group" aria-label="비교 방식">
+            <button type="button" data-mode="split" aria-pressed="true">나란히 보기</button>
+            <button type="button" data-mode="overlay" aria-pressed="false">겹쳐 보기</button>
+          </div>
+          <label class="zoom">크기 <select id="zoom"><option value="fit">화면에 맞춤</option><option value="actual">원본 100%</option></select></label>
+        </div>
+      </div>
+      <nav id="screen-nav" aria-label="비교할 화면"></nav>
+      <div class="screen-heading"><div><h2 id="screen-title">히어로</h2><p id="screen-description"></p></div><span id="screen-count">01 / 09</span></div>
+      <div id="comparison" class="comparison" data-viewport="desktop" data-mode="split" data-zoom="fit">
+        <div class="split-view">
+          <figure><figcaption><span><i class="dot before-dot"></i>BEFORE</span><a id="before-original" target="_blank" rel="noopener">원본 보기 ↗</a></figcaption><div class="canvas"><img id="before-image" width="1440" height="1000" alt=""></div></figure>
+          <figure><figcaption><span><i class="dot after-dot"></i>AFTER</span><a id="after-original" target="_blank" rel="noopener">원본 보기 ↗</a></figcaption><div class="canvas"><img id="after-image" width="1440" height="1000" alt=""></div></figure>
+        </div>
+        <div class="overlay-view" hidden>
+          <div class="overlay-labels"><span>BEFORE · GitHub</span><span>AFTER · 현재</span></div>
+          <div class="overlay-scroll"><div class="overlay-stage" id="overlay-stage">
+            <img id="overlay-after" width="1440" height="1000" alt="">
+            <img id="overlay-before" width="1440" height="1000" alt="">
+            <span class="divider" aria-hidden="true"><span>↔</span></span>
+          </div></div>
+          <label class="slider-label" for="reveal">슬라이더를 움직여 변화를 확인하세요 <output id="reveal-value" for="reveal">50%</output></label>
+          <input id="reveal" type="range" min="0" max="100" value="50" aria-label="Before 화면 비율" aria-valuetext="Before 50%, After 50%">
+        </div>
+      </div>
+      <p id="load-error" role="alert" hidden>이미지를 불러오지 못했습니다. shots 폴더가 함께 있는지 확인해 주세요.</p>
+      <p class="comparison-note" id="comparison-note" aria-live="polite"></p>
+    </section>
+    <footer>동일한 예시 프로젝트 · 동일한 화면 크기 · 애니메이션 정지 상태의 실제 화면 캡처<br>이 프리뷰는 위 커밋 기준의 디자인 기록입니다. 화면 속 버튼은 캡처 이미지에 포함되어 있습니다.</footer>
+  </main>
+  <script src="viewer.js"></script>
+</body>
+</html>
