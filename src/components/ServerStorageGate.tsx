@@ -14,6 +14,7 @@ export default function ServerStorageGate({ children }: { children: ReactNode })
   const [legacyCount, setLegacyCount] = useState(0);
   const [collisionCount, setCollisionCount] = useState(0);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [storageNoticeClosed, setStorageNoticeClosed] = useState(false);
   const [migrating, setMigrating] = useState(false);
 
   useEffect(() => {
@@ -101,7 +102,7 @@ export default function ServerStorageGate({ children }: { children: ReactNode })
   </main>;
 
   return <>
-    {status === "ready" && <div role="status" className="bg-[#FFF2F5] px-4 py-2 text-center text-sm text-[#6C4050]">
+    {status === "ready" && (!storageNoticeClosed || saveError) && <div role="status" className="relative bg-[#FFF2F5] px-10 py-2 text-center text-sm text-[#6C4050]">
       서버 저장 연결됨{saveError ? ` · 저장 오류: ${saveError}` : ""}
       {saveError && <button type="button" onClick={() => void retryServerWrites()} className="ml-3 font-semibold underline">저장 다시 시도</button>}
       {legacyCount > 0 && <button type="button" disabled={migrating} onClick={() => void migrate()} className="ml-3 font-semibold underline disabled:opacity-50">
@@ -112,6 +113,7 @@ export default function ServerStorageGate({ children }: { children: ReactNode })
         <button type="button" onClick={backupCollisions} className="ml-3 font-semibold underline">브라우저 원본 JSON 백업</button>
       </>}
       {message && <span className="ml-3">{message}</span>}
+      {!saveError && <button type="button" aria-label="서버 저장 안내 닫기" title="서버 저장 안내 닫기" onClick={() => setStorageNoticeClosed(true)} className="absolute right-3 top-1/2 -translate-y-1/2 rounded p-1 text-lg leading-none hover:bg-[#F9E2E9] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#6C4050]">×</button>}
     </div>}
     {status === "direct" && <div role="status" className="bg-amber-50 px-4 py-2 text-center text-sm text-amber-900">
       브라우저 저장 중 · 학교 컴퓨터에서는 재부팅 후 사라질 수 있어요. <a href={SMART_CAMPUS_ORIGIN} className="font-semibold underline">스마트 캠퍼스에서 서버 저장 사용</a>
