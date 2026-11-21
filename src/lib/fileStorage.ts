@@ -1,6 +1,8 @@
 // File System Access API — Chrome/Edge only
 // Persists FileSystemDirectoryHandle in IndexedDB so it survives page reloads
 
+import { flushServerWrites, isServerStorageActive } from "./storage";
+
 const DB_NAME = "plancraft_fs";
 const STORE_NAME = "handles";
 const DB_VERSION = 1;
@@ -63,6 +65,7 @@ export function isFileSystemAccessSupported(): boolean {
  * Returns true if the user selected a folder, false if cancelled or unsupported.
  */
 export async function requestDirectory(projectId: string): Promise<boolean> {
+  if (isServerStorageActive()) return false;
   if (!isFileSystemAccessSupported()) return false;
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -93,6 +96,10 @@ export async function hasDirectory(projectId: string): Promise<boolean> {
  * Returns true on success, false if no directory is stored or the write fails.
  */
 export async function saveProjectToDir(projectId: string, project: unknown): Promise<boolean> {
+  if (isServerStorageActive()) {
+    await flushServerWrites();
+    return true;
+  }
   if (!isFileSystemAccessSupported()) return false;
   try {
     const dirHandle = await getHandle(projectId);

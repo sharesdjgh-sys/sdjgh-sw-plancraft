@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useSyncExternalStore } from "react";
-import { getProject, getProjects, PROJECTS_CHANGED_EVENT } from "./storage";
+import { getProject, getProjects, getProjectsSnapshot, PROJECTS_CHANGED_EVENT } from "./storage";
 
 function subscribe(onChange: () => void) {
   window.addEventListener(PROJECTS_CHANGED_EVENT, onChange);
@@ -12,7 +12,7 @@ function subscribe(onChange: () => void) {
   };
 }
 function getSnapshot() {
-  try { return localStorage.getItem("plancraft_projects") ?? "[]"; } catch { return "[]"; }
+  return getProjectsSnapshot();
 }
 const getServerSnapshot = () => null;
 

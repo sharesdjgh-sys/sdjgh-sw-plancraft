@@ -102,34 +102,42 @@ export default function ScriptPage({ params }: { params: Promise<{ id: string }>
 
   const save = async () => {
     setSaving(true);
-    updateProject(id, {
-      proposalScript,
-      currentStep: Math.max(5, getProject(id)?.currentStep ?? 1),
-    });
-    await saveProjectToDir(id, getProject(id));
-    setSaving(false);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    try {
+      updateProject(id, {
+        proposalScript,
+        currentStep: Math.max(5, getProject(id)?.currentStep ?? 1),
+      });
+      await saveProjectToDir(id, getProject(id));
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch (error) {
+      setSaved(false);
+      alert(error instanceof Error ? error.message : "저장에 실패했어요.");
+    } finally { setSaving(false); }
   };
 
   const goNext = async () => {
     if (!proposalScript.trim()) { setShowEmptyModal(true); return; }
-    updateProject(id, {
-      proposalScript,
-      currentStep: Math.max(5, getProject(id)?.currentStep ?? 1),
-    });
-    await saveProjectToDir(id, getProject(id));
-    router.push(`/project/${id}/submit`);
+    try {
+      updateProject(id, {
+        proposalScript,
+        currentStep: Math.max(5, getProject(id)?.currentStep ?? 1),
+      });
+      await saveProjectToDir(id, getProject(id));
+      router.push(`/project/${id}/submit`);
+    } catch (error) { alert(error instanceof Error ? error.message : "저장에 실패했어요."); }
   };
 
   const goNextAnyway = async () => {
     setShowEmptyModal(false);
-    updateProject(id, {
-      proposalScript,
-      currentStep: Math.max(5, getProject(id)?.currentStep ?? 1),
-    });
-    await saveProjectToDir(id, getProject(id));
-    router.push(`/project/${id}/submit`);
+    try {
+      updateProject(id, {
+        proposalScript,
+        currentStep: Math.max(5, getProject(id)?.currentStep ?? 1),
+      });
+      await saveProjectToDir(id, getProject(id));
+      router.push(`/project/${id}/submit`);
+    } catch (error) { alert(error instanceof Error ? error.message : "저장에 실패했어요."); }
   };
 
   const autofill = async () => {

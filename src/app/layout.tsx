@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import ServerStorageGate from "@/components/ServerStorageGate";
 import "./globals.css";
 
 const lineSeed = localFont({
@@ -28,7 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ko" className={`${lineSeed.variable} ${roundedSmile.variable} h-full`}>
       <body className="min-h-full flex flex-col">
-        {children}
+        <ServerStorageGate>{children}</ServerStorageGate>
       </body>
     </html>
   );

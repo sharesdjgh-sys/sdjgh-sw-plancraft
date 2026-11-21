@@ -10,7 +10,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import * as Dialog from "@radix-ui/react-dialog";
 import { ArrowRight, BookOpen, Check, Download, Loader2, Pencil, Plus, Search, Trash2, Upload, X } from "lucide-react";
 import { GENRES, STEPS } from "@/lib/utils";
-import { createProject, deleteProject, updateProject, type Project, type UserType } from "@/lib/storage";
+import { createProject, deleteProject, flushServerWrites, isServerStorageActive, updateProject, type Project, type UserType } from "@/lib/storage";
 import { useProjects } from "@/lib/use-project";
 import { getDaysUntil, getProjectHref, getProjectProgress } from "@/lib/project-status";
 import { exportAllProjects, importProjects } from "@/lib/download";
@@ -39,6 +39,7 @@ function DashboardContent() {
   const preferredUserType: UserType = searchParams.get("type") === "general" ? "general" : "student";
   const stored = useProjects();
   const projects = stored ?? [];
+  const serverStorage = isServerStorageActive();
   const [filter, setFilter] = useState<Filter>("all");
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<Sort>("recent");
@@ -96,23 +97,25 @@ function DashboardContent() {
       const data = { ...form, title: form.title.trim(), author: form.author.trim(), targetCompetition: form.targetCompetition.trim() };
       if (editingId) {
         updateProject(editingId, data);
+        await flushServerWrites();
         setShowModal(false);
         setNotice("프로젝트 정보를 저장했어요.");
       } else {
         const project = createProject(data);
-        if (connectFolder && isFileSystemAccessSupported()) await requestDirectory(project.id);
+        await flushServerWrites();
+        if (!serverStorage && connectFolder && isFileSystemAccessSupported()) await requestDirectory(project.id);
         setShowModal(false);
         router.push(getProjectHref(project));
       }
-    } catch {
-      setFormError("저장하지 못했어요. 브라우저 저장 공간과 설정을 확인해주세요.");
+    } catch (error) {
+      setFormError(error instanceof Error ? error.message : "프로젝트를 저장하지 못했어요.");
     } finally { setCreating(false); }
   }
 
   async function handleImport(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
-    try { await importProjects(file); setNotice("프로젝트를 가져왔어요. 같은 프로젝트는 백업 파일의 내용으로 업데이트됩니다."); }
+    try { await importProjects(file); setNotice(serverStorage ? "프로젝트를 서버에 복사했어요. 같은 ID는 새 프로젝트로 추가됩니다." : "프로젝트를 가져왔어요. 같은 프로젝트는 백업 파일의 내용으로 업데이트됩니다."); }
     catch (error) { setNotice(error instanceof Error ? error.message : "백업 파일을 가져오지 못했어요."); }
     finally { event.target.value = ""; }
   }
@@ -128,10 +131,11 @@ function DashboardContent() {
     setDeleteError("");
     try {
       deleteProject(deleteTarget.id);
+      await flushServerWrites();
       await clearDirectory(deleteTarget.id);
       setDeleteTarget(null);
       setNotice("프로젝트를 삭제했어요.");
-    } catch { setDeleteError("삭제하지 못했어요. 다시 시도해주세요."); }
+    } catch (error) { setDeleteError(error instanceof Error ? error.message : "삭제하지 못했어요. 다시 시도해주세요."); }
     finally { setDeleting(false); }
   }
 
@@ -153,7 +157,7 @@ function DashboardContent() {
           <div className={styles.sidebarFooter}>
             <p className={styles.toolsLabel}>데이터 보관</p>
             <div className={styles.backupTools}>{backupButtons}</div>
-            <p className={styles.localNote}>프로젝트는 현재 브라우저에 저장돼요.<br />백업 파일을 따로 보관해주세요.</p>
+            <p className={styles.localNote}>{serverStorage ? "스마트 캠퍼스 계정의 서버에 저장돼요." : <>프로젝트는 현재 브라우저에 저장돼요.<br />백업 파일을 따로 보관해주세요.</>}</p>
           </div>
         } />
 
@@ -242,8 +246,8 @@ function DashboardContent() {
             <div className={styles.field}><label htmlFor="dashboard-title">프로젝트 제목 <span>필수</span></label><input id="dashboard-title" value={form.title} onChange={(event) => setForm((value) => ({ ...value, title: event.target.value }))} placeholder={form.userType === "general" ? "예: 모임 일정을 한곳에" : "예: 학교 알림을 한곳에"} maxLength={120} required /></div>
             <div className={styles.formRow}><div className={styles.field}><label htmlFor="dashboard-author">작성자 또는 팀 이름</label><input id="dashboard-author" value={form.author} onChange={(event) => setForm((value) => ({ ...value, author: event.target.value }))} placeholder="이름 또는 팀 이름" /></div><div className={styles.field}><label htmlFor="dashboard-genre">아이디어 분야</label><select id="dashboard-genre" value={form.genre} onChange={(event) => setForm((value) => ({ ...value, genre: event.target.value }))}><option value="">나중에 선택</option>{GENRES.map((genre) => <option key={genre}>{genre}</option>)}</select></div></div>
             <div className={styles.formRow}><div className={styles.field}><label htmlFor="dashboard-target">{form.userType === "general" ? "활용 분야·프로그램" : "참가 공모전"}</label><input id="dashboard-target" value={form.targetCompetition} onChange={(event) => setForm((value) => ({ ...value, targetCompetition: event.target.value }))} placeholder="선택 사항" /></div><div className={styles.field}><label htmlFor="dashboard-deadline">{form.userType === "general" ? "목표 완료일" : "마감일"}</label><input id="dashboard-deadline" type="date" value={form.deadline} onChange={(event) => setForm((value) => ({ ...value, deadline: event.target.value }))} /></div></div>
-            {!editingId && isFileSystemAccessSupported() && <label className={styles.folderOption}><input type="checkbox" checked={connectFolder} onChange={(event) => setConnectFolder(event.target.checked)} /><span>작성 내용을 저장할 폴더 연결 <small>선택</small></span></label>}
-            <p className={styles.formNote}>{form.userType === "general" ? "선생님·일반 사용자" : "학생"} 모드 · 프로젝트는 현재 브라우저에 저장됩니다.</p>
+            {!serverStorage && !editingId && isFileSystemAccessSupported() && <label className={styles.folderOption}><input type="checkbox" checked={connectFolder} onChange={(event) => setConnectFolder(event.target.checked)} /><span>작성 내용을 저장할 폴더 연결 <small>선택</small></span></label>}
+            <p className={styles.formNote}>{form.userType === "general" ? "선생님·일반 사용자" : "학생"} 모드 · 프로젝트는 {serverStorage ? "스마트 캠퍼스 서버" : "현재 브라우저"}에 저장됩니다.</p>
             {formError && <p className={styles.formError} role="alert">{formError}</p>}
             <div className={styles.formActions}><Dialog.Close type="button" disabled={creating} className={base.secondary}>취소</Dialog.Close><button type="submit" className={base.primary} disabled={creating}>{creating ? <Loader2 size={14} className="animate-spin" /> : editingId ? <Check size={14} /> : <Plus size={14} />}{creating ? "저장 중..." : editingId ? "변경 사항 저장" : "프로젝트 시작하기"}</button></div>
           </form>
@@ -253,7 +257,7 @@ function DashboardContent() {
 
       <Dialog.Root open={deleteTarget !== null} onOpenChange={(open) => { if (!open && !deleting) setDeleteTarget(null); }}>
         <Dialog.Portal><Dialog.Overlay className={base.overlay} /><Dialog.Content className={base.dialog}>
-          <p className={base.eyebrow}>프로젝트 관리</p><Dialog.Title>프로젝트를 삭제할까요?</Dialog.Title><Dialog.Description>‘{deleteTarget?.title}’ 프로젝트가 이 브라우저에서 삭제됩니다. 이 작업은 되돌릴 수 없으니 필요한 내용은 먼저 백업해주세요.</Dialog.Description>
+          <p className={base.eyebrow}>프로젝트 관리</p><Dialog.Title>프로젝트를 삭제할까요?</Dialog.Title><Dialog.Description>‘{deleteTarget?.title}’ 프로젝트가 {serverStorage ? "스마트 캠퍼스 서버" : "이 브라우저"}에서 삭제됩니다. 이 작업은 되돌릴 수 없으니 필요한 내용은 먼저 백업해주세요.</Dialog.Description>
           {deleteError && <p className={styles.formError} role="alert">{deleteError}</p>}
           <div className={base.dialogActions}><Dialog.Close disabled={deleting} className={base.secondary}>취소</Dialog.Close><button onClick={handleDelete} disabled={deleting} className={base.primary}>{deleting ? "삭제 중..." : "프로젝트 삭제"}</button></div>
           <Dialog.Close className={base.close} disabled={deleting} aria-label="삭제 창 닫기"><X size={19} /></Dialog.Close>

@@ -1,4 +1,4 @@
-import { type Project, getProjects, saveProjects, isProject } from "./storage";
+import { type Project, flushServerWrites, getProjects, isProject, isServerStorageActive, saveProjects } from "./storage";
 
 function triggerDownload(filename: string, content: string, mimeType: string) {
   const blob = new Blob([content], { type: mimeType });
@@ -21,7 +21,7 @@ export function exportAllProjects() {
 export function importProjects(file: File): Promise<void> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       try {
         const parsed = JSON.parse(e.target?.result as string);
 
@@ -38,18 +38,30 @@ export function importProjects(file: File): Promise<void> {
 
         if (!incoming.every(isProject)) throw new Error();
         const existing = getProjects();
-        for (const project of incoming) {
-          const idx = existing.findIndex((p) => p.id === project.id);
-          if (idx !== -1) {
-            existing[idx] = project; // 동일 ID → 덮어쓰기
-          } else {
-            existing.unshift(project); // 새 프로젝트 → 맨 앞에 추가
+        if (isServerStorageActive()) {
+          const ids = new Set(existing.map(project => project.id));
+          const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+          const additions = incoming.map(project => {
+            const id = uuid.test(project.id) && !ids.has(project.id) ? project.id : crypto.randomUUID();
+            ids.add(id);
+            return { ...project, id };
+          });
+          saveProjects([...additions, ...existing]);
+        } else {
+          for (const project of incoming) {
+            const idx = existing.findIndex((p) => p.id === project.id);
+            if (idx !== -1) {
+              existing[idx] = project; // 동일 ID → 덮어쓰기
+            } else {
+              existing.unshift(project); // 새 프로젝트 → 맨 앞에 추가
+            }
           }
+          saveProjects(existing);
         }
-        saveProjects(existing);
+        await flushServerWrites();
         resolve();
-      } catch {
-        reject(new Error("올바른 백업 파일이 아니에요."));
+      } catch (error) {
+        reject(error instanceof Error ? error : new Error("올바른 백업 파일이 아니에요."));
       }
     };
     reader.onerror = () => reject(new Error("파일을 읽지 못했어요. 다시 선택해주세요."));
